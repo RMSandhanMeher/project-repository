@@ -164,6 +164,8 @@ keyframes ripple {to { transform:scale(4);
 </head>
 <body class="bg-gray-50 min-h-screen p-4">
 	<!-- Navbar -->
+	<jsp:include page="./../../navbar/NavRecipient.jsp" />
+	<div class="h-20"></div>
 	<jsp:include page="NavBar.jsp" />
 	<!-- Booking Loading Overlay -->
 	<div id="bookingOverlay"

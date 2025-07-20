@@ -14,7 +14,9 @@
 </style>
 </head>
 <body class="bg-gray-100 min-h-screen p-6">
-
+	<!-- Navbar -->
+	<jsp:include page="./../../navbar/NavRecipient.jsp" />
+	<div class="h-20"></div>
 	<jsp:include page="NavBar.jsp" />
 
 	<div class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
