@@ -29,25 +29,23 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	// Generates the next appointment ID in APPT### format
 	public static String generateNextAppointmentId(Session session) {
 		String prefix = "APPT";
-		String hql = "SELECT a.appointmentId FROM Appointment a ORDER BY a.appointmentId DESC";
 
-		Query query = session.createQuery(hql);
-		query.setMaxResults(1);
+		try {
+			// Native SQL for extracting numeric part
+			String sql = "SELECT MAX(CAST(SUBSTRING(appointment_id, 5) AS UNSIGNED)) FROM appointment";
+			Query query = session.createSQLQuery(sql);
 
-		String lastId = (String) query.uniqueResult();
+			Number result = (Number) query.uniqueResult(); // It returns Long or BigInteger
+			int nextNumber = (result != null) ? result.intValue() + 1 : 101;
 
-		int nextNumber = 101;
-		if (lastId != null && lastId.startsWith(prefix)) {
-			try {
-				int lastNumber = Integer.parseInt(lastId.substring(prefix.length()));
-				nextNumber = lastNumber + 1;
-			} catch (NumberFormatException e) {
-				System.err.println("Warning: Could not parse number from last appointment ID: " + lastId
-						+ ". Starting from default " + nextNumber);
-			}
+			// Format to 3-digit padded number: APPT001, APPT124
+			return prefix + String.format("%06d", nextNumber);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			// In case of any error, fallback to APPT101
+			return prefix + "000001";
 		}
-
-		return prefix + nextNumber;
 	}
 
 	public String bookAnAppointment(Appointment appointment) {
@@ -134,8 +132,8 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			}
 
 			// VALIDATION 6: Check if max capacity is reached for this availability
-			Query bookedCountQuery = session.createQuery(
-					"SELECT COUNT(*) FROM Appointment WHERE availability.availabilityId = :availabilityId "
+			Query bookedCountQuery = session
+					.createQuery("SELECT COUNT(*) FROM Appointment WHERE availability.availabilityId = :availabilityId "
 							+ "AND status IN ('BOOKED', 'PENDING')");
 			bookedCountQuery.setParameter("availabilityId", availabilityId);
 			long bookedCount = (Long) bookedCountQuery.uniqueResult();
@@ -249,8 +247,8 @@ public class AppointmentDaoImpl implements AppointmentDao {
 
 			Session session = SessionHelper.getSessionFactory().openSession();
 			// Step 1: Get total booked/pending appointments for the availability
-			Query countQuery = session.createQuery(
-					"SELECT COUNT(*) FROM Appointment WHERE availability.availabilityId = :availabilityId "
+			Query countQuery = session
+					.createQuery("SELECT COUNT(*) FROM Appointment WHERE availability.availabilityId = :availabilityId "
 							+ "AND status IN ('BOOKED', 'PENDING')");
 			countQuery.setParameter("availabilityId", availabilityId);
 			long bookedCount = (Long) countQuery.uniqueResult();
@@ -295,7 +293,6 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			return null;
 		}
 	}
-
 
 	@Override
 	public List<Appointment> getPastAppointmentsByRecipient(String recipientId) {

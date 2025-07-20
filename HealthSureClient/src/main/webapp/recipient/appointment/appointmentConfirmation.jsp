@@ -66,12 +66,10 @@
 					<h:form>
 						<!-- Action buttons -->
 						<div class="button-group">
-							<h:commandButton value="Book Another Appointment"
-								action="doctorAvailabilityList"
-								styleClass="btn btn-primary focus-ring" />
-
-							<h:commandButton value="Back to Home" action="providerList"
-								styleClass="btn btn-secondary focus-ring" />
+							<h:outputLink value="./../SearchProviders.jsf"
+								styleClass="btn btn-primary focus-ring">Book Another Appointment</h:outputLink>
+							<h:outputLink value="./../../home/Home.jsf"
+								styleClass="btn btn-secondary focus-ring">Back to Home</h:outputLink>
 						</div>
 					</h:form>
 				</div>

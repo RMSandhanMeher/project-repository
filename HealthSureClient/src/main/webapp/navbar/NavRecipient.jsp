@@ -17,7 +17,7 @@
         <ul class="nav-links">
         
             <li><a href="RecipientDashBoard.jsf" class="nav-link">DashBoard</a></li>
-            <li><a href="Appointment.jsf" class="nav-link">My Appointments</a></li>
+            <li><a href="${pageContext.request.contextPath}/recipient/appointment/doctorAvailabilityList.jsf" class="nav-link">My Appointments</a></li>
             <li><a href="ShowInsurance.jsf" class="nav-link">My Insurance</a></li>
             <li><a href="SearchProviders.jsf" class="nav-link">Find Doctors</a></li>
 			<li><a href="Reports.jsf" class="nav-link">Reports</a></li>

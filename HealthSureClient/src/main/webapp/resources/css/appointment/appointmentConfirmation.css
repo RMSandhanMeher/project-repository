@@ -3,13 +3,13 @@
 .confirmation-page {
     background-color: #f3f4f6;
     min-height: 100vh;
-    padding: 1.5rem;
+    padding: 0.5rem; /* Reduced page padding */
 }
 
 /* Card styles */
 .confirmation-card {
     transition: all 0.3s ease;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
                 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     background-color: white;
     border-radius: 0.75rem;
@@ -19,7 +19,7 @@
 /* Header styles */
 .card-header {
     background: linear-gradient(to right, #2563eb, #1e40af);
-    padding: 1.5rem;
+    padding: 0.75rem; /* Reduced from 1rem */
     text-align: center;
 }
 
@@ -28,30 +28,30 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 4rem;
-    width: 4rem;
+    height: 2rem; /* Further reduced height */
+    width: 3rem;  /* Further reduced width */
     border-radius: 9999px;
     background-color: rgba(255, 255, 255, 0.1);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.1rem; /* Reduced from 0.5rem */
 }
 
 .header-icon {
     color: white;
-    font-size: 1.5rem;
+    font-size: 1.2rem; /* Further reduced icon size */
 }
 
 .card-title {
-    font-size: 1.5rem;
+    font-size: 1.25rem; /* Further reduced title font size */
     font-weight: 700;
     color: white;
 }
 
 /* Content area */
 .card-content {
-    padding: 1.5rem;
+    padding: 0.75rem; /* Reduced from 1.25rem */
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 0.75rem; /* Reduced from 1.25rem */
 }
 
 /* Success message */
@@ -59,7 +59,7 @@
     background-color: #f0fdf4;
     border-left: 4px solid #10b981;
     border-radius: 0 0.375rem 0.375rem 0;
-    padding: 0.75rem 1rem;
+    padding: 0.5rem 0.75rem; /* Reduced padding */
     display: flex;
     align-items: flex-start;
 }
@@ -67,12 +67,13 @@
 .success-icon {
     color: #10b981;
     flex-shrink: 0;
-    padding-top: 0.25rem;
+    padding-top: 0.1rem; /* Reduced padding */
+    font-size: 0.9rem; /* Adjusted icon size */
 }
 
 .success-text {
-    margin-left: 0.75rem;
-    font-size: 0.875rem;
+    margin-left: 0.5rem; /* Reduced from 0.75rem */
+    font-size: 0.8rem; /* Slightly reduced font size */
     font-weight: 500;
     color: #065f46;
 }
@@ -80,12 +81,12 @@
 /* Info cards */
 .info-grid {
     display: grid;
-    gap: 1rem;
+    gap: 0.5rem; /* Reduced from 0.8rem */
 }
 
 .info-card {
     border-radius: 0.5rem;
-    padding: 1rem;
+    padding: 0.6rem; /* Reduced from 0.8rem */
     border-width: 1px;
 }
 
@@ -100,9 +101,9 @@
 }
 
 .info-title {
-    font-size: 0.875rem;
+    font-size: 0.8rem; /* Reduced from 0.875rem */
     font-weight: 500;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.2rem; /* Reduced from 0.4rem */
 }
 
 .info-title-blue {
@@ -116,15 +117,15 @@
 .info-list {
     list-style-type: disc;
     list-style-position: inside;
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* Reduced from 0.875rem */
     color: #4b5563;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.125rem; /* Reduced from 0.25rem */
 }
 
 .info-text {
-    font-size: 0.875rem;
+    font-size: 0.75rem; /* Reduced from 0.875rem */
     color: #4b5563;
 }
 
@@ -140,7 +141,7 @@
 .button-group {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: 0.5rem; /* Reduced from 0.75rem */
 }
 
 @media (min-width: 640px) {
@@ -151,9 +152,9 @@
 
 .btn {
     flex: 1;
-    padding: 0.5rem 1rem;
+    padding: 0.2rem 0.8rem; /* Reduced from 0.5rem 1rem */
     border-radius: 0.5rem;
-    font-size: 0.875rem;
+    font-size: 0.8rem; /* Reduced from 0.875rem */
     font-weight: 500;
     text-align: center;
     cursor: pointer;
@@ -201,7 +202,7 @@
 
 /* Spacing utilities */
 .spacer {
-    height: 5rem;
+    height: 3rem; /* Reduced from 5rem */
 }
 
 /* Container styles */
@@ -209,12 +210,12 @@
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem;
-    padding-right: 1rem;
+    padding-left: 0.5rem; /* Reduced from 1rem */
+    padding-right: 0.5rem; /* Reduced from 1rem */
 }
 
 .max-w-sm {
-    max-width: 24rem;
+    max-width: 24rem; /* Kept max-width same to maintain horizontal proportion */
 }
 
 .mx-auto {
