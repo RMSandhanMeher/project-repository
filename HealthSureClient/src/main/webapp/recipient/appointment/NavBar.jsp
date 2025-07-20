@@ -1,3 +1,4 @@
+<script src="https://cdn.tailwindcss.com"></script>
 <nav
     class="bg-white backdrop-blur-md text-gray-800 px-6 py-4 rounded-2xl shadow-lg mb-6 border border-gray-200">
 
