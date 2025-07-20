@@ -2,7 +2,7 @@ package com.infinite.jsf.provider.model;
 
 import java.sql.Time;
 import java.sql.Timestamp;
-import java.util.Date;
+import java.sql.Date;
 
 public class DoctorAvailability {
 	private String availabilityId;
