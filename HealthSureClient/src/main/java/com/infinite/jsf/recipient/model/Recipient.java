@@ -13,7 +13,7 @@ import com.infinite.jsf.provider.model.Claims;
 import com.infinite.jsf.provider.model.MedicalProcedure;
 import com.infinite.jsf.provider.model.Prescription;
 
-public class Recipient implements Serializable{
+public class Recipient implements Serializable {
 	private String hId; // Health ID
 	private String firstName;
 	private String lastName;
@@ -28,7 +28,6 @@ public class Recipient implements Serializable{
 	private String email;
 	private RecipientStatus status;
 
-	// Relationships
 	private Set<Appointment> appointments;
 	private Set<MedicalProcedure> procedures;
 	private Set<Subscribe> subscriptions;
@@ -88,7 +87,7 @@ public class Recipient implements Serializable{
 	}
 
 	public void setFullName(String firstName, String lastName) {
-		this.fullName = getFirstName() +" "+getLastName();
+		this.fullName = getFirstName() + " " + getLastName();
 	}
 
 	public String getMobile() {
@@ -162,8 +161,6 @@ public class Recipient implements Serializable{
 	public void setStatus(RecipientStatus status) {
 		this.status = status;
 	}
-
-	
 
 	// Relationship getters and setters
 	public Set<Appointment> getAppointments() {

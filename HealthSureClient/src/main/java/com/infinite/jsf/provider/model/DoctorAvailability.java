@@ -11,13 +11,19 @@ public class DoctorAvailability {
 	private Time startTime;
 	private Time endTime;
 	private SlotType slotType;
-	private Integer maxCapacity;
+	private int maxCapacity;
 	private Boolean isRecurring;
 	private String notes;
 	private Timestamp createdAt;
+	private int patientWindow;
 
-	// One-to-One bidirectional relationship with Appointment
-	private Appointment appointment;
+	public int getPatientWindow() {
+		return patientWindow;
+	}
+
+	public void setPatientWindow(int patientWindow) {
+		this.patientWindow = patientWindow;
+	}
 
 	// Constructors
 	public DoctorAvailability() {
@@ -116,21 +122,12 @@ public class DoctorAvailability {
 		this.createdAt = createdAt;
 	}
 
-	public Appointment getAppointment() {
-		return appointment;
-	}
-
-	public void setAppointment(Appointment appointment) {
-		this.appointment = appointment;
-	}
-
 	@Override
 	public String toString() {
 		return "DoctorAvailability [availabilityId=" + availabilityId + ", doctor=" + doctor + ", availableDate="
 				+ availableDate + ", startTime=" + startTime + ", endTime=" + endTime + ", slotType=" + slotType
 				+ ", maxCapacity=" + maxCapacity + ", isRecurring=" + isRecurring + ", notes=" + notes + ", createdAt="
-				+ createdAt + ", appointment=" + appointment + "]";
+				+ createdAt + ", patientWindow=" + patientWindow + "]";
 	}
 
-	
 }

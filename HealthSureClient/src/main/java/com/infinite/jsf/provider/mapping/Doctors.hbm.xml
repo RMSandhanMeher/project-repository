@@ -4,49 +4,58 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="com.infinite.jsf.provider.model.Doctors" table="Doctors">
-        
-        <id name="doctorId" column="doctor_id">
-            <generator class="assigned"/>
-        </id>
+	<class name="com.infinite.jsf.provider.model.Doctors"
+		table="Doctors">
 
-        <many-to-one name="provider" column="provider_id" class="com.infinite.jsf.provider.model.Provider" not-null="false"  fetch = "join" lazy ="false"/>
+		<id name="doctorId" column="doctor_id">
+			<generator class="assigned" />
+		</id>
 
-        <property name="doctorName" column="doctor_name"/>
-        <property name="qualification" column="qualification"/>
-        <property name="specialization" column="specialization"/>
-        <property name="licenseNo" column="license_no"/>
-        <property name="email" column="email"/>
-        <property name="address" column="address"/>
+		<many-to-one name="provider" column="provider_id"
+			class="com.infinite.jsf.provider.model.Provider" not-null="false"
+			fetch="join" lazy="false" />
 
-        <property name="gender">
-            <column name="gender"/>
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">com.infinite.jsf.provider.model.Gender</param>
-                <param name="type">12</param>
-            </type>
-        </property>
+		<property name="doctorName" column="doctor_name" />
+		<property name="qualification" column="qualification" />
+		<property name="specialization" column="specialization" />
+		<property name="licenseNo" column="license_no" />
+		<property name="email" column="email" />
+		<property name="address" column="address" />
 
-        <property name="type">
-            <column name="type"/>
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">com.infinite.jsf.provider.model.DoctorType</param>
-                <param name="type">12</param>
-            </type>
-        </property>
+		<property name="gender">
+			<column name="gender" />
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">com.infinite.jsf.provider.model.Gender</param>
+				<param name="type">12</param>
+			</type>
+		</property>
 
-        <property name="status">
-            <column name="doctor_status"/>
-            <type name="org.hibernate.type.EnumType">
-                <param name="enumClass">com.infinite.jsf.provider.model.DoctorStatus</param>
-                <param name="type">12</param>
-            </type>
-        </property>
-        
+		<property name="type">
+			<column name="type" />
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">com.infinite.jsf.provider.model.DoctorType</param>
+				<param name="type">12</param>
+			</type>
+		</property>
 
-    </class>
-    
-     <query name="fetchAllSpecializations">
-    select distinct specialization from Doctors
-</query>
+		<property name="status">
+			<column name="doctor_status" />
+			<type name="org.hibernate.type.EnumType">
+				<param name="enumClass">com.infinite.jsf.provider.model.DoctorStatus</param>
+				<param name="type">12</param>
+			</type>
+		</property>
+		<set name="availabilityList" table="doctor_availability"
+			inverse="true" cascade="all-delete-orphan">
+			<key column="doctor_id" />
+			<one-to-many
+				class="com.infinite.jsf.provider.model.DoctorAvailability" />
+		</set>
+
+
+	</class>
+
+	<query name="fetchAllSpecializations">
+		select distinct specialization from Doctors
+	</query>
 </hibernate-mapping>
