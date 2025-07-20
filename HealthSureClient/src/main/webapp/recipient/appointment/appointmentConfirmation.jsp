@@ -19,7 +19,7 @@
 	<jsp:include page="NavBar.jsp" />
 	<div class="page-container">
 		<div class="max-w-sm mx-auto">
-			<div class="confirmation-card">
+			<div class="confirmation-card" style="margin-top: 180px">
 				<!-- Header with gradient background -->
 				<div class="card-header">
 					<div class="header-icon-container">
