@@ -18,7 +18,6 @@
 </head>
 <body class="body-bg-color min-h-screen-full p-4-spacing">
 	<jsp:include page="./../../navbar/NavRecipient.jsp" />
-	<div class="h-20-spacing"></div>
 	<jsp:include page="NavBar.jsp" />
 	<div id="bookingOverlay" class="booking-overlay">
 		<div class="booking-overlay-content">
@@ -35,7 +34,7 @@
 		</div>
 	</div>
 
-	<div class="main-container-card">
+	<div class="main-container-card" style=" margin-top: 165px">
 		<div class="header-section-flex">
 			<h1 class="header-title transform-hover">
 				<i class="fas fa-calendar-alt mr-2-spacing"></i> Book Appointment

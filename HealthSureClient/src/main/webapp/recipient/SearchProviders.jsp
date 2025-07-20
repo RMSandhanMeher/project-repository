@@ -698,7 +698,7 @@ h2 {
 				</f:facet>
 				<h:panelGroup rendered="#{doc.status eq 'ACTIVE'}">
 					<h:commandButton value="Book Now"
-						action="#{doctorSearchController.bookDummy}"
+						action="#{doctorAvailabilityController.chooseDoctor(doc.doctorId)}"
 						styleClass="btn btn-success" />
 				</h:panelGroup>
 				<h:outputText rendered="#{doc.status ne 'ACTIVE'}"

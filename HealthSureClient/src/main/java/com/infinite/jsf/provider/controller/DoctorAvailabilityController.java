@@ -1,6 +1,5 @@
 package com.infinite.jsf.provider.controller;
 
-
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -26,14 +25,13 @@ import com.infinite.jsf.provider.model.Provider;
 import com.infinite.jsf.recipient.model.Recipient;
 import com.infinite.jsf.util.MailSend;
 
-
 public class DoctorAvailabilityController implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private final DoctorAvailabilityDaoImpl availabilityDao = new DoctorAvailabilityDaoImpl();
 	private final AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
 
-	private String doctorId = "DOC001";
+	private String doctorId;
 	private List<DayAvailabilitySummary> groupedAvailabilityList;
 	private Date selectedDate;
 	private String selectedDateInput;
@@ -41,7 +39,7 @@ public class DoctorAvailabilityController implements Serializable {
 	private Map<Date, List<DoctorAvailability>> dateMap;
 	private String selectedAvailabilityId;
 	private int selectedSlotNumber;
-	private Doctors doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
+	private Doctors doctor;
 
 	private List<String> availabilityTiming;
 
@@ -100,6 +98,18 @@ public class DoctorAvailabilityController implements Serializable {
 						new SlotDisplay(availabilityId, slotNo, formatTime(slotStartTime), formatTime(slotEndTime)));
 			});
 		}
+	}
+
+	public String chooseDoctor(String doctorId) {
+		this.doctorId = doctorId;
+
+		if (doctorId == null || doctorId.isEmpty()) {
+			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "Please select a doctor.", null));
+			return null;
+		}
+		doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
+		return "/recipient/appointment/doctorAvailabilityList.jsf?faces-redirect=true";
 	}
 
 	public void handleDateSelection() {

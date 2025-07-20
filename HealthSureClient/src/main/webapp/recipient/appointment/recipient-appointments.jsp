@@ -21,7 +21,7 @@
 	<jsp:include page="./../../navbar/NavRecipient.jsp" />
 	<div class="header-spacing"></div>
 	<jsp:include page="NavBar.jsp" />
-
+	<div class="header-spacing"></div>
 	<div class="main-container">
 		<h1 class="main-title">My Appointments</h1>
 
@@ -159,7 +159,7 @@
 	</div>
 	<script>
 		function showLoadingAndConfirm() {
-			const confirmCancel = confirm('Are you sure you want to cancel this appointment?');
+			const confirmCancel = true;
 			if (confirmCancel) {
 				document.getElementById("loadingOverlay").style.display = "flex";
 				return true;
