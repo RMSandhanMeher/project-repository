@@ -109,6 +109,7 @@ public class DoctorAvailabilityController implements Serializable {
 			return null;
 		}
 		doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
+		loadAllUpcomingAvailability();
 		return "/recipient/appointment/doctorAvailabilityList.jsf?faces-redirect=true";
 	}
 
