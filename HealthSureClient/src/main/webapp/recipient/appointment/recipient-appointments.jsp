@@ -6,72 +6,67 @@
 	<html>
 <head>
 <title>Recipient Appointments</title>
-<script src="https://cdn.tailwindcss.com"></script>
+<%-- Removed Tailwind CDN script --%>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/appointment/recipientAppointment.css">
+<%-- Link to external CSS --%>
 <style>
+/* Specific table cell alignment, can also be moved to external CSS if preferred */
 .slots-table-component>tbody>tr>td {
 	text-align: center;
 }
 </style>
 </head>
-<body class="bg-gray-100 min-h-screen p-6">
-	<!-- Navbar -->
+<body class="body-bg min-h-screen-full page-padding">
 	<jsp:include page="./../../navbar/NavRecipient.jsp" />
-	<div class="h-20"></div>
+	<div class="header-spacing"></div>
 	<jsp:include page="NavBar.jsp" />
 
-	<div class="max-w-6xl mx-auto bg-white p-6 rounded shadow">
-		<h1 class="text-2xl font-bold mb-6 text-blue-700">My Appointments</h1>
+	<div class="main-container">
+		<h1 class="main-title">My Appointments</h1>
 
 		<h:form id="appointmentForm">
-			<div id="loadingOverlay"
-				style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.8); z-index: 9999; justify-content: center; align-items: center;">
-				<div class="text-center">
-					<svg class="animate-spin h-10 w-10 text-blue-500 mx-auto"
-						xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-						<circle class="opacity-25" cx="12" cy="12" r="10"
+			<div id="loadingOverlay" class="loading-overlay">
+				<div class="loading-overlay-content">
+					<svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg"
+						fill="none" viewBox="0 0 24 24">
+						<circle class="opacity-25-svg" cx="12" cy="12" r="10"
 							stroke="currentColor" stroke-width="4"></circle>
-						<path class="opacity-75" fill="currentColor"
+						<path class="opacity-75-svg" fill="currentColor"
 							d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
 					</svg>
-					<p class="mt-2 text-gray-700">Cancelling your appointment...</p>
+					<p class="loading-text">Cancelling your appointment...</p>
 				</div>
 			</div>
 
-			<div
-				class="mb-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 items-center">
-				<div>
-					<label for="timeFilter"
-						class="block text-gray-700 font-medium mb-1">Time Filter:</label>
+			<div class="filter-grid-container">
+				<div class="filter-item">
+					<label for="timeFilter" class="filter-label">Time Filter:</label>
 					<h:selectOneMenu id="timeFilter"
 						value="#{recipientAppointmentController.timeFilterType}"
-						styleClass="border px-2 py-1 rounded w-full"
-						onchange="this.form.submit();">
+						styleClass="filter-select" onchange="this.form.submit();">
 						<f:selectItem itemLabel="Future" itemValue="future" />
 						<f:selectItem itemLabel="Past" itemValue="past" />
 					</h:selectOneMenu>
 				</div>
 
-				<div>
-					<label for="statusFilter"
-						class="block text-gray-700 font-medium mb-1">Status
+				<div class="filter-item">
+					<label for="statusFilter" class="filter-label">Status
 						Filter:</label>
 					<h:selectOneMenu id="statusFilter"
 						value="#{recipientAppointmentController.statusFilterType}"
-						styleClass="border px-2 py-1 rounded w-full"
-						onchange="this.form.submit();">
+						styleClass="filter-select" onchange="this.form.submit();">
 						<f:selectItems
 							value="#{recipientAppointmentController.statusFilterOptions}" />
 					</h:selectOneMenu>
 				</div>
 				<%-- Added Page Size filter --%>
-				<div>
-					<label for="pageSizeFilter"
-						class="block text-gray-700 font-medium mb-1">Items Per
+				<div class="filter-item">
+					<label for="pageSizeFilter" class="filter-label">Items Per
 						Page:</label>
 					<h:selectOneMenu id="pageSizeFilter"
 						value="#{recipientAppointmentController.pageSize}"
-						styleClass="border px-2 py-1 rounded w-full"
-						onchange="this.form.submit();">
+						styleClass="filter-select" onchange="this.form.submit();">
 						<f:selectItem itemLabel="5" itemValue="5" />
 						<f:selectItem itemLabel="10" itemValue="10" />
 						<f:selectItem itemLabel="20" itemValue="20" />
@@ -81,10 +76,8 @@
 
 			<h:dataTable
 				value="#{recipientAppointmentController.paginatedAppointments}"
-				var="appt"
-				styleClass="slots-table-component min-w-full table-auto border border-gray-300 text-sm mb-6"
-				rowClasses="bg-white even:bg-gray-50"
-				columnClasses="px-4 py-2 border">
+				var="appt" styleClass="slots-table-component appointment-table"
+				rowClasses="table-row-odd,table-row-even" columnClasses="table-cell">
 
 				<h:column>
 					<f:facet name="header">
@@ -123,7 +116,6 @@
 					</f:facet>
 					<h:outputText value="#{empty appt.notes ? 'None' : appt.notes}" />
 				</h:column>
-
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Actions" />
@@ -132,7 +124,7 @@
 						rendered="#{recipientAppointmentController.cancellableMap[appt.appointmentId]}"
 						onclick="return showLoadingAndConfirm();"
 						action="#{recipientAppointmentController.cancelAppointment}"
-						styleClass="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">
+						styleClass="cancel-button">
 						<f:setPropertyActionListener
 							target="#{recipientAppointmentController.selectedAppointment}"
 							value="#{appt}" />
@@ -141,29 +133,28 @@
 			</h:dataTable>
 			<h:panelGroup
 				rendered="#{empty recipientAppointmentController.paginatedAppointments}">
-				<div class="text-gray-500 italic mt-4">No appointments found
-					for this filter.</div>
+				<div class="no-appointments-message">No appointments found for
+					this filter.</div>
 			</h:panelGroup>
-			<div class="flex justify-between items-center mt-4">
+			<div class="pagination-container">
 				<h:commandButton value="Previous"
 					action="#{recipientAppointmentController.prevPage}"
 					disabled="#{recipientAppointmentController.currentPage == 1}"
-					styleClass="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400" />
+					styleClass="pagination-button" />
 
-				<span class="text-gray-700"> <h:outputText
+				<span class="pagination-info"> <h:outputText
 						value="Page #{recipientAppointmentController.currentPage} of #{recipientAppointmentController.totalPages}" />
 				</span>
 
 				<h:commandButton value="Next"
 					action="#{recipientAppointmentController.nextPage}"
 					disabled="#{recipientAppointmentController.currentPage == recipientAppointmentController.totalPages}"
-					styleClass="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400" />
+					styleClass="pagination-button" />
 			</div>
 
-			<h:messages globalOnly="true"
-				infoClass="p-3 bg-green-100 text-green-700 border border-green-300 rounded mb-4"
-				errorClass="p-3 bg-red-100 text-red-700 border border-red-300 rounded mb-4"
-				warnClass="p-3 bg-yellow-100 text-yellow-700 border border-yellow-300 rounded mb-4" />
+			<h:messages globalOnly="true" styleClass="global-message"
+				infoClass="info-message" errorClass="error-message"
+				warnClass="warn-message" />
 		</h:form>
 	</div>
 	<script>
