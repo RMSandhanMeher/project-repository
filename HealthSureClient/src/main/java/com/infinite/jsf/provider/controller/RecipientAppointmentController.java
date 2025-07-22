@@ -1,6 +1,5 @@
 package com.infinite.jsf.provider.controller;
 
-
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.*;
@@ -23,9 +22,6 @@ import com.infinite.jsf.provider.model.Doctors;
 import com.infinite.jsf.recipient.model.Recipient;
 import com.infinite.jsf.util.MailSend;
 
-
-
-
 public class RecipientAppointmentController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -45,6 +41,8 @@ public class RecipientAppointmentController implements Serializable {
 
 	private String timeFilterType = "future"; // "future" or "past"
 	private String statusFilterType = "ALL"; // ALL, PENDING, BOOKED, CANCELLED, COMPLETED
+
+	private String selectedAppointmentIdForDetail; // New property to hold the ID
 
 	// Pagination
 	private int pageSize = 5; // Default to 5
@@ -162,6 +160,16 @@ public class RecipientAppointmentController implements Serializable {
 			options.add(new SelectItem("COMPLETED", "Completed"));
 		}
 		return options;
+	}
+
+	public String viewAppointmentDetails() {
+		if (selectedAppointmentIdForDetail != null) {
+
+			System.out.println("Initiating detail view for Appointment ID: " + selectedAppointmentIdForDetail);
+
+			return "appointmentDetail.jsf?faces-redirect=true&appointmentId=" + selectedAppointmentIdForDetail;
+		}
+		return null;
 	}
 
 	public String cancelAppointment() {
@@ -287,5 +295,13 @@ public class RecipientAppointmentController implements Serializable {
 		this.pageSize = pageSize;
 		this.currentPage = 1; // Reset to first page if page size changes
 		updateFilteredAppointments();
+	}
+
+	public String getSelectedAppointmentIdForDetail() {
+		return selectedAppointmentIdForDetail;
+	}
+
+	public void setSelectedAppointmentIdForDetail(String selectedAppointmentIdForDetail) {
+		this.selectedAppointmentIdForDetail = selectedAppointmentIdForDetail;
 	}
 }
