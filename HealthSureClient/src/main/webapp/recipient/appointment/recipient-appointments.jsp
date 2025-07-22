@@ -6,10 +6,8 @@
 	<html>
 <head>
 <title>Recipient Appointments</title>
-<%-- Removed Tailwind CDN script --%>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/appointment/recipientAppointment.css">
-<%-- Link to external CSS --%>
 <style>
 /* Specific table cell alignment, can also be moved to external CSS if preferred */
 .slots-table-component>tbody>tr>td {
@@ -77,58 +75,71 @@
 			<h:dataTable
 				value="#{recipientAppointmentController.paginatedAppointments}"
 				var="appt" styleClass="slots-table-component appointment-table"
-				rowClasses="table-row-odd,table-row-even" columnClasses="table-cell">
+				rowClasses="table-row-odd,table-row-even"
+				columnClasses="table-cell">
 
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Appointment ID" />
 					</f:facet>
-					<h:outputText value="#{appt.appointmentId}" />
+                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					    <h:outputText value="#{appt.appointmentId}" />
+                    </h:panelGroup>
 				</h:column>
 
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Doctor Name" />
 					</f:facet>
-					<h:outputText
-						value="#{appt.doctor != null ? appt.doctor.doctorName : 'N/A'}" />
+                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					    <h:outputText
+						    value="#{appt.doctor != null ? appt.doctor.doctorName : 'N/A'}" />
+                    </h:panelGroup>
 				</h:column>
 
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Appointment Date" />
 					</f:facet>
-					<h:outputText value="#{appt.start}">
-						<f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
-					</h:outputText>
+                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					    <h:outputText value="#{appt.start}">
+						    <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+					    </h:outputText>
+                    </h:panelGroup>
 				</h:column>
 
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Status" />
 					</f:facet>
-					<h:outputText value="#{appt.status}" />
+                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					    <h:outputText value="#{appt.status}" />
+                    </h:panelGroup>
 				</h:column>
 
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Notes" />
 					</f:facet>
-					<h:outputText value="#{empty appt.notes ? 'None' : appt.notes}" />
+                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					    <h:outputText value="#{empty appt.notes ? 'None' : appt.notes}" />
+                    </h:panelGroup>
 				</h:column>
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Actions" />
 					</f:facet>
-					<h:commandButton value="Cancel"
-						rendered="#{recipientAppointmentController.cancellableMap[appt.appointmentId]}"
-						onclick="return showLoadingAndConfirm();"
-						action="#{recipientAppointmentController.cancelAppointment}"
-						styleClass="cancel-button">
-						<f:setPropertyActionListener
-							target="#{recipientAppointmentController.selectedAppointment}"
-							value="#{appt}" />
-					</h:commandButton>
+                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					    <h:commandButton value="Cancel"
+						    rendered="#{recipientAppointmentController.cancellableMap[appt.appointmentId]}"
+						    onclick="return showLoadingAndConfirm();"
+						    action="#{recipientAppointmentController.cancelAppointment}"
+						    styleClass="cancel-button">
+						    <f:setPropertyActionListener
+							    target="#{recipientAppointmentController.selectedAppointment}"
+							    value="#{appt}" />
+					    </h:commandButton>
+                    </h:panelGroup>
 				</h:column>
 			</h:dataTable>
 			<h:panelGroup
@@ -159,7 +170,10 @@
 	</div>
 	<script>
 		function showLoadingAndConfirm() {
-			const confirmCancel = true;
+			// You might want a JS confirmation here like:
+			// const confirmCancel = confirm("Are you sure you want to cancel this appointment?");
+			const confirmCancel = true; // For now, directly proceed as per original logic
+
 			if (confirmCancel) {
 				document.getElementById("loadingOverlay").style.display = "flex";
 				return true;
