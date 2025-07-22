@@ -15,7 +15,7 @@
     /* Important for absolute positioning of inner elements */
     position: relative;
     /* Ensure padding is defined here for the cell itself */
-    padding: 0.5rem 1rem; /* px-4 py-2 from your original CSS */
+    padding: 20px 1px; /* px-4 py-2 from your original CSS */
 }
 </style>
 </head>
@@ -51,7 +51,6 @@
 						<f:selectItem itemLabel="Past" itemValue="past" />
 					</h:selectOneMenu>
 				</div>
-
 				<div class="filter-item">
 					<label for="statusFilter" class="filter-label">Status
 						Filter:</label>
@@ -173,17 +172,14 @@
 		</h:form>
 	</div>
 	<script>
-		function showLoadingAndConfirm() {
-			// You might want a JS confirmation here like:
-			// const confirmCancel = confirm("Are you sure you want to cancel this appointment?");
-			const confirmCancel = true; // For now, directly proceed as per original logic
-
-			if (confirmCancel) {
-				document.getElementById("loadingOverlay").style.display = "flex";
-				return true;
-			}
-			return false;
+	function showLoadingAndConfirm() {
+		const confirmCancel = confirm('Are you sure you want to cancel this appointment?');
+		if (confirmCancel) {
+			document.getElementById("loadingOverlay").style.display = "flex";
+			return true;
 		}
+		return false;
+	}
 	</script>
 </body>
 	</html>

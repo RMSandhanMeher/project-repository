@@ -225,7 +225,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			session.save(appointment);
 			tx.commit();
 
-			result = "Appointment booked successfully with ID: " + appointment.getAppointmentId();
+			result = "Appointment Requested successfully with ID: " + appointment.getAppointmentId();
 		} catch (Exception e) {
 			if (tx != null) {
 				tx.rollback();

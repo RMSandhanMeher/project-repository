@@ -25,7 +25,7 @@
 					<div class="header-icon-container">
 						<i class="fas fa-check-circle header-icon"></i>
 					</div>
-					<h1 class="card-title">Appointment Confirmed!</h1>
+					<h1 class="card-title">Appointment Requested !</h1>
 				</div>
 
 				<!-- Content area -->
@@ -47,7 +47,11 @@
 						<div class="info-card info-card-blue">
 							<h3 class="info-title info-title-blue">What's Next?</h3>
 							<ul class="info-list">
-								<li>You'll receive a confirmation email</li>
+								<li>The provider will review and approve your appointment
+									shortly. You will receive an email confirmation once it's
+									approved.
+									</p>
+								</li>
 								<li>Arrive 15 minutes before your appointment</li>
 								<li>Bring your ID and insurance card</li>
 							</ul>
