@@ -12,6 +12,10 @@
 /* Specific table cell alignment, can also be moved to external CSS if preferred */
 .slots-table-component>tbody>tr>td {
 	text-align: center;
+    /* Important for absolute positioning of inner elements */
+    position: relative;
+    /* Ensure padding is defined here for the cell itself */
+    padding: 0.5rem 1rem; /* px-4 py-2 from your original CSS */
 }
 </style>
 </head>
@@ -76,13 +80,13 @@
 				value="#{recipientAppointmentController.paginatedAppointments}"
 				var="appt" styleClass="slots-table-component appointment-table"
 				rowClasses="table-row-odd,table-row-even"
-				columnClasses="table-cell">
+				columnClasses="table-cell"> <%-- No dynamic classes here --%>
 
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Appointment ID" />
 					</f:facet>
-                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					<h:panelGroup styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 					    <h:outputText value="#{appt.appointmentId}" />
                     </h:panelGroup>
 				</h:column>
@@ -91,7 +95,7 @@
 					<f:facet name="header">
 						<h:outputText value="Doctor Name" />
 					</f:facet>
-                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					<h:panelGroup styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 					    <h:outputText
 						    value="#{appt.doctor != null ? appt.doctor.doctorName : 'N/A'}" />
                     </h:panelGroup>
@@ -101,7 +105,7 @@
 					<f:facet name="header">
 						<h:outputText value="Appointment Date" />
 					</f:facet>
-                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					<h:panelGroup styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 					    <h:outputText value="#{appt.start}">
 						    <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
 					    </h:outputText>
@@ -112,7 +116,7 @@
 					<f:facet name="header">
 						<h:outputText value="Status" />
 					</f:facet>
-                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					<h:panelGroup styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 					    <h:outputText value="#{appt.status}" />
                     </h:panelGroup>
 				</h:column>
@@ -121,7 +125,7 @@
 					<f:facet name="header">
 						<h:outputText value="Notes" />
 					</f:facet>
-                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					<h:panelGroup styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 					    <h:outputText value="#{empty appt.notes ? 'None' : appt.notes}" />
                     </h:panelGroup>
 				</h:column>
@@ -129,7 +133,7 @@
 					<f:facet name="header">
 						<h:outputText value="Actions" />
 					</f:facet>
-                    <h:panelGroup styleClass="#{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-cell">
+					<h:panelGroup styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 					    <h:commandButton value="Cancel"
 						    rendered="#{recipientAppointmentController.cancellableMap[appt.appointmentId]}"
 						    onclick="return showLoadingAndConfirm();"
