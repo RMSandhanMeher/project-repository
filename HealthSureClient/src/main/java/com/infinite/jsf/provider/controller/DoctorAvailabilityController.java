@@ -145,7 +145,8 @@ public class DoctorAvailabilityController implements Serializable {
 			appointment.setSlotNo(selectedSlotNumber);
 
 			// Set current user as recipient (should come from session)
-			Recipient recipient = new Recipient();
+			
+			Recipient recipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("loggedInRecipient");
 			recipient.sethId("REC001");
 			appointment.setRecipient(recipient);
 

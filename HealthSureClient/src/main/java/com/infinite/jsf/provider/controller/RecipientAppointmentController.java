@@ -32,7 +32,7 @@ public class RecipientAppointmentController implements Serializable {
 
 	private final AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
 
-	private String hId = "REC001"; // Ideally from session
+	private String hId = (String)((Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("loggedInRecipient")).gethId(); // Ideally from session
 
 	private List<Appointment> upcomingAppointments = new ArrayList<>();
 	private List<Appointment> pastAppointments = new ArrayList<>();

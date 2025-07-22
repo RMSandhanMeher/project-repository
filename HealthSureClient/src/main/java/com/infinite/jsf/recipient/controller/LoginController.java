@@ -483,14 +483,13 @@ public class LoginController implements Serializable{
 			
 			if (valid) {
 				Recipient recipient = loginDao.getRecipientByUserName(userName);
+				recipient.setPassword("");
 				
 				if (recipient != null) {
 					recipient.setFullName(recipient.getFirstName(),recipient.getLastName());
 					LOGGER.info(recipient.getFullName()+ " "+ "has logged-in....");
 					System.out.println(recipient.getFullName()+" "+"has logged-in....");
-			        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("loggedInRecipientId", recipient.gethId());
-			        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("fullName", recipient.getFullName());
-			        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("recipient", recipient); // optional
+			        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("loggedInRecipient", recipient);
 			    }
 				return "RecipientDashBoard.jsp?faces-redirect=true";
 			} else {

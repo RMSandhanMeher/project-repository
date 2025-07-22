@@ -15,7 +15,7 @@
     /* Important for absolute positioning of inner elements */
     position: relative;
     /* Ensure padding is defined here for the cell itself */
-    padding: 0.5rem 1rem; /* px-4 py-2 from your original CSS */
+    padding: 1rem 0px; /* px-4 py-2 from your original CSS */
 }
 </style>
 </head>
