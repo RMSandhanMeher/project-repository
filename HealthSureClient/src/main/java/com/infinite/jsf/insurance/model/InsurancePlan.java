@@ -17,9 +17,9 @@ public class InsurancePlan implements Serializable{
     private String availableCoverAmounts;
     private String waitingPeriod;
 
+    private Date activeOn;
     private Date createdOn = java.sql.Date.valueOf("2025-06-01");
     private Date expireDate = java.sql.Date.valueOf("2099-12-31");
-    private Date activeOn;
     private String periodicDiseases; // YES or NO
 
     // Helper for Hibernate to store enum as string

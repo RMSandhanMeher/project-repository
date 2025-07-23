@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Scanner;
 
 import com.infinite.jsf.provider.model.Doctors;
-import com.infinite.jsf.recipient.controller.DoctorSearchController;
+import com.infinite.jsf.recipient.controller.RecipientSearchDoctorController;
 
 public class DoctorSearchTest {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
-        DoctorSearchController controller = new DoctorSearchController();
+        RecipientSearchDoctorController controller = new RecipientSearchDoctorController();
 
         System.out.println("=== Doctor Search Tester ===");
 

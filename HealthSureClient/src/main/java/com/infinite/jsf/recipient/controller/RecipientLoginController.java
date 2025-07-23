@@ -16,10 +16,10 @@ import com.infinite.jsf.recipient.model.OtpStatus;
 import com.infinite.jsf.recipient.model.Recipient;
 import com.infinite.jsf.recipient.model.RecipientOtp;
 
-public class LoginController implements Serializable{
+public class RecipientLoginController implements Serializable{
 
     private static final long serialVersionUID = 1L; // Recommended for Serializable
-    private static final Logger LOGGER = Logger.getLogger(LoginController.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(RecipientLoginController.class.getName());
     private Recipient recipient;
 	private String userName;
     private Integer otpCode;
@@ -229,71 +229,71 @@ public class LoginController implements Serializable{
 	    // Username validation (only when not coming back)
 	    if (!isComingBack) {
 	        if (recipient.getUserName() == null || recipient.getUserName().trim().isEmpty()) {
-	            context.addMessage("form:userName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username is required", null));
+	            context.addMessage("login:userName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username is required", null));
 	            hasError = true;
 	        } else if (!recipient.getUserName().matches("^[a-zA-Z0-9_]{5,20}$")) {
-	            context.addMessage("form:userName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username must be 5–20 characters (letters, digits, underscores)", null));
+	            context.addMessage("login:userName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username must be 5–20 characters (letters, digits, underscores)", null));
 	            hasError = true;
 	        } else if (loginDao.existsbyUserName(recipient.getUserName())) {
-	            context.addMessage("form:userName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username already exists", null));
+	            context.addMessage("login:userName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username already exists", null));
 	            hasError = true;
 	        }
 	    }
 
 	    // First Name
 	    if (recipient.getFirstName() == null || recipient.getFirstName().trim().isEmpty()) {
-	        context.addMessage("form:firstName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "First name is required", null));
+	        context.addMessage("login:firstName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "First name is required", null));
 	        hasError = true;
 	    } else if (!recipient.getFirstName().matches("^[A-Z][a-zA-Z]*$")) {
-	        context.addMessage("form:firstName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "First name must start with a capital letter and contain only alphabets", null));
+	        context.addMessage("login:firstName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "First name must start with a capital letter and contain only alphabets", null));
 	        hasError = true;
 	    }
 
 	    // Last Name
 	    if (recipient.getLastName() == null || recipient.getLastName().trim().isEmpty()) {
-	        context.addMessage("form:lastName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Last name is required", null));
+	        context.addMessage("login:lastName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Last name is required", null));
 	        hasError = true;
 	    } else if (!recipient.getLastName().matches("^[A-Z][a-zA-Z]*$")) {
-	        context.addMessage("form:lastName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Last name must start with a capital letter and contain only alphabets", null));
+	        context.addMessage("login:lastName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Last name must start with a capital letter and contain only alphabets", null));
 	        hasError = true;
 	    }
 
 	    // Email
 	    String email = recipient.getEmail();
 	    if (email == null || email.trim().isEmpty()) {
-	        context.addMessage("form:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Email is required", null));
+	        context.addMessage("login:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Email is required", null));
 	        hasError = true;
 	    } else if (!email.contains("@")) {
-	        context.addMessage("form:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Email must contain '@' symbol", null));
+	        context.addMessage("login:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Email must contain '@' symbol", null));
 	        hasError = true;
 	    } else if (!email.matches("^[a-zA-Z0-9._%+-]+@(gmail)\\.com$")) {
-	        context.addMessage("form:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Only Gmail emails allowed", null));
+	        context.addMessage("login:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Only Gmail emails allowed", null));
 	        hasError = true;
 	    } else if (loginDao.existsByEmail(email)) {
-	        context.addMessage("form:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Email already registered", null));
+	        context.addMessage("login:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Email already registered", null));
 	        hasError = true;
 	    }
 
 	    // Mobile (only when not coming back)
 	    if (!isComingBack) {
 	        if (recipient.getMobile() == null || recipient.getMobile().trim().isEmpty()) {
-	            context.addMessage("form:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile Number is required", null));
+	            context.addMessage("login:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile Number is required", null));
 	            hasError = true;
 	        } else {
 	            if (!recipient.getMobile().trim().matches("^\\d+$")) {
-	                context.addMessage("form:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number must contain only digits (no letters or symbols)", null));
+	                context.addMessage("login:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number must contain only digits (no letters or symbols)", null));
 	                hasError = true;
 	            } else if (recipient.getMobile().trim().length() < 10) {
-	                context.addMessage("form:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number must be at least 10 digits", null));
+	                context.addMessage("login:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number must be at least 10 digits", null));
 	                hasError = true;
 	            } else if (recipient.getMobile().trim().length() > 10) {
-	                context.addMessage("form:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number must not exceed 10 digits", null));
+	                context.addMessage("login:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number must not exceed 10 digits", null));
 	                hasError = true;
 	            } else if (recipient.getMobile().trim().startsWith("0")) {
-	                context.addMessage("form:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number cannot start with 0", null));
+	                context.addMessage("login:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number cannot start with 0", null));
 	                hasError = true;
 	            } else if (loginDao.existsByMobile(recipient.getMobile().trim())) {
-	                context.addMessage("form:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number already in use", null));
+	                context.addMessage("login:mobile", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Mobile number already in use", null));
 	                hasError = true;
 	            }
 	        }
@@ -302,38 +302,38 @@ public class LoginController implements Serializable{
 	    // These validations are OUTSIDE of the if (!isComingBack) block:
 	    // Gender
 	    if (recipient.getGender() == null) {
-	        context.addMessage("form:gender", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Gender is required", null));
+	        context.addMessage("login:gender", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Gender is required", null));
 	        hasError = true;
 	    }
 
 	    // DOB
 	    if (recipient.getDob() == null) {
-	        context.addMessage("form:dob", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Date of birth is required", null));
+	        context.addMessage("login:dob", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Date of birth is required", null));
 	        hasError = true;
 	    } else {
 	        LocalDate birthDate = recipient.getDob().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 	        LocalDate today = LocalDate.now();
 	        if (birthDate.isAfter(today)) {
-	            context.addMessage("form:dob", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Date of birth cannot be in the future", null));
+	            context.addMessage("login:dob", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Date of birth cannot be in the future", null));
 	            hasError = true;
 	        } else if (birthDate.isEqual(today)) {
-	            context.addMessage("form:dob", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Date of birth cannot be today", null));
+	            context.addMessage("login:dob", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Date of birth cannot be today", null));
 	            hasError = true;
 	        } else if (birthDate.isBefore(LocalDate.of(1950, 1, 1))) {
-	            context.addMessage("form:dob", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Date of birth must be after 1950", null));
+	            context.addMessage("login:dob", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Date of birth must be after 1950", null));
 	            hasError = true;
 	        }
 	    }
 
 	    // Address
 	    if (recipient.getAddress() == null || recipient.getAddress().trim().isEmpty()) {
-	        context.addMessage("form:address", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Address is required", null));
+	        context.addMessage("login:address", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Address is required", null));
 	        hasError = true;
 	    } else if (recipient.getAddress().length() < 10) {
-	        context.addMessage("form:address", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Address must be at least 10 characters", null));
+	        context.addMessage("login:address", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Address must be at least 10 characters", null));
 	        hasError = true;
 	    } else if (recipient.getAddress().matches("^[0-9]+$")) {
-	        context.addMessage("form:address", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Address cannot be just numbers", null));
+	        context.addMessage("login:address", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Address cannot be just numbers", null));
 	        hasError = true;
 	    }
 
@@ -368,17 +368,17 @@ public class LoginController implements Serializable{
 	    FacesContext context = FacesContext.getCurrentInstance();
 
 	    if (email == null || email.trim().isEmpty()) {
-	        context.addMessage("form:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Email is required", null));
+	        context.addMessage("login:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Email is required", null));
 	        return null;
 	    }
 
 	    if (!email.matches("^[a-zA-Z0-9._%+-]+@gmail\\.com$")) {
-	        context.addMessage("form:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Only valid Gmail addresses are allowed", null));
+	        context.addMessage("login:email", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Only valid Gmail addresses are allowed", null));
 	        return null;
 	    }
 
 	    if (otpCode == null || !String.valueOf(otpCode).matches("^\\d{5}$")) {
-	        context.addMessage("form:otp", new FacesMessage(FacesMessage.SEVERITY_ERROR, "OTP must be a 5-digit number", null));
+	        context.addMessage("login:otp", new FacesMessage(FacesMessage.SEVERITY_ERROR, "OTP must be a 5-digit number", null));
 	        return null;
 	    }
 
@@ -415,18 +415,18 @@ public class LoginController implements Serializable{
 	    FacesContext context = FacesContext.getCurrentInstance();
 
 	    if (password == null || password.trim().isEmpty()) {
-	        context.addMessage("form:newPassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Password is required", null));
+	        context.addMessage("login:newPassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Password is required", null));
 	        return null;
 	    }
 
 	    if (!password.equals(confirmPassword)) {
-	        context.addMessage("form:confirmPassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Passwords do not match", null));
+	        context.addMessage("login:confirmPassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Passwords do not match", null));
 	        return null;
 	    }
 
 	    String strength = evaluatePasswordStrength(password);
 	    if ("Weak".equals(strength)) {
-	        context.addMessage("form:newPassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Weak password. Use at least 8 characters with uppercase, lowercase, number, and symbol.", null));
+	        context.addMessage("login:newPassword", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Weak password. Use at least 8 characters with uppercase, lowercase, number, and symbol.", null));
 	        return null;
 	    }
 
@@ -468,12 +468,12 @@ public class LoginController implements Serializable{
 
 			// Validate required fields
 			if (userName == null || userName.trim().isEmpty()) {
-				context.addMessage("userName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username is required", null));
+				context.addMessage("login:userName", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Username is required", null));
 				return null;
 			}
 
 			if (password == null || password.trim().isEmpty()) {
-				context.addMessage("password", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Password is required", null));
+				context.addMessage("login:password", new FacesMessage(FacesMessage.SEVERITY_ERROR, "Password is required", null));
 				return null;
 			}
 
@@ -484,13 +484,15 @@ public class LoginController implements Serializable{
 			if (valid) {
 				Recipient recipient = loginDao.getRecipientByUserName(userName);
 				recipient.setPassword("");
-				
+
 				if (recipient != null) {
-					recipient.setFullName(recipient.getFirstName(),recipient.getLastName());
-					LOGGER.info(recipient.getFullName()+ " "+ "has logged-in....");
-					System.out.println(recipient.getFullName()+" "+"has logged-in....");
-			        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("loggedInRecipient", recipient);
-			    }
+					recipient.setFullName(recipient.getFirstName(), recipient.getLastName());
+					LOGGER.info(recipient.getFullName() + " " + "has logged-in....");
+					FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("loggedInRecipient",
+							recipient);
+					FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("fullName", recipient);
+
+				}
 				return "RecipientDashBoard.jsp?faces-redirect=true";
 			} else {
 				context.addMessage(null,

@@ -1,3 +1,5 @@
+/// Copyright © 2025 Infinite Computer Solution. All rights reserved. 
+
 package com.infinite.jsf.recipient.controller;
 
 import java.io.Serializable;
@@ -5,13 +7,13 @@ import java.lang.reflect.Field;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
 
 import com.infinite.jsf.insurance.model.PlanType;
 import com.infinite.jsf.insurance.model.SubscribedMember;
@@ -21,35 +23,42 @@ import com.infinite.jsf.recipient.daoImpl.InsuranceDaoImpl;
 import com.infinite.jsf.recipient.model.PatientInsuranceDetails;
 import com.infinite.jsf.recipient.model.Recipient;
 
-public class ShowInsuranceController implements Serializable{ // No annotations here as per request
+/**
+ * JSF Managed Bean responsible for displaying, filtering, and sorting recipient
+ * insurance data, handling member information, pagination for insurance and
+ * members tables, and managing user session.
+ */
+public class RecipientShowInsuranceController implements Serializable {
 
-    private static final long serialVersionUID = 1L; // Recommended for Serializable
-    private static final Logger LOGGER = Logger.getLogger(ShowInsuranceController.class.getName());
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(RecipientShowInsuranceController.class.getName());
+
+	// Data objects
 	private MedicalProcedure medicalProcedure;
 	private InsuranceDaoImpl insuranceDaoImpl;
 	private Recipient recipient = new Recipient();
 	private PatientInsuranceDetails selectedItem;
-	private String hId;
+	private String hId = (String) ((Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+			.get("loggedInRecipient")).gethId();
 	private String userName;
-	private String fullName;
-	private String selectedStatus; // New: Holds selected ACTIVE or EXPIRED
-
-
+	private String fullName = (String) ((Recipient) FacesContext.getCurrentInstance().getExternalContext()
+			.getSessionMap().get("fullName")).getFullName();
+	private String selectedStatus;
 	private InsuranceDao insuranceDao = new InsuranceDaoImpl();
 
 	private List<PatientInsuranceDetails> patientInsuranceList;
-	private List<PatientInsuranceDetails> originalInsuranceList; // Store original unfiltered list
+	private List<PatientInsuranceDetails> originalInsuranceList;
 	private List<SubscribedMember> subscribedMembers;
 
-	// Sorting state for Patient Insurance Details table
+	// Sorting state for Insurance
 	private String currentInsuranceSortColumn;
 	private String currentInsuranceSortDirection; // "asc" or "desc"
 
-	// Sorting state for Subscribed Members table
+	// Sorting state for Members
 	private String currentMemberSortColumn;
 	private String currentMemberSortDirection; // "asc" or "desc"
 
-	// Separate pagination for insurance and members
+	// Pagination
 	private int insurancePage = 0;
 	private int memberPage = 0;
 	private final int pageSize = 4;
@@ -58,96 +67,81 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 	private Date fromDate;
 	private Date toDate;
 
-	
-	
-	
-	
-	// Show Insurance logic
+	/**
+	 * Retrieves the paginated and sorted list of insurance details for the
+	 * recipient.
+	 * 
+	 * @return List of PatientInsuranceDetails for current page.
+	 */
 	public List<PatientInsuranceDetails> getInsuranceData() {
 		FacesContext context = FacesContext.getCurrentInstance();
-
-		// Lazy fetch if list is null
 		try {
+			// Lazy fetch if list is null
 			if (patientInsuranceList == null) {
-
-				hId = (String) context.getExternalContext().getSessionMap().get("loggedInRecipientId");
-				fullName = (String) context.getExternalContext().getSessionMap().get("fullName");
-
-				// Initialize original list
 				originalInsuranceList = insuranceDao.showInsuranceOfRecipient(hId);
-				patientInsuranceList = originalInsuranceList; // Start with the full list
+				patientInsuranceList = originalInsuranceList;
 
-				
 				if (patientInsuranceList == null || patientInsuranceList.isEmpty()) {
 					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "No Insurance Found",
 							"Please subscribe to a plan."));
 					return Collections.emptyList();
 				}
 
-				
-				// Apply default sort if needed (e.g., if no sort was previously applied)
+				// Apply default sort if needed
 				if (currentInsuranceSortColumn == null || currentInsuranceSortColumn.isEmpty()) {
-					currentInsuranceSortColumn = "coverageStart"; // Example default
+					currentInsuranceSortColumn = "coverageStart";
 					currentInsuranceSortDirection = "desc";
 				}
 				sortPatientInsuranceList();
 				resetInsurancePage();
 			}
 		} catch (Exception e) {
-			LOGGER.info("Exception occured while retriving the insurance data");
+			LOGGER.warn("Exception occurred while retrieving the insurance data: " + e.getMessage());
 		}
 
 		// Always return paginated data
+		if (patientInsuranceList == null)
+			return Collections.emptyList();
 		int from = insurancePage * pageSize;
 		int to = Math.min(from + pageSize, patientInsuranceList.size());
 		return patientInsuranceList.subList(from, to);
 	}
 
-	
-	
-	
-	
-	// View Members Logic
+	/**
+	 * Handles viewing of family members for a particular insurance item.
+	 * 
+	 * @param insurance PatientInsuranceDetails
+	 * @return Navigation outcome for JSF page redirection.
+	 */
 	public String viewMembers(PatientInsuranceDetails insurance) {
 		this.selectedItem = insurance;
 		try {
 			if (insurance != null && insurance.getCoverageType() == PlanType.FAMILY) {
 				this.subscribedMembers = insurance.getSubscribedMembers();
 
-				// Optional: set hId in session just in case
 				FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("hId", insurance.gethId());
-
-				// Reset member table's sort state when viewing new members
-				this.currentMemberSortColumn = null; // Clear sort state for new list
+				this.currentMemberSortColumn = null;
 				this.currentMemberSortDirection = null;
-
 				resetMemberPage();
 
-				// Apply default sort to members if needed
 				if (subscribedMembers != null && !subscribedMembers.isEmpty()) {
-					currentMemberSortColumn = "memberId"; // Example default for members
+					currentMemberSortColumn = "memberId";
 					currentMemberSortDirection = "asc";
 					sortViewMemberList();
 				}
-
 				return "/recipient/ViewMemebers.jsp?faces-redirect=true";
 			}
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while fething the memebers data");
+			LOGGER.warn("Exception occurred while fetching the members data: " + e.getMessage());
 		}
 		return null;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
 
-	                                          //ACTIVE or EXPIRED FILTERS
-	// Filter by ACTIVE or EXPIRED (merged)
+	/**
+	 * Filters insurance records by coverage status (ACTIVE or EXPIRED).
+	 * 
+	 * @param status The status to filter by.
+	 */
 	public void filterByCoverageStatus(String status) {
 		try {
 			if (originalInsuranceList == null || status == null) {
@@ -155,207 +149,197 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 				return;
 			}
 
-			this.selectedStatus = status; //Store selected filter status
-
-			// Reset date range to avoid conflicting filters
+			this.selectedStatus = status;
 			this.fromDate = null;
 			this.toDate = null;
 
 			this.patientInsuranceList = originalInsuranceList.stream()
-				.filter(p -> p.getCoverageStatus() != null &&
-				             p.getCoverageStatus().name().equalsIgnoreCase(status))
-				.collect(Collectors.toList());
+					.filter(p -> p.getCoverageStatus() != null && p.getCoverageStatus().name().equalsIgnoreCase(status))
+					.collect(Collectors.toList());
 
 			this.currentInsuranceSortColumn = null;
 			this.currentInsuranceSortDirection = null;
 			resetInsurancePage();
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while filtering the insurace by status");
-			e.printStackTrace();
+			LOGGER.warn("Exception occurred while filtering insurance by status: " + e.getMessage());
 		}
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
+	/**
+	 * Filters patient insurance list by the currently selected date range and
+	 * status.
+	 */
+	public void filterByDateRange() {
+		try {
+			FacesContext context = FacesContext.getCurrentInstance();
 
-	                                            //Date filter Logic
-    //Date Filter
-		public void filterByDateRange() {
-			try {
-				FacesContext context = FacesContext.getCurrentInstance();
-
-				if (fromDate == null && toDate == null) {
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"Both From and To dates are required.", null));
-					return;
-				}
-				
-				if(fromDate == null){
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"From date must be selected", null));
-					return;
-				}
-				
-				if(toDate == null) {
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"To Date must be selected",null));
-					return;
-				}
-
-				if (fromDate.after(toDate)) {
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-							"From Date cannot be after To Date.", null));
-					return;
-				}
-
-				if (originalInsuranceList == null || originalInsuranceList.isEmpty()) {
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-							"No insurance records available to filter.", null));
-					
-					return;
-				}
-
-				this.patientInsuranceList = originalInsuranceList.stream().filter(p -> {
-					Date start = p.getCoverageStartDate();
-					boolean isInRange = start != null &&
-					                    !start.before(fromDate) &&
-					                    !start.after(toDate);
-
-					boolean matchesStatus = true; // Allow all if not set
-					if (selectedStatus != null && !selectedStatus.isEmpty()) {
-						matchesStatus = p.getCoverageStatus() != null &&
-						                p.getCoverageStatus().name().equalsIgnoreCase(selectedStatus);
-					}
-
-					return isInRange && matchesStatus;
-				}).collect(Collectors.toList());
-
-				if (patientInsuranceList.isEmpty()) {
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-							"No insurance records fall within the selected date range.", null));
-				}
-
-				this.currentInsuranceSortColumn = null;
-				this.currentInsuranceSortDirection = null;
-				resetInsurancePage();
-			} 
-			catch (Exception e) {
-				LOGGER.info("An exception occured while filtering by date range");
+			if (fromDate == null && toDate == null) {
+				context.addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Both From and To dates are required.", null));
+				return;
 			}
+
+			if (fromDate == null) {
+				context.addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "From date must be selected", null));
+				return;
+			}
+
+			if (toDate == null) {
+				context.addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "To Date must be selected", null));
+				return;
+			}
+
+			if (fromDate.after(toDate)) {
+				context.addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "From Date cannot be after To Date.", null));
+				return;
+			}
+
+			if (originalInsuranceList == null || originalInsuranceList.isEmpty()) {
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+						"No insurance records available to filter.", null));
+				return;
+			}
+
+			this.patientInsuranceList = originalInsuranceList.stream().filter(p -> {
+				Date start = p.getCoverageStartDate();
+				boolean isInRange = start != null && !start.before(fromDate) && !start.after(toDate);
+				boolean matchesStatus = true;
+				if (selectedStatus != null && !selectedStatus.isEmpty()) {
+					matchesStatus = p.getCoverageStatus() != null
+							&& p.getCoverageStatus().name().equalsIgnoreCase(selectedStatus);
+				}
+				return isInRange && matchesStatus;
+			}).collect(Collectors.toList());
+
+			if (patientInsuranceList.isEmpty()) {
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+						"No insurance records fall within the selected date range.", null));
+			}
+
+			this.currentInsuranceSortColumn = null;
+			this.currentInsuranceSortDirection = null;
+			resetInsurancePage();
+		} catch (Exception e) {
+			LOGGER.warn("Exception occurred while filtering by date range: " + e.getMessage());
 		}
+	}
 
-
-		
-	
-	
- 
-	                                    // Member Pagination
+	/**
+	 * Gets the paginated member list for the members table.
+	 * 
+	 * @return Sub-list for current page, or empty list if none.
+	 */
 	public List<SubscribedMember> getPaginatedMemberList() {
 		try {
 			if (subscribedMembers == null || subscribedMembers.isEmpty())
 				return Collections.emptyList();
 		} catch (Exception e) {
-			LOGGER.info("Empty paginated list found");
+			LOGGER.warn("Exception occurred in getPaginatedMemberList: " + e.getMessage());
 		}
 		int from = memberPage * pageSize;
 		int to = Math.min(from + pageSize, subscribedMembers.size());
 		return subscribedMembers.subList(from, to);
 	}
 
-	
-	
-	// Pagination Summary like showing 6 of 10 data
+	/**
+	 * Summary string for paginated insurance list.
+	 * 
+	 * @return Pagination summary ("Showing N of M Results")
+	 */
 	public String getPaginationIncSummary() {
 		try {
 			if (patientInsuranceList == null || patientInsuranceList.isEmpty()) {
 				return "";
 			}
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while getting the Inc Summary");
-			e.printStackTrace();
+			LOGGER.warn("Exception occurred while getting the Insurance pagination summary: " + e.getMessage());
 		}
 		int from = Math.min((insurancePage + 1) * pageSize, patientInsuranceList.size());
 		int total = patientInsuranceList.size();
-//		int page = insurancePage + 1;
-//		int totalPages = getTotalPages();
-
-		return "Showing " + from + " of " + total + " " + "Results";
+		return "Showing " + from + " of " + total + " Results";
 	}
 
-
-	
-	// Pagination Summary for Members
+	/**
+	 * Summary string for paginated member list.
+	 * 
+	 * @return Pagination summary ("Showing N of M Results")
+	 */
 	public String getPaginationMemSummary() {
 		try {
 			if (subscribedMembers == null || subscribedMembers.isEmpty()) {
 				return "";
 			}
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while getting the member Summary");
+			LOGGER.warn("Exception occurred while getting the members pagination summary: " + e.getMessage());
 		}
 		int from = Math.min((memberPage + 1) * pageSize, subscribedMembers.size());
 		int total = subscribedMembers.size();
-//		int page = memberPage + 1;
-//		int totalPages = getTotalPages();
-
-		return "Showing " + from + " of " + total + " " + "Results";
+		return "Showing " + from + " of " + total + " Results";
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	                                             // Full Sorting Methods
-	// Sorting Asc Insurance
+	/**
+	 * Sorts patientInsuranceList ascending by fieldName.
+	 * 
+	 * @param fieldName Field to sort on.
+	 * @return null for JSF navigation.
+	 */
 	public String sortByAsc(String fieldName) {
 		try {
 			this.currentInsuranceSortColumn = fieldName;
 			this.currentInsuranceSortDirection = "asc";
 			sortPatientInsuranceList();
-			resetInsurancePage(); // Reset page after sort
+			resetInsurancePage();
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while sorting by Ascending");
+			LOGGER.warn("Exception occurred while sorting by Ascending: " + e.getMessage());
 		}
 		return null;
 	}
 
-	// Sorting Desc Insurance
+	/**
+	 * Sorts patientInsuranceList descending by fieldName.
+	 * 
+	 * @param fieldName Field to sort on.
+	 * @return null for JSF navigation.
+	 */
 	public String sortByDesc(String fieldName) {
 		try {
 			this.currentInsuranceSortColumn = fieldName;
 			this.currentInsuranceSortDirection = "desc";
 			sortPatientInsuranceList();
-			resetInsurancePage(); // Reset page after sort
+			resetInsurancePage();
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while sorting by Descending");
-
+			LOGGER.warn("Exception occurred while sorting by Descending: " + e.getMessage());
 		}
 		return null;
 	}
 
-	// Sorting Asc members
+	/**
+	 * Sort members ascending by fieldName.
+	 * 
+	 * @param fieldName Member object field to sort on.
+	 * @return null for JSF navigation.
+	 */
 	public String sortByAscMem(String fieldName) {
 		try {
 			this.currentMemberSortColumn = fieldName;
 			this.currentMemberSortDirection = "asc";
 			sortViewMemberList();
-			resetMemberPage(); // Reset page after sort
+			resetMemberPage();
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while sorting by Asending for members table");
+			LOGGER.warn("Exception occurred while sorting members ascending: " + e.getMessage());
 		}
 		return null;
 	}
 
-	// Sorting Desc members
+	/**
+	 * Sort members descending by fieldName.
+	 * 
+	 * @param fieldName Member object field to sort on.
+	 * @return null for JSF navigation.
+	 */
 	public String sortByDescMem(String fieldName) {
 		try {
 			this.currentMemberSortColumn = fieldName;
@@ -363,109 +347,93 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 			sortViewMemberList();
 			resetMemberPage();
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while sorting by Descending for members table");
-		} // Reset page after sort
+			LOGGER.warn("Exception occurred while sorting members descending: " + e.getMessage());
+		}
 		return null;
 	}
 
-	// Filter Reset Button
+	/**
+	 * Resets all insurance and date filters, restoring the original list.
+	 * 
+	 * @return null for JSF.
+	 */
 	public String resetFilter() {
 		try {
 			this.insurancePage = 0;
 			this.fromDate = null;
 			this.toDate = null;
-			this.selectedStatus = null; // ✅ Reset selected status too
+			this.selectedStatus = null;
 			this.patientInsuranceList = insuranceDao.showInsuranceOfRecipient(hId);
 			this.currentInsuranceSortColumn = null;
 			this.currentInsuranceSortDirection = null;
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while resetting the filters");
+			LOGGER.warn("Exception occurred while resetting the filters: " + e.getMessage());
 		}
 		return null;
 	}
 
-
-	
-	
-	
-	
-	
-	
-	                                        // Sorting for PatientInsurance page
 	@SuppressWarnings("unchecked")
 	private void sortPatientInsuranceList() {
 		try {
-			if (patientInsuranceList == null || currentInsuranceSortColumn == null) // Use currentInsuranceSortColumn
+			if (patientInsuranceList == null || currentInsuranceSortColumn == null)
 				return;
 
 			Collections.sort(patientInsuranceList, (a, b) -> {
 				try {
-					Field fieldA = a.getClass().getDeclaredField(currentInsuranceSortColumn); // Use
-																								// currentInsuranceSortColumn
-					Field fieldB = b.getClass().getDeclaredField(currentInsuranceSortColumn); // Use
-																								// currentInsuranceSortColumn
+					Field fieldA = a.getClass().getDeclaredField(currentInsuranceSortColumn);
+					Field fieldB = b.getClass().getDeclaredField(currentInsuranceSortColumn);
 					fieldA.setAccessible(true);
 					fieldB.setAccessible(true);
 					Comparable<Object> valueA = (Comparable<Object>) fieldA.get(a);
 					Comparable<Object> valueB = (Comparable<Object>) fieldB.get(b);
 
 					if (valueA == null)
-						return currentInsuranceSortDirection.equals("asc") ? -1 : 1; // Use currentInsuranceSortDirection
+						return currentInsuranceSortDirection.equals("asc") ? -1 : 1;
 					if (valueB == null)
-						return currentInsuranceSortDirection.equals("asc") ? 1 : -1; // Use currentInsuranceSortDirection
+						return currentInsuranceSortDirection.equals("asc") ? 1 : -1;
 
 					return currentInsuranceSortDirection.equals("asc") ? valueA.compareTo(valueB)
-							: valueB.compareTo(valueA); // Use currentInsuranceSortDirection
+							: valueB.compareTo(valueA);
 				} catch (Exception e) {
 					return 0;
 				}
 			});
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while Sorting the fields of Insurance table");
+			LOGGER.warn("Exception occurred while sorting Insurance table: " + e.getMessage());
 		}
 	}
 
-	
-	
-	                                           // Sorting for ViewMembers Page
 	@SuppressWarnings("unchecked")
 	private void sortViewMemberList() {
 		try {
-			if (subscribedMembers == null || currentMemberSortColumn == null) // Use currentMemberSortColumn
+			if (subscribedMembers == null || currentMemberSortColumn == null)
 				return;
 
 			Collections.sort(subscribedMembers, (a, b) -> {
 				try {
-					Field fieldA = a.getClass().getDeclaredField(currentMemberSortColumn); // Use currentMemberSortColumn
-					Field fieldB = b.getClass().getDeclaredField(currentMemberSortColumn); // Use currentMemberSortColumn
+					Field fieldA = a.getClass().getDeclaredField(currentMemberSortColumn);
+					Field fieldB = b.getClass().getDeclaredField(currentMemberSortColumn);
 					fieldA.setAccessible(true);
 					fieldB.setAccessible(true);
 					Comparable<Object> valueA = (Comparable<Object>) fieldA.get(a);
 					Comparable<Object> valueB = (Comparable<Object>) fieldB.get(b);
 
 					if (valueA == null)
-						return currentMemberSortDirection.equals("asc") ? -1 : 1; // Use currentMemberSortDirection
+						return currentMemberSortDirection.equals("asc") ? -1 : 1;
 					if (valueB == null)
-						return currentMemberSortDirection.equals("asc") ? 1 : -1; // Use currentMemberSortDirection
-
-					return currentMemberSortDirection.equals("asc") ? valueA.compareTo(valueB) : valueB.compareTo(valueA); // Use
-																															// currentMemberSortDirection
+						return currentMemberSortDirection.equals("asc") ? 1 : -1;
+					return currentMemberSortDirection.equals("asc") ? valueA.compareTo(valueB)
+							: valueB.compareTo(valueA);
 				} catch (Exception e) {
 					return 0;
 				}
 			});
 		} catch (Exception e) {
-			LOGGER.info("An exception occured while sorting the members table");
+			LOGGER.warn("Exception occurred while sorting Members table: " + e.getMessage());
 		}
 	}
-	
-	
-	
-	
-	
-	
 
-	                                                 // Getters & Setters
+	// Getter and setter methods (no logic change, so left as-is)
 	public String gethId() {
 		return hId;
 	}
@@ -554,31 +522,24 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 		this.insurancePage = insurancePage;
 	}
 
-	// These 'sortField' and 'ascending' are now effectively unused as we have
-	// specific ones for each table.
-	// You might consider removing them if they are truly not used elsewhere.
 	public String getSortField() {
-		return null; // Not directly used for table sorting state anymore
+		return null;
 	}
 
 	public void setSortField(String sortField) {
-		// Not directly used for table sorting state anymore
 	}
 
 	public boolean isAscending() {
-		return true; // Not directly used for table sorting state anymore
+		return true;
 	}
 
 	public void setAscending(boolean ascending) {
-		// Not directly used for table sorting state anymore
 	}
 
 	public int getPageSize() {
 		return pageSize;
 	}
 
-	// Getters and Setters for currentInsuranceSortColumn and
-	// currentInsuranceSortDirection
 	public String getCurrentInsuranceSortColumn() {
 		return currentInsuranceSortColumn;
 	}
@@ -595,8 +556,6 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 		this.currentInsuranceSortDirection = currentInsuranceSortDirection;
 	}
 
-	// Getters and Setters for currentMemberSortColumn and
-	// currentMemberSortDirection
 	public String getCurrentMemberSortColumn() {
 		return currentMemberSortColumn;
 	}
@@ -613,43 +572,51 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 		this.currentMemberSortDirection = currentMemberSortDirection;
 	}
 
-	
-	
-	
+	public Date getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public Date getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
+	}
+
+	public String getSelectedStatus() {
+		return selectedStatus;
+	}
+
+	public void setSelectedStatus(String selectedStatus) {
+		this.selectedStatus = selectedStatus;
+	}
+
 	/**
 	 * Determines if a sort button (up or down arrow) should be rendered for the
-	 * PatientInsuranceDetails table. The button should disappear if it represents
-	 * the currently active sort.*/
+	 * PatientInsuranceDetails table.
+	 */
 	public boolean renderSortButton(String column, String direction) {
-		// If no sorting is active, or if this is a different column, render all buttons
-		if (currentInsuranceSortColumn == null || !currentInsuranceSortColumn.equals(column)) {
+		if (currentInsuranceSortColumn == null || !currentInsuranceSortColumn.equals(column))
 			return true;
-		}
-		// If it's the same column, render only if its direction is different from the
-		// current sort direction
 		return !currentInsuranceSortDirection.equals(direction);
 	}
 
-	
-	
 	/**
 	 * Determines if a sort button (up or down arrow) should be rendered for the
-	 * SubscribedMembers table. The button should disappear if it represents the
-	 * currently active sort.*/
+	 * SubscribedMembers table.
+	 */
 	public boolean renderSortButtonMem(String column, String direction) {
-		// If no sorting is active, or if this is a different column, render all buttons
-		if (currentMemberSortColumn == null || !currentMemberSortColumn.equals(column)) {
+		if (currentMemberSortColumn == null || !currentMemberSortColumn.equals(column))
 			return true;
-		}
-		// If it's the same column, render only if its direction is different from the
-		// current sort direction
 		return !currentMemberSortDirection.equals(direction);
 	}
 
-	
-	
-	
-	// Pagination getters/setters for Insurance table
+	// Insurance table pagination methods...
 	public void nextPage() {
 		if (getHasNextPage())
 			insurancePage++;
@@ -682,7 +649,7 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 		this.insurancePage = 0;
 	}
 
-	// Pagination getters/setters for Members table
+	// Members table pagination methods...
 	public void nextMemberPage() {
 		if (getHasNextMemberPage())
 			memberPage++;
@@ -701,7 +668,7 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 		return memberPage > 0;
 	}
 
-	public int getMemberPage() { // This returns current page number (1-based)
+	public int getMemberPage() {
 		return memberPage + 1;
 	}
 
@@ -715,52 +682,28 @@ public class ShowInsuranceController implements Serializable{ // No annotations 
 		this.memberPage = 0;
 	}
 
-	public Date getFromDate() {
-		return fromDate;
-	}
-
-	public void setFromDate(Date fromDate) {
-		this.fromDate = fromDate;
-	}
-
-	public Date getToDate() {
-		return toDate;
-	}
-
-	public void setToDate(Date toDate) {
-		this.toDate = toDate;
-	}
-	
-	
-
-	public String getSelectedStatus() {
-		return selectedStatus;
-	}
-
-
-
-
-
-	public void setSelectedStatus(String selectedStatus) {
-		this.selectedStatus = selectedStatus;
-	}
-
-
-	// Logout method
+	/**
+	 * JSF action for logging out user, clearing session, and redirecting to home
+	 * page.
+	 * 
+	 * @return navigation string
+	 */
 	public String logout() {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 		HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
 		if (session != null) {
-	        LOGGER.info(recipient.getFullName()+" "+"has logged-out....");
-			System.out.println(recipient.getFullName()+" "+"has logged-out....");
+			LOGGER.info(getFullName() + " has logged-out....");
 			session.invalidate();
 		}
 		return "/home/Home.jsp?faces-redirect=true";
 	}
-	
-	
-    public String goBackinc() {
-        return "ShowInsurance";
-    }
 
+	/**
+	 * Action to return to insurance listing.
+	 * 
+	 * @return navigation string to ShowInsurance page
+	 */
+	public String goBackinc() {
+		return "ShowInsurance";
+	}
 }

@@ -1,3 +1,5 @@
+/// Copyright © 2025 Infinite Computer Solution. All rights reserved.
+
 package com.infinite.jsf.recipient.daoImpl;
 
 import java.util.ArrayList;
@@ -9,128 +11,239 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Restrictions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
+
 
 import com.infinite.jsf.provider.model.Doctors;
 import com.infinite.jsf.recipient.dao.SearchDoctorDao;
 import com.infinite.jsf.util.SessionHelper;
 
+/**
+ * Implementation of SearchDoctorDao interface for searching doctors based on
+ * name, address, specialization, and fetching all specializations. Uses
+ * Hibernate for database operations.
+ */
 public class SearchDoctorDaoImpl implements SearchDoctorDao {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SearchDoctorDaoImpl.class);
+    private static final Logger LOGGER = Logger.getLogger(SearchDoctorDaoImpl.class.getName());
 
-    static SessionFactory sessionFactory;
-    static {
-        sessionFactory = SessionHelper.getSessionFactory();
-    }
+	static SessionFactory sessionFactory;
 
-    // Private helper method to avoid repetition (Core Engine)
-    private List<Doctors> searchByCriteria(String fieldName, String keywordOrValue, MatchMode matchMode) {
-        List<Doctors> result = new ArrayList<>();
-        Session session = null;
+	static {
+		sessionFactory = SessionHelper.getSessionFactory();
+	}
 
-        try {
-            session = sessionFactory.openSession();
-            Criteria criteria = session.createCriteria(Doctors.class);
+	/**
+	 * Utility method to perform doctor search using criteria.
+	 *
+	 * @param fieldName      the field to search (e.g., "doctorName", "address")
+	 * @param keywordOrValue the value to match against
+	 * @param matchMode      match mode (EXACT, START, ANYWHERE)
+	 * @return list of matching Doctor objects
+	 */
+	@SuppressWarnings("unchecked")
+	private List<Doctors> searchByCriteria(String fieldName, String keywordOrValue, MatchMode matchMode) {
+		if (fieldName == null || keywordOrValue == null || fieldName.trim().isEmpty()) {
+			LOGGER.warn("searchByCriteria: Required parameter is null or empty. fieldName={}, keyword={}");
+			return new ArrayList<>();
+		}
 
-            if (matchMode != null) {
-                criteria.add(Restrictions.ilike(fieldName, keywordOrValue.trim(), matchMode));
-            } else {
-                criteria.add(Restrictions.eq(fieldName, keywordOrValue));
-            }
+		List<Doctors> result = new ArrayList<>();
+		Session session = null;
 
-            result = criteria.list();
-        } catch (Exception e) {
-            LOGGER.error("Error searching doctors by field: {} with value: {}", fieldName, keywordOrValue, e);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+		try {
+			session = sessionFactory.openSession();
 
-        return result != null ? result : new ArrayList<>();
-    }
+			if ("doctorName".equalsIgnoreCase(fieldName) && matchMode == MatchMode.EXACT) {
+				String normalizedValue = keywordOrValue.trim().toLowerCase();
+				String hql = "FROM Doctors d WHERE lower(d.doctorName) = :name";
+				result = session.createQuery(hql).setParameter("name", normalizedValue).list();
+			} else {
+				Criteria criteria = session.createCriteria(Doctors.class);
 
-    // Drop Down based search from UI for Search Value
-    @Override
-    public List<Doctors> searchDoctors(String searchBy, String value) {
-        try {
-            if ("doctorName".equalsIgnoreCase(searchBy)) {
-                return searchByCriteria("doctorName", value, MatchMode.ANYWHERE);
-            } else if ("specialization".equalsIgnoreCase(searchBy)) {
-                return searchByCriteria("specialization", value, null);
-            } else if ("address".equalsIgnoreCase(searchBy)) {
-                return searchByCriteria("address", value, MatchMode.ANYWHERE);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Error in searchDoctors with searchBy: {} and value: {}", searchBy, value, e);
-        }
-        return new ArrayList<>();
-    }
+				if (matchMode != null) {
+					criteria.add(Restrictions.ilike(fieldName, keywordOrValue.trim(), matchMode));
+				} else {
+					criteria.add(Restrictions.eq(fieldName, keywordOrValue));
+				}
 
-    @Override
-    public List<Doctors> findDoctorsByNameStartsWith(String keyword) {
-        try {
-            String searchKeyword = keyword.trim();
-            if (!searchKeyword.toLowerCase().startsWith("dr.")) {
-                searchKeyword = "Dr. " + searchKeyword;
-            }
-            return searchByCriteria("doctorName", searchKeyword, MatchMode.START);
-        } catch (Exception e) {
-            LOGGER.error("Error in findDoctorsByNameStartsWith with keyword: {}", keyword, e);
-            return new ArrayList<>();
-        }
-    }
+				result = criteria.list();
+			}
 
-    @Override
-    public List<Doctors> findDoctorsByNameContains(String keyword) {
-        try {
-            return searchByCriteria("doctorName", keyword, MatchMode.ANYWHERE);
-        } catch (Exception e) {
-            LOGGER.error("Error in findDoctorsByNameContains with keyword: {}", keyword, e);
-            return new ArrayList<>();
-        }
-    }
+		} catch (Exception e) {
+			LOGGER.error("searchByCriteria: Error while searching. field={}, keyword={}, mode={}", e);
+		} finally {
+			if (session != null) {
+				try {
+					session.close();
+				} catch (Exception closeEx) {
+					LOGGER.warn("searchByCriteria: Error closing session", closeEx);
+				}
+			}
+		}
 
-    @Override
-    public List<Doctors> findDoctorsByAddressStartsWith(String keyword) {
-        try {
-            return searchByCriteria("address", keyword, MatchMode.START);
-        } catch (Exception e) {
-            LOGGER.error("Error in findDoctorsByAddressStartsWith with keyword: {}", keyword, e);
-            return new ArrayList<>();
-        }
-    }
+		return result != null ? result : new ArrayList<>();
+	}
 
-    @Override
-    public List<Doctors> findDoctorsByAddressContains(String keyword) {
-        try {
-            return searchByCriteria("address", keyword, MatchMode.ANYWHERE);
-        } catch (Exception e) {
-            LOGGER.error("Error in findDoctorsByAddressContains with keyword: {}", keyword, e);
-            return new ArrayList<>();
-        }
-    }
+	/**
+	 * Searches for doctors based on selected criteria (e.g., name, specialization,
+	 * address).
+	 *
+	 * @param searchBy the field to search on
+	 * @param value    the value to match
+	 * @return list of matching Doctors
+	 */
+	@Override
+	public List<Doctors> searchDoctors(String searchBy, String value) {
+		if (searchBy == null || value == null || searchBy.trim().isEmpty()) {
+			LOGGER.warn("searchDoctors: searchBy or value is null or empty. searchBy={}, value={}");
+			return new ArrayList<>();
+		}
 
-    // Fetches all the distinct specialization
-    @Override
-    public List<String> fetchAllSpecialization() {
-        Session session = null;
-        List<String> specializations = new ArrayList<>();
+		try {
+			String searchField = searchBy.trim().toLowerCase();
 
-        try {
-            session = sessionFactory.openSession();
-            Query query = session.getNamedQuery("fetchAllSpecializations");
-            specializations = query.list();
-        } catch (Exception e) {
-            LOGGER.error("Error fetching all specializations", e);
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+			switch (searchField) {
+			case "doctorname":
+				return searchByCriteria("doctorName", value, MatchMode.EXACT);
+			case "specialization":
+				return searchByCriteria("specialization", value, null);
+			case "address":
+				return searchByCriteria("address", value, MatchMode.ANYWHERE);
+			default:
+				LOGGER.warn("searchDoctors: Unsupported searchBy value '{}'");
+			}
+		} catch (Exception e) {
+			LOGGER.error("searchDoctors: Exception occurred. searchBy={}, value={}", e);
+		}
 
-        return specializations != null ? specializations : new ArrayList<>();
-    }
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Finds doctors whose names start with the given keyword.
+	 *
+	 * @param keyword the name prefix to match
+	 * @return list of matching Doctors
+	 */
+	@Override
+	public List<Doctors> findDoctorsByNameStartsWith(String keyword) {
+		if (keyword == null || keyword.trim().isEmpty()) {
+			LOGGER.warn("findDoctorsByNameStartsWith: keyword is null or empty");
+			return new ArrayList<>();
+		}
+
+		try {
+			String searchKeyword = keyword.trim();
+			if (!searchKeyword.toLowerCase().startsWith("dr.")) {
+				searchKeyword = "Dr. " + searchKeyword;
+			}
+			return searchByCriteria("doctorName", searchKeyword, MatchMode.START);
+		} catch (Exception e) {
+			LOGGER.error("findDoctorsByNameStartsWith: Exception occurred. keyword={}", e);
+		}
+
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Finds doctors whose names contain the keyword.
+	 *
+	 * @param keyword the keyword fragment
+	 * @return list of matching Doctors
+	 */
+	@Override
+	public List<Doctors> findDoctorsByNameContains(String keyword) {
+		if (keyword == null || keyword.trim().isEmpty()) {
+			LOGGER.warn("findDoctorsByNameContains: keyword is null or empty");
+			return new ArrayList<>();
+		}
+
+		try {
+			return searchByCriteria("doctorName", keyword, MatchMode.ANYWHERE);
+		} catch (Exception e) {
+			LOGGER.error("findDoctorsByNameContains: Exception occurred. keyword={}", e);
+		}
+
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Finds doctors by address prefix.
+	 *
+	 * @param keyword the beginning of the address
+	 * @return list of matching Doctors
+	 */
+	@Override
+	public List<Doctors> findDoctorsByAddressStartsWith(String keyword) {
+		if (keyword == null || keyword.trim().isEmpty()) {
+			LOGGER.warn("findDoctorsByAddressStartsWith: keyword is null or empty");
+			return new ArrayList<>();
+		}
+
+		try {
+			return searchByCriteria("address", keyword, MatchMode.START);
+		} catch (Exception e) {
+			LOGGER.error("findDoctorsByAddressStartsWith: Exception occurred. keyword={}", e);
+		}
+
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Finds doctors by address containing the keyword.
+	 *
+	 * @param keyword the substring of the address
+	 * @return list of matching Doctors
+	 */
+	@Override
+	public List<Doctors> findDoctorsByAddressContains(String keyword) {
+		if (keyword == null || keyword.trim().isEmpty()) {
+			LOGGER.warn("findDoctorsByAddressContains: keyword is null or empty");
+			return new ArrayList<>();
+		}
+
+		try {
+			return searchByCriteria("address", keyword, MatchMode.ANYWHERE);
+		} catch (Exception e) {
+			LOGGER.error("findDoctorsByAddressContains: Exception occurred. keyword={}", e);
+		}
+
+		return new ArrayList<>();
+	}
+
+	/**
+	 * Retrieves all doctor specializations from the database.
+	 *
+	 * @return list of specialization names
+	 */
+	@Override
+	public List<String> fetchAllSpecialization() {
+		Session session = null;
+		List<String> specializations = new ArrayList<>();
+
+		try {
+			session = sessionFactory.openSession();
+			Query query = session.getNamedQuery("fetchAllSpecializations");
+
+			if (query != null) {
+				specializations = query.list();
+			} else {
+				LOGGER.warn("fetchAllSpecialization: Named query 'fetchAllSpecializations' not found");
+			}
+
+		} catch (Exception e) {
+			LOGGER.error("fetchAllSpecialization: Exception occurred", e);
+		} finally {
+			if (session != null) {
+				try {
+					session.close();
+				} catch (Exception closeEx) {
+					LOGGER.warn("fetchAllSpecialization: Error closing session", closeEx);
+				}
+			}
+		}
+
+		return specializations != null ? specializations : new ArrayList<>();
+	}
 }

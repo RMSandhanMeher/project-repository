@@ -4,34 +4,38 @@
     "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
 
 <hibernate-mapping>
-    <class name="com.infinite.jsf.insurance.model.InsurancePlan" table="insurance_plan">
+	<class name="com.infinite.jsf.insurance.model.InsurancePlan"
+		table="insurance_plan">
 
-        <id name="planId" column="plan_id" type="string">
-            <generator class="assigned"/>
-        </id>
+		<id name="planId" column="plan_id" type="string">
+			<generator class="assigned" />
+		</id>
 
-        <many-to-one name="insuranceCompany"
-             class="com.infinite.jsf.insurance.model.InsuranceCompany"
-             column="company_id"
-             not-null="true"
-             lazy="false"
-             fetch="join" />
+		<many-to-one name="insuranceCompany"
+			class="com.infinite.jsf.insurance.model.InsuranceCompany"
+			column="company_id" not-null="true" lazy="false" fetch="join" />
 
 
-        <property name="planName" column="plan_name" type="string"/>
+		<property name="planName" column="plan_name" type="string" />
 
-        <!-- Map enum via helper method -->
-        <property name="planTypeString" column="plan_type" type="string"/>
+		<!-- Map enum via helper method -->
+		<property name="planTypeString" column="plan_type"
+			type="string" />
 
-        <property name="minEntryAge" column="min_entry_age" type="int"/>
-        <property name="maxEntryAge" column="max_entry_age" type="int"/>
-        <property name="description" column="description" type="text"/>
-        <property name="availableCoverAmounts" column="available_cover_amounts" type="string"/>
-        <property name="waitingPeriod" column="waiting_period" type="string"/>
-        <property name="createdOn" column="created_on" type="date"/>
-        <property name="expireDate" column="expire_date" type="date"/>
-        <property name="activeOn" column="active_on" type="date"/>
-        <property name="periodicDiseases" column="periodic_diseases" type="string"/>
+		<property name="minEntryAge" column="min_entry_age"
+			type="int" />
+		<property name="maxEntryAge" column="max_entry_age"
+			type="int" />
+		<property name="description" column="description" type="text" />
+		<property name="availableCoverAmounts"
+			column="available_cover_amounts" type="string" />
+		<property name="waitingPeriod" column="waiting_period"
+			type="string" />
+		<property name="createdOn" column="created_on" type="date" />
+		<property name="expireDate" column="expire_date" type="date" />
+		<property name="activeOn" column="active_on" type="date" />
+		<property name="periodicDiseases" column="periodic_diseases"
+			type="string" />
 
-    </class>
+	</class>
 </hibernate-mapping>

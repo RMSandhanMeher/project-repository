@@ -26,7 +26,7 @@
 	<h2>Health Insurance Details</h2>
 
 	<h:form id="insuranceForm" styleClass="main-content-panel">
-		
+
 		<%-- Filter Buttons --%>
 		<h:panelGroup layout="block" styleClass="filter-buttons-bar">
 			<h:commandButton id="activeOnlyBtn" value="Show Active Only"
@@ -59,21 +59,21 @@
 
 			<h:commandButton id="resetFilterBtn" value="Reset Filters"
 				action="#{showincController.resetFilter}"
-				styleClass="btn btn-secondary"
-				onclick="resetActiveFilter();" />
+				styleClass="btn btn-secondary" onclick="resetActiveFilter();" />
 		</h:panelGroup>
 
 
 
 
-        <h:messages globalOnly="true" style="color:red" id="messages"/> <%-- Added ID to messages --%>
+		<h:messages globalOnly="true" style="color:red" id="messages" />
+		<%-- Added ID to messages --%>
 
-		<h:panelGroup id="insuranceTablePanel"> 
-			
+		<h:panelGroup id="insuranceTablePanel">
+
 
 			<h:dataTable id="insuranceTable"
-				value="#{showincController.insuranceData}"
-				var="insurance" styleClass="data-table"
+				value="#{showincController.insuranceData}" var="insurance"
+				styleClass="data-table"
 				rendered="#{not empty showincController.insuranceData}">
 
 				<h:column>
@@ -346,7 +346,7 @@
 							</h:panelGroup>
 						</h:panelGroup>
 					</f:facet>
-					
+
 					<h:panelGroup rendered="#{insurance.coverageType eq 'FAMILY'}">
 						<h:commandLink
 							action="#{showincController.viewMembers(insurance)}"
@@ -354,7 +354,7 @@
 							<h:outputText value="#{insurance.coverageLimit}" />
 						</h:commandLink>
 					</h:panelGroup>
-					
+
 					<h:panelGroup rendered="#{insurance.coverageType ne 'FAMILY'}">
 						<h:outputText value="#{insurance.coverageLimit}" />
 					</h:panelGroup>
@@ -450,17 +450,17 @@
 							</h:panelGroup>
 						</h:panelGroup>
 					</f:facet>
-					
+
 					<h:panelGroup rendered="#{insurance.coverageType eq 'FAMILY'}">
 						<h:commandLink
 							action="#{showincController.viewMembers(insurance)}"
 							style="display:block; text-decoration:none; color:inherit;">
 							<h:outputText value="#{insurance.lastClaimDate}">
 								<f:convertDateTime pattern="MM-dd-yyyy" />
-								</h:outputText>
-							</h:commandLink>
+							</h:outputText>
+						</h:commandLink>
 					</h:panelGroup>
-					
+
 					<h:panelGroup rendered="#{insurance.coverageType ne 'FAMILY'}">
 						<h:outputText value="#{insurance.lastClaimDate}">
 							<f:convertDateTime pattern="MM-dd-yyyy" />
@@ -468,17 +468,19 @@
 					</h:panelGroup>
 				</h:column>
 			</h:dataTable>
-		</h:panelGroup> <%-- Closing panelGroup for insuranceTablePanel --%>
+		</h:panelGroup>
+		<%-- Closing panelGroup for insuranceTablePanel --%>
 
 		<h:panelGroup id="paginationPanel"
 			rendered="#{not empty showincController.insuranceData}"
 			layout="block" styleClass="pagination">
-			
-			<h:outputText value="#{showincController.paginationIncSummary}" 
+
+			<h:outputText value="#{showincController.paginationIncSummary}"
 				styleClass="pagination-label"
-				rendered="#{not empty showincController.insuranceData}"/>
-				
-			<div> <%-- This div groups the pagination buttons and current page label --%>
+				rendered="#{not empty showincController.insuranceData}" />
+
+			<div>
+				<%-- This div groups the pagination buttons and current page label --%>
 				<h:commandButton value="« Previous"
 					action="#{showincController.previousPage}"
 					disabled="#{not showincController.hasPreviousPage}"
@@ -489,10 +491,15 @@
 
 				<h:commandButton value="Next »"
 					action="#{showincController.nextPage}"
-					disabled="#{not showincController.hasNextPage}"
-					styleClass="btn" />
+					disabled="#{not showincController.hasNextPage}" styleClass="btn" />
 			</div>
 		</h:panelGroup>
+
+		<h:panelGroup rendered="#{empty showincController.insuranceData}">
+			<h:outputText value="Please subscribe to a plan now."
+				styleClass="not-found" />
+		</h:panelGroup>
+
 
 	</h:form>
 </body>

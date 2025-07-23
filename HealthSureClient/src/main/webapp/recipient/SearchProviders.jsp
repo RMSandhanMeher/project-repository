@@ -23,10 +23,10 @@
 
 	<jsp:include page="/navbar/NavRecipient.jsp" />
 
-	<h2>Search for Providers🩺</h2>
-	<p class="paragrah">Find the best Doctors Near you</p>
+
 
 	<h:form id="searchForm" styleClass="main-content-panel">
+	<h2>Search for Providers🩺</h2>
 		<%-- Global messages display --%>
 		<h:messages globalOnly="true" style="color:red"/>
 
@@ -43,9 +43,10 @@
                 </div>
             </div>
 
+
             <div class="form-row">
                 <h:outputLabel escape="false"
-                    value="Search Criteria: <span style='color:red; font-size:20px;'>*</span>"/>
+                    value="<span style='color:red; font-size:20px;'>*</span>Search Criteria:"/>
                 <div class="input-wrapper">
                     <%-- Input Text for Doctor Name / Address --%>
                     <h:panelGroup id="searchValueInputDiv" layout="block"
@@ -74,7 +75,8 @@
                 <h:panelGroup id="searchModeRadiosDiv" layout="block"
                     styleClass="#{(doctorSearchController.searchBy eq 'doctorName' or doctorSearchController.searchBy eq 'address') ? 'search-mode-radios-container' : 'hidden search-mode-radios-container'}">
                     <h:selectOneRadio id="searchMode" value="#{doctorSearchController.searchMode}" styleClass="search-mode-radios">
-                        <f:selectItem itemValue="startsWith" itemLabel="Starts With" />
+                    	<f:selectItem itemValue="exact" itemLabel="Exact Match" /><br>
+                        <f:selectItem itemValue="startsWith" itemLabel="StartsWith" />
                         <f:selectItem itemValue="contains" itemLabel="Contains" />
                         <%-- Important: If doctorSearchController.searchMode is null or not matching any itemValue, none will be selected --%>
                     </h:selectOneRadio>
@@ -329,7 +331,7 @@
 		</h:panelGroup>
 
 	</h:form>
-
 </body>
+	<jsp:include page="/footer/Footer.jsp" />
 	</html>
 </f:view>
