@@ -34,5 +34,14 @@
 		<param-name>contact</param-name>
 		<param-value>+91 87432 98324</param-value>
 	</context-param>
+	
+	<filter>
+		<filter-name>RecipientFilter</filter-name>
+		<filter-class>com.infinite.jsf.recipient.filter.RecipientFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>RecipientFilter</filter-name>
+		<url-pattern>/recipient/*</url-pattern>
+	</filter-mapping>
 
 </web-app>
