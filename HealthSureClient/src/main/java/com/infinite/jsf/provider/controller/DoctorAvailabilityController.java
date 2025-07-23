@@ -155,7 +155,7 @@ public class DoctorAvailabilityController implements Serializable {
 			appointment.setProvider(provider);
 
 			String result = appointmentDao.bookAnAppointment(appointment);
-			if (result.startsWith("Appointment booked")) {
+			if (result.startsWith("Appointment requested successfully")) {
 
 				HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext()
 						.getSession(true);

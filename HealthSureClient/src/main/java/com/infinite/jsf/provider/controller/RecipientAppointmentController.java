@@ -6,8 +6,6 @@ import java.util.*;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
@@ -15,7 +13,6 @@ import javax.servlet.ServletContext;
 
 import com.infinite.jsf.provider.daoImpl.AppointmentDaoImpl;
 import com.infinite.jsf.provider.daoImpl.DoctorDaoImpl;
-import com.infinite.jsf.provider.daoImpl.RecipientDaoImpl;
 import com.infinite.jsf.provider.dto.AppointmentSlip;
 import com.infinite.jsf.provider.model.Appointment;
 import com.infinite.jsf.provider.model.AppointmentStatus;
