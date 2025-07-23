@@ -98,11 +98,11 @@
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 						<h:outputText value="#{appt.appointmentId}" />
                         <h:commandButton id="detailButton" value="View"
-                                       action="#{recipientAppointmentController.loadAppointmentDetailsForDisplay}"
+                                       action="#{appointmentDetailController.loadAppointmentDetailsForDisplay(appt.appointmentId)}"
                                        styleClass="hidden-command-button"
                                        onclick="document.getElementById('loadingOverlay').style.display = 'flex'; return true;">
                             <f:setPropertyActionListener
-                                target="#{recipientAppointmentController.selectedAppointmentIdForDetail}"
+                                target="#{appointmentDetailController.selectedAppointmentIdForDetail}"
                                 value="#{appt.appointmentId}" />
                         </h:commandButton>
 					</h:panelGroup>

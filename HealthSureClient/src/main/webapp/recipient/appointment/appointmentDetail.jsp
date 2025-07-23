@@ -48,67 +48,67 @@
 
         <div class="detail-item">
             <span class="detail-label">Doctor Name:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.doctorName}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.doctorName}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Specialization:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.doctorSpecialization}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.doctorSpecialization}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Gender:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.doctorGender}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.doctorGender}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Availability Timing:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.doctorAvailabilityTiming}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.doctorAvailabilityTiming}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Appointment ID:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.appointmentId}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.appointmentId}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Requested At:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.requestedAt}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.requestedAt}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Booked At:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.bookedAt}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.bookedAt}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Cancelled At:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.cancelledAt}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.cancelledAt}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Completed At:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.completedAt}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.completedAt}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Status:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.status}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.status}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Slot No:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.slotNo}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.slotNo}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">Start Time:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.start}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.start}" />
         </div>
 
         <div class="detail-item">
             <span class="detail-label">End Time:</span>
-            <h:outputText value="#{recipientAppointmentController.appointmentDetailsForDisplay.end}" />
+            <h:outputText value="#{appointmentDetailController.appointmentDetailsForDisplay.end}" />
         </div>
 
         <h:outputLink value="./recipient-appointments.jsf" styleClass="back-link">← Back to Appointments</h:outputLink>
@@ -116,5 +116,10 @@
 </body>
 </html>
 </f:view>
+
+
+
+
+
 
 

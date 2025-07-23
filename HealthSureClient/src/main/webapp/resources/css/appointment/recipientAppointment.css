@@ -151,11 +151,21 @@
 /* Default row styling (for odd/even rows) - these apply to the TR */
 .table-row-odd {
     background-color: #ffffff; /* bg-white */
+    
 }
 
 .table-row-even {
     background-color: #f9fafb; /* even:bg-gray-50 */
 }
+.table-row-odd:hover {
+   opacity: 0.5;
+    
+}
+
+.table-row-even :hover{
+	opacity:0.5;
+	}
+
 
 /*
    Styles for the h:panelGroup that wraps cell content.
