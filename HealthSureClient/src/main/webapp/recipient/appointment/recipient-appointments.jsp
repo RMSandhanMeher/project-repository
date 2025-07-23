@@ -15,7 +15,17 @@
 	/* Important for absolute positioning of inner elements */
 	position: relative;
 	/* Ensure padding is defined here for the cell itself */
-	padding: 1rem 0px; /* px-4 py-2 from your original CSS */
+	padding: 20px 1px; /* px-4 py-2 from your original CSS */
+}
+
+/* New CSS for clickable rows */
+.clickable-row {
+    cursor: pointer;
+}
+
+/* Ensure the hidden button doesn't take up space or interfere with layout */
+.hidden-command-button {
+    display: none;
 }
 </style>
 </head>
@@ -35,10 +45,9 @@
 						<circle class="opacity-25-svg" cx="12" cy="12" r="10"
 							stroke="currentColor" stroke-width="4"></circle>
 						<path class="opacity-75-svg" fill="currentColor"
-							d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+							d="M4 12a8 8 0 018-8v4a4 0 00-4 4H4z"></path>
 					</svg>
-					<p class="loading-text">Cancelling your appointment...</p>
-				</div>
+					<p class="loading-text">Loading details...</p> </div>
 			</div>
 
 			<div class="filter-grid-container">
@@ -51,7 +60,6 @@
 						<f:selectItem itemLabel="Past" itemValue="past" />
 					</h:selectOneMenu>
 				</div>
-
 				<div class="filter-item">
 					<label for="statusFilter" class="filter-label">Status
 						Filter:</label>
@@ -79,9 +87,9 @@
 			<h:dataTable
 				value="#{recipientAppointmentController.paginatedAppointments}"
 				var="appt" styleClass="slots-table-component appointment-table"
-				rowClasses="table-row-odd,table-row-even" columnClasses="table-cell">
-				<%-- No dynamic classes here --%>
-
+				rowClasses="table-row-odd clickable-row,table-row-even clickable-row"
+				columnClasses="table-cell">
+				
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Appointment ID" />
@@ -89,6 +97,14 @@
 					<h:panelGroup
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 						<h:outputText value="#{appt.appointmentId}" />
+                        <h:commandButton id="detailButton" value="View"
+                                       action="#{recipientAppointmentController.loadAppointmentDetailsForDisplay}"
+                                       styleClass="hidden-command-button"
+                                       onclick="document.getElementById('loadingOverlay').style.display = 'flex'; return true;">
+                            <f:setPropertyActionListener
+                                target="#{recipientAppointmentController.selectedAppointmentIdForDetail}"
+                                value="#{appt.appointmentId}" />
+                        </h:commandButton>
 					</h:panelGroup>
 				</h:column>
 
@@ -134,6 +150,7 @@
 						<h:outputText value="#{empty appt.notes ? 'None' : appt.notes}" />
 					</h:panelGroup>
 				</h:column>
+
 				<h:column>
 					<f:facet name="header">
 						<h:outputText value="Actions" />
@@ -142,7 +159,7 @@
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 						<h:commandButton value="Cancel"
 							rendered="#{recipientAppointmentController.cancellableMap[appt.appointmentId]}"
-							onclick="return showLoadingAndConfirm();"
+							onclick="event.stopPropagation(); return showLoadingAndConfirm();"
 							action="#{recipientAppointmentController.cancelAppointment}"
 							styleClass="cancel-button">
 							<f:setPropertyActionListener
@@ -179,6 +196,36 @@
 		</h:form>
 	</div>
 	<script>
+        // This function will be called once the DOM is fully loaded.
+        // It ensures that elements exist before we try to attach listeners.
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all rows with the 'clickable-row' class within the table body
+            const rows = document.querySelectorAll('.slots-table-component tbody tr.clickable-row');
+
+            rows.forEach(row => {
+                row.addEventListener('click', function(event) {
+                    // Check if the click originated from the cancel button or its children
+                    // or from any element with the 'no-row-click' class (for other future interactive elements)
+                    if (event.target.closest('.cancel-button') || 
+                        event.target.closest('.pagination-button') ||
+                        event.target.closest('.no-row-click')) { // Add this class to any element that should NOT trigger row click
+                        return; // Do nothing if a specific button or element was clicked
+                    }
+
+                    // Find the hidden commandButton within the clicked row
+                    // Note: JSF generates complex IDs like formId:dataTableId:rowIndex:componentId
+                    // querySelector works with just the class or attribute selectors
+                    const detailButton = row.querySelector('.hidden-command-button');
+                    
+                    if (detailButton) {
+                        // Programmatically click the hidden button
+                        detailButton.click();
+                    }
+                });
+            });
+        });
+
+
 		function showLoadingAndConfirm() {
 			const confirmCancel = confirm('Are you sure you want to cancel this appointment?');
 			if (confirmCancel) {
