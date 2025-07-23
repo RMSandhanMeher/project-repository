@@ -2,12 +2,9 @@
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core"%>
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html"%>
 <f:view>
-	<!DOCTYPE html>
 	<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Doctor Availability</title>
+
 <%-- <script src="https://cdn.tailwindcss.com"></script> --%>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/appointment/doctorAvailability.css">
