@@ -98,7 +98,7 @@
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 						<h:outputText value="#{appt.appointmentId}" />
                         <h:commandButton id="detailButton" value="View"
-                                       action="#{recipientAppointmentController.viewAppointmentDetails}"
+                                       action="#{recipientAppointmentController.loadAppointmentDetailsForDisplay}"
                                        styleClass="hidden-command-button"
                                        onclick="document.getElementById('loadingOverlay').style.display = 'flex'; return true;">
                             <f:setPropertyActionListener
@@ -224,6 +224,8 @@
                 });
             });
         });
+
+
 		function showLoadingAndConfirm() {
 			const confirmCancel = confirm('Are you sure you want to cancel this appointment?');
 			if (confirmCancel) {
