@@ -135,6 +135,10 @@
     border-collapse: collapse; /* Ensure borders are collapsed for a cleaner look */
 }
 
+.appointment-table tbody>tr:hover{
+    border: 2px solid black;/* Ensure borders are collapsed for a cleaner look */
+}
+
 .appointment-table th {
     padding: 0.5rem 1rem; /* px-4 py-2 */
     border: 1px solid #d1d5db; /* border */
@@ -157,14 +161,6 @@
 .table-row-even {
     background-color: #f9fafb; /* even:bg-gray-50 */
 }
-.table-row-odd:hover {
-   opacity: 0.5;
-    
-}
-
-.table-row-even :hover{
-	opacity:0.5;
-	}
 
 
 /*
