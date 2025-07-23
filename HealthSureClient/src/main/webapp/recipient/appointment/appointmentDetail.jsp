@@ -76,6 +76,7 @@
 		<h:outputText
 			value="#{recipientAppointmentController.appointmentDetailsForDisplay.end}" />
 	</p>
+	<h:outputLink value="./recipient-appointments.jsf"> back </h:outputLink>
 </body>
 	</html>
 </f:view>
