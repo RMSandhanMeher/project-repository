@@ -1,6 +1,5 @@
 package com.infinite.jsf.provider.controller;
 
-
 import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.*;
@@ -9,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.ServletContext;
@@ -23,17 +23,14 @@ import com.infinite.jsf.provider.model.Doctors;
 import com.infinite.jsf.recipient.model.Recipient;
 import com.infinite.jsf.util.MailSend;
 
-
-
-
 public class RecipientAppointmentController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	private final AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
 
-	private String hId = (String)((Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("loggedInRecipient")).gethId(); // Ideally from session
-
+	private String hId ;
+	private Recipient recipient;
 	private List<Appointment> upcomingAppointments = new ArrayList<>();
 	private List<Appointment> pastAppointments = new ArrayList<>();
 	private List<Appointment> filteredAppointments = new ArrayList<>();
@@ -58,6 +55,13 @@ public class RecipientAppointmentController implements Serializable {
 
 	public void loadAppointments() {
 		try {
+			recipient = ((Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+					.get("loggedInRecipient"));
+			if (recipient == null) {
+				ExternalContext e = FacesContext.getCurrentInstance().getExternalContext();
+				e.redirect(e.getRequestContextPath() + "/recipient/Login.jsf");
+			}
+			hId = recipient.gethId();
 			upcomingAppointments = appointmentDao.getUpcomingAppointmentsByRecipient(hId);
 			pastAppointments = appointmentDao.getPastAppointmentsByRecipient(hId);
 			updateFilteredAppointments(); // This will also handle pagination
@@ -179,8 +183,8 @@ public class RecipientAppointmentController implements Serializable {
 				return null;
 			}
 
-			Recipient recipient = new RecipientDaoImpl()
-					.searchRecipientById(selectedAppointment.getRecipient().gethId());
+			recipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+					.get("loggedInRecipient");
 			Doctors doctor = new DoctorDaoImpl().searchADoctorById(selectedAppointment.getDoctor().getDoctorId());
 
 			ServletContext context = (ServletContext) FacesContext.getCurrentInstance().getExternalContext()
