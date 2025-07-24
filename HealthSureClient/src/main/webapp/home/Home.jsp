@@ -26,7 +26,7 @@
         <div class="appointment-button-container">
 		    <h:form>
 		        <div class="appointment-button-wrapper">
-		            <h:outputLink value="./../recipient/SearchProviders.jsf"  styleClass="appointment-button">Book Appointment</h:outputLink>
+		            <h:outputLink value="./../recipient/appointment/SearchProviders.jsf"  styleClass="appointment-button">Book Appointment</h:outputLink>
 		        </div>
 		    </h:form>
 		</div>

@@ -1,0 +1,465 @@
+html {
+  scroll-behavior: smooth;
+}
+
+/* Basic Reset & Body Styling */
+body {
+	font-family: 'Poppins', sans-serif; /* Modern font */
+	background-color: #eef2f7; /* Light, calming background */
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-height: 100vh;
+	color: #333;
+}
+
+/* Page Title */
+h2 {
+	text-align: center;
+	color: #0056b3; /* Deeper blue for headings */
+	margin-top: 100px; /* Adjust for navbar */
+	margin-bottom: 20px; /* More space below title */
+	font-size: 32px; /* Larger title */
+	font-weight: 600; /* Slightly bolder */
+	letter-spacing: -0.5px;
+}
+
+/* Main Content Panel */
+.main-content-panel {
+	width: 85%; /* Cover more page width */
+	max-width: 1200px; /* Adjusted max-width for better balance */
+	margin-bottom: 30px;
+	background-color: #ffffff;
+	border-radius: 16px; /* More rounded corners */
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+	/* Softer, larger shadow */
+	padding: 5px 40px 40px 40px; /* Increased padding */
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+/* --- Form Layout --- */
+.search-form-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px; /* Space between form rows */
+    align-items: center; /* Center the form elements */
+    padding: 0 50px; /* Horizontal padding for the form elements within the panel */
+    margin-bottom: 15px; /* Space before buttons */
+}
+
+.form-row {
+    display: flex;
+    align-items: center; /* Align items vertically in the middle */
+    width: 100%; /* Full width within the search-form-container */
+    max-width: 700px; /* Max width for individual form rows to keep them centered */
+    gap: 20px; /* Space between label and input */
+    margin-left: 200px;
+}
+
+.form-row label {
+    flex-shrink: 0; /* Prevent label from shrinking */
+    width: 150px; /* Fixed width for labels for alignment */
+    text-align: right; /* Align label text to the right */
+    font-weight: 500;
+    color: #555;
+    font-size: 15px;
+}
+
+.form-row .input-wrapper {
+    flex-grow: 1; /* Allow input wrapper to take remaining space */
+    position: relative; /* For custom select arrow */
+}
+
+/* Targeting JSF rendered select and input for better styling */
+.form-row select,
+.form-row input[type="text"] {
+	width: 50%;
+	padding: 12px 18px; /* Generous padding */
+	font-size: 16px; /* Readable font size */
+	border: 1px solid #dcdfe6; /* Light, subtle border */
+	border-radius: 8px; /* Nicely rounded */
+	transition: border-color 0.3s ease, box-shadow 0.3s ease;
+	outline: none;
+	background-color: #f9fbff; /* Slightly off-white background */
+	-webkit-appearance: none;
+	/* Remove default browser styling for select */
+	-moz-appearance: none;
+	appearance: none;
+}
+
+.form-row select:focus,
+.form-row input[type="text"]:focus {
+	border-color: #4a90e2; /* Clear blue on focus */
+	box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2); /* Soft glow */
+	background-color: #ffffff;
+}
+
+/* Custom arrow for select elements */
+.form-row .input-wrapper::after {
+	position: absolute;
+	right: 50px;
+	top: 50%;
+	transform: translateY(-50%);
+	font-size: 16px; /* Larger arrow */
+	color: #888;
+	pointer-events: none;
+}
+
+/* Radio button specific styling */
+.search-mode-radios-container {
+    /* No specific padding needed here as form-row handles the vertical spacing */
+}
+
+.search-mode-radios {
+    display: flex;
+    gap: 20px; /* Space between radio options */
+    align-items: center;
+}
+
+.search-mode-radios label {
+    width: auto; /* Override fixed label width for radio labels */
+    text-align: center; /* Align radio labels to left */
+    font-weight: 400; /* Normal weight for radio labels */
+    color: #555;
+    cursor: pointer;
+    display: flex; /* Make label a flex container for checkbox and text */
+    align-items: center;
+    margin-right: 0; /* Ensure no extra margin */
+}
+
+.search-mode-radios input[type="radio"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid #a0a0a0;
+    border-radius: 50%;
+    margin-right: 8px;
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease-in-out;
+    flex-shrink: 0; /* Prevent radio from shrinking */
+}
+
+.search-mode-radios input[type="radio"]:checked {
+    border-color: #007bff; /* Blue border when checked */
+    background-color: #007bff; /* Blue background when checked */
+}
+
+.search-mode-radios input[type="radio"]:checked::before {
+    content: '';
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: #ffffff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.search-mode-radios input[type="radio"]:focus {
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.3); /* Focus ring */
+}
+
+
+/* Button Styles */
+.btn {
+	padding: 12px 25px; /* Larger buttons */
+	border: none; /* No border for modern look */
+	border-radius: 8px; /* Match input styling */
+	cursor: pointer;
+	font-size: 16px;
+	font-weight: 500;
+	text-decoration: none;
+	display: inline-block;
+	transition: background-color 0.3s ease, transform 0.2s ease;
+	letter-spacing: 0.5px;
+	outline: none;
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle button shadow */
+}
+
+.btn:hover {
+	transform: translateY(-2px); /* Slight lift on hover */
+	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+	transform: translateY(0); /* Press effect */
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+	background-color: #007bff; /* Vibrant blue */
+	color: white;
+}
+
+.btn-primary:hover {
+	background-color: #0069d9; /* Darker blue on hover */
+}
+
+.btn-secondary {
+	background-color: #6c757d; /* Muted gray for reset */
+	color: white;
+}
+
+.btn-secondary:hover {
+	background-color: #5a6268;
+}
+
+.btn-success {
+	background-color: #28a745; /* Standard green for success */
+	color: white;
+}
+
+.btn-success:hover {
+	background-color: #218838;
+}
+
+.search-buttons {
+	text-align: center;
+	margin-top: 15px; /* Adjust spacing */
+	margin-bottom: 20px; /* More space before table */
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	gap: 25px; /* Increased gap between buttons */
+}
+
+/* Data Table Styling */
+.data-table {
+	width: 100%; /* Important for table inside scrollable container */
+	border-collapse: collapse;
+	background-color: #ffffff;
+	border-radius: 12px; /* Soft corners for table */
+	/* overflow: hidden; /* This might hide scrollbars of the parent if applied here */
+	box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); /* Light table shadow */
+}
+
+.data-table th, .data-table td {
+	border: 1px solid #e9ecef; /* Lighter borders */
+	padding: 15px 20px; /* More padding in cells */
+	text-align: left;
+	font-size: 15px;
+}
+
+.data-table th {
+	background-color: #f8f9fa; /* Very light header background */
+	text-align: center;
+	font-weight: 600; /* Semi-bold headers */
+	color: #495057; /* Darker text for headers */
+	font-size: 16px;
+	/* Removed position: sticky; from here and moved it to be more specific */
+	z-index: 10;
+}
+
+/* NEW: Scrollable Wrapper for the Table */
+#scrollableTableWrapper {
+    max-height: 400px; /* Set a maximum height for the scrollable area */
+    overflow-y: auto; /* Enable vertical scrolling when content exceeds max-height */
+    overflow-x: hidden; /* Hide horizontal scroll if not explicitly needed */
+    width: 100%; /* Ensure the wrapper takes full width */
+    margin-top: 20px; /* Space above the scrollable table */
+    border-radius: 12px; /* Match table border-radius */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); /* Match table shadow */
+}
+
+/* NEW: Sticky Headers specifically for tables INSIDE the scrollable wrapper */
+#scrollableTableWrapper .data-table th {
+    position: sticky;
+    top: 0;
+    /* Ensure the background is opaque to cover scrolling content */
+    background-color: #f8f9fa; 
+    z-index: 20; /* Higher z-index to ensure it stays on top */
+}
+
+
+.data-table th .h-panelgroup {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px; /* More space for sort icons */
+}
+
+.data-table tr:nth-child(even) {
+	background-color: #fcfdff; /* Even rows slightly different */
+}
+
+.data-table tr:hover {
+	background-color: #eef7ff; /* Gentle hover effect */
+}
+
+/* Doctor Status Styling */
+.data-table td:nth-child(3) { /* Target the Status column */
+	font-weight: 500;
+	text-align: center; /* Center the status text */
+}
+
+/* Ensure these CSS classes are well defined for dynamic status */
+.status-ACTIVE { /* Specific class for active status */
+	font-weight: 600;
+	color: #28a745; /* Green for active */
+}
+
+.status-INACTIVE, .status-EXPIRED { /* Grouping inactive/expired */
+	font-weight: 500;
+	color: #dc3545; /* Red for inactive/expired */
+}
+
+.unavailable-now { /* Specific class for "Unavailable Now" */
+	color: #6c757d; /* Muted grey */
+	font-weight: 500;
+	font-style: italic;
+	font-size: 14px;
+}
+
+/* Pagination Styles */
+.pagination {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 15px; /* Increased gap */
+	margin: 25px 0 0 0; /* More top margin */
+	width: 100%;
+}
+
+.pagination .btn {
+	padding: 8px 15px; /* Smaller pagination buttons */
+	font-size: 13px;
+	border: none; /* No border for modern look */
+	border-radius: 6px;
+	box-shadow: none; /* No shadow for pagination buttons */
+	background-color: #f0f4f8; /* Light background */
+	color: #4a90e2; /* Blue text */
+}
+
+.pagination .btn:hover {
+	background-color: #e0e7ed;
+	transform: none; /* No lift */
+	box-shadow: none;
+}
+
+.pagination .btn:active {
+	background-color: #d0d6dd;
+}
+
+.pagination .btn:disabled { /* Used :disabled for JSF disabled attribute */
+	opacity: 0.6;
+	cursor: not-allowed;
+	background-color: #f8f9fa;
+	color: #99aab5;
+}
+
+.pagination-label { /* New class for the summary text */
+	font-weight: 400; /* Normal weight */
+	color: #777;
+	font-size: 14px;
+}
+
+.pagination-info { /* Used for "Page X of Y" text */
+	font-weight: 400; /* Normal weight */
+	color: #777;
+	font-size: 14px;
+	margin: 0 10px; /* Adjust spacing around this label if needed */
+}
+
+/* Sort Icons */
+.sort-icons-container {
+	display: flex;
+	flex-direction: column;
+	margin-left: 5px; /* Space from text */
+}
+
+.sort-icons {
+	display: block;
+	line-height: 1; /* Tighter spacing */
+}
+
+.sort-icons+.sort-icons {
+	margin-top: 4px; /* More space between arrows */
+}
+
+.sort-icons img {
+	filter: invert(50%) sepia(0%) saturate(10%) hue-rotate(0deg)
+		brightness(50%) contrast(100%);
+	/* Darken image for better contrast on light background */
+	opacity: 0.7;
+	transition: opacity 0.2s ease;
+}
+
+.sort-icons:hover img {
+	opacity: 1; /* Full opacity on hover */
+	filter: invert(30%) sepia(0%) saturate(10%) hue-rotate(0deg)
+		brightness(30%) contrast(100%); /* Even darker on hover */
+}
+
+/* Global Messages */
+.global-messages {
+	list-style: none;
+	padding: 0;
+	margin: 0 auto 30px auto; /* More margin */
+	width: 90%;
+	text-align: center;
+}
+
+.global-messages li {
+	padding: 15px 20px; /* Larger messages */
+	margin-bottom: 12px;
+	border-radius: 10px; /* Softer corners */
+	font-size: 15px;
+	font-weight: 500;
+	color: #333;
+	border: 1px solid; /* Add border for definition */
+}
+
+.global-messages .ui-messages-info {
+	background-color: #d4edda;
+	color: #155724;
+	border-color: #c3e6cb;
+}
+
+.global-messages .ui-messages-warn {
+	background-color: #fff3cd;
+	color: #856404;
+	border-color: #ffeeba;
+}
+
+.global-messages .ui-messages-error, .global-messages .ui-messages-fatal
+	{
+	background-color: #f8d7da;
+	color: #721c24;
+	border-color: #f5c6cb;
+}
+
+/* No results / Initial message */
+.not-found {
+	text-align: center;
+	font-weight: 500;
+	color: green; /* Muted color */
+	margin-top: 30px;
+	font-size: 1em;
+	width: 80%;
+	padding: 20px;
+	background-color: #f0f4f8; /* Light background */
+	border-radius: 10px;
+	border: 1px solid #dcdfe6;
+}
+
+/* Utility Class */
+.hidden {
+	display: none !important; /* Use !important to override other display properties */
+}
+
+
+.paragrah{
+margin-bottom:15px;
+}

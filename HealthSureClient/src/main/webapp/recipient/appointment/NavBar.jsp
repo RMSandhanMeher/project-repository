@@ -6,7 +6,7 @@
 		class="px-10 max-w-screen-xl mx-auto flex justify-center items-center">
 		<div class="space-x-4 flex">
 			<a
-				href="${pageContext.request.contextPath}/recipient/SearchProviders.jsf"
+				href="${pageContext.request.contextPath}/recipient/appointment/SearchProviders.jsf"
 				class="nav-link text-nowrap px-4 py-2 rounded-xl transition duration-200 border border-gray-300"
 				onclick="setActiveLink(this)"> Select Doctor </a> <a
 				href="${pageContext.request.contextPath}/recipient/appointment/doctorAvailabilityList.jsf"
