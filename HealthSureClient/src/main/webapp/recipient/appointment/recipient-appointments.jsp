@@ -143,11 +143,11 @@
 
 				<h:column>
 					<f:facet name="header">
-						<h:outputText value="Notes" />
+						<h:outputText value="Specialization " />
 					</f:facet>
 					<h:panelGroup
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
-						<h:outputText value="#{empty appt.notes ? 'None' : appt.notes}" />
+						<h:outputText value="#{appt.doctor.specialization}" />
 					</h:panelGroup>
 				</h:column>
 
