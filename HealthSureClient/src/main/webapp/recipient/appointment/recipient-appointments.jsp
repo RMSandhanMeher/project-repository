@@ -5,7 +5,7 @@
 <f:view>
 	<html>
 <head>
-<title>Recipient Appointments</title>
+<title>My Appointments</title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/appointment/recipientAppointment.css">
 <style>
@@ -27,6 +27,27 @@
 .hidden-command-button {
     display: none;
 }
+
+/* Styles for sort icons - you might want to move these to your external CSS file */
+.h-panelgroup {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px; /* Space between text and icons */
+    /* Ensure the header text itself doesn't wrap oddly */
+    white-space: nowrap;
+}
+
+.sort-icons-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.sort-icons img {
+    vertical-align: middle;
+}
 </style>
 </head>
 <body class="body-bg min-h-screen-full page-padding">
@@ -47,7 +68,8 @@
 						<path class="opacity-75-svg" fill="currentColor"
 							d="M4 12a8 8 0 018-8v4a4 0 00-4 4H4z"></path>
 					</svg>
-					<p class="loading-text">Loading details...</p> </div>
+					<p class="loading-text">Loading details...</p>
+				</div>
 			</div>
 
 			<div class="filter-grid-container">
@@ -70,7 +92,8 @@
 							value="#{recipientAppointmentController.statusFilterOptions}" />
 					</h:selectOneMenu>
 				</div>
-				<%-- Added Page Size filter --%>
+				<%-- REMOVED Page Size filter as it's now fixed in the controller --%>
+				<%-- The following section was removed:
 				<div class="filter-item">
 					<label for="pageSizeFilter" class="filter-label">Items Per
 						Page:</label>
@@ -82,6 +105,7 @@
 						<f:selectItem itemLabel="20" itemValue="20" />
 					</h:selectOneMenu>
 				</div>
+				--%>
 			</div>
 
 			<h:dataTable
@@ -89,28 +113,68 @@
 				var="appt" styleClass="slots-table-component appointment-table"
 				rowClasses="table-row-odd clickable-row,table-row-even clickable-row"
 				columnClasses="table-cell">
-				
+
 				<h:column>
 					<f:facet name="header">
-						<h:outputText value="Appointment ID" />
+						<h:panelGroup styleClass="h-panelgroup">
+							<h:outputText value="Appointment ID" />
+							<h:panelGroup layout="block" styleClass="sort-icons-container">
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByAsc('appointmentId')}"
+									rendered="#{recipientAppointmentController.renderSortButton('appointmentId', 'asc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/up-arrow.png"
+										width="9" height="9" title="Sort Ascending" />
+								</h:commandLink>
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByDesc('appointmentId')}"
+									rendered="#{recipientAppointmentController.renderSortButton('appointmentId', 'desc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/down-arrow.png"
+										width="10" height="10" title="Sort Descending" />
+								</h:commandLink>
+							</h:panelGroup>
+						</h:panelGroup>
 					</f:facet>
 					<h:panelGroup
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
 						<h:outputText value="#{appt.appointmentId}" />
-                        <h:commandButton id="detailButton" value="View"
-                                       action="#{appointmentDetailController.loadAppointmentDetailsForDisplay(appt.appointmentId)}"
-                                       styleClass="hidden-command-button"
-                                       onclick="document.getElementById('loadingOverlay').style.display = 'flex'; return true;">
-                            <f:setPropertyActionListener
-                                target="#{appointmentDetailController.selectedAppointmentIdForDetail}"
-                                value="#{appt.appointmentId}" />
-                        </h:commandButton>
+						<h:commandButton id="detailButton" value="View"
+							action="#{appointmentDetailController.loadAppointmentDetailsForDisplay(appt.appointmentId)}"
+							styleClass="hidden-command-button"
+							onclick="document.getElementById('loadingOverlay').style.display = 'flex'; return true;">
+							<f:setPropertyActionListener
+								target="#{appointmentDetailController.selectedAppointmentIdForDetail}"
+								value="#{appt.appointmentId}" />
+						</h:commandButton>
 					</h:panelGroup>
 				</h:column>
 
 				<h:column>
 					<f:facet name="header">
-						<h:outputText value="Doctor Name" />
+						<h:panelGroup styleClass="h-panelgroup">
+							<h:outputText value="Doctor Name" />
+							<h:panelGroup layout="block" styleClass="sort-icons-container">
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByAsc('doctorName')}"
+									rendered="#{recipientAppointmentController.renderSortButton('doctorName', 'asc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/up-arrow.png"
+										width="9" height="9" title="Sort Ascending" />
+								</h:commandLink>
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByDesc('doctorName')}"
+									rendered="#{recipientAppointmentController.renderSortButton('doctorName', 'desc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/down-arrow.png"
+										width="10" height="10" title="Sort Descending" />
+								</h:commandLink>
+							</h:panelGroup>
+						</h:panelGroup>
 					</f:facet>
 					<h:panelGroup
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
@@ -121,7 +185,27 @@
 
 				<h:column>
 					<f:facet name="header">
-						<h:outputText value="Appointment Date" />
+						<h:panelGroup styleClass="h-panelgroup">
+							<h:outputText value="Appointment Date" />
+							<h:panelGroup layout="block" styleClass="sort-icons-container">
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByAsc('start')}"
+									rendered="#{recipientAppointmentController.renderSortButton('start', 'asc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/up-arrow.png"
+										width="9" height="9" title="Sort Ascending" />
+								</h:commandLink>
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByDesc('start')}"
+									rendered="#{recipientAppointmentController.renderSortButton('start', 'desc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/down-arrow.png"
+										width="10" height="10" title="Sort Descending" />
+								</h:commandLink>
+							</h:panelGroup>
+						</h:panelGroup>
 					</f:facet>
 					<h:panelGroup
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
@@ -133,7 +217,27 @@
 
 				<h:column>
 					<f:facet name="header">
-						<h:outputText value="Status" />
+						<h:panelGroup styleClass="h-panelgroup">
+							<h:outputText value="Status" />
+							<h:panelGroup layout="block" styleClass="sort-icons-container">
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByAsc('status')}"
+									rendered="#{recipientAppointmentController.renderSortButton('status', 'asc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/up-arrow.png"
+										width="9" height="9" title="Sort Ascending" />
+								</h:commandLink>
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByDesc('status')}"
+									rendered="#{recipientAppointmentController.renderSortButton('status', 'desc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/down-arrow.png"
+										width="10" height="10" title="Sort Descending" />
+								</h:commandLink>
+							</h:panelGroup>
+						</h:panelGroup>
 					</f:facet>
 					<h:panelGroup
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
@@ -143,7 +247,27 @@
 
 				<h:column>
 					<f:facet name="header">
-						<h:outputText value="Specialization " />
+						<h:panelGroup styleClass="h-panelgroup">
+							<h:outputText value="Specialization" />
+							<h:panelGroup layout="block" styleClass="sort-icons-container">
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByAsc('specialization')}"
+									rendered="#{recipientAppointmentController.renderSortButton('specialization', 'asc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/up-arrow.png"
+										width="9" height="9" title="Sort Ascending" />
+								</h:commandLink>
+								<h:commandLink
+									action="#{recipientAppointmentController.sortByDesc('specialization')}"
+									rendered="#{recipientAppointmentController.renderSortButton('specialization', 'desc')}"
+									styleClass="sort-icons">
+									<%-- Corrected image path: Use f:facet for graphicImage value --%>
+									<h:graphicImage value="/resources/media/images/down-arrow.png"
+										width="10" height="10" title="Sort Descending" />
+								</h:commandLink>
+							</h:panelGroup>
+						</h:panelGroup>
 					</f:facet>
 					<h:panelGroup
 						styleClass="cell-content #{appt.status != null ? appt.status.name().toLowerCase() : ''}-status-background">
@@ -177,7 +301,7 @@
 			<div class="pagination-container">
 				<h:commandButton value="Previous"
 					action="#{recipientAppointmentController.prevPage}"
-					disabled="#{recipientAppointmentController.currentPage == 1}"
+					disabled="#{not recipientAppointmentController.hasPrevPage}"
 					styleClass="pagination-button" />
 
 				<span class="pagination-info"> <h:outputText
@@ -186,7 +310,7 @@
 
 				<h:commandButton value="Next"
 					action="#{recipientAppointmentController.nextPage}"
-					disabled="#{recipientAppointmentController.currentPage == recipientAppointmentController.totalPages}"
+					disabled="#{not recipientAppointmentController.hasNextPage}"
 					styleClass="pagination-button" />
 			</div>
 
@@ -208,13 +332,13 @@
                     // or from any element with the 'no-row-click' class (for other future interactive elements)
                     if (event.target.closest('.cancel-button') || 
                         event.target.closest('.pagination-button') ||
-                        event.target.closest('.no-row-click')) { // Add this class to any element that should NOT trigger row click
+                        event.target.closest('.sort-icons') || // Added to prevent row click on sort icons
+                        event.target.closest('.filter-select') || // Added to prevent row click on filter dropdowns
+                        event.target.closest('.no-row-click')) {
                         return; // Do nothing if a specific button or element was clicked
                     }
 
                     // Find the hidden commandButton within the clicked row
-                    // Note: JSF generates complex IDs like formId:dataTableId:rowIndex:componentId
-                    // querySelector works with just the class or attribute selectors
                     const detailButton = row.querySelector('.hidden-command-button');
                     
                     if (detailButton) {
