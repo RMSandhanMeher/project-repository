@@ -220,10 +220,9 @@
                     </div>
                     <div class="detail-item">
                         <span class="detail-label">Provider:</span>
-                        <span class="detail-value">City General Hospital</span>
+                        <span class="detail-value">HealthSure Hospital</span>
                     </div>
                 </div>
-
                 <div>
                     <div class="detail-item">
                         <span class="detail-label">Date:</span>
