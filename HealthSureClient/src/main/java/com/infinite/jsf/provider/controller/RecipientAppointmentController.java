@@ -51,7 +51,7 @@ public class RecipientAppointmentController implements Serializable {
 
 	// Pagination: Fixed page size
 	private final int pageSize = 5; // Fixed at 5 as per requirement
-	private int currentPage = 0; // 0-based for subList
+	private int currentPage = 0; // 0-based for sublist
 
 	// Sorting
 	private String sortField = "start"; // Default sort by appointment start date/time
@@ -251,8 +251,10 @@ public class RecipientAppointmentController implements Serializable {
 	}
 
 	public void goToPage(int page) {
+		// Convert 1-based page to 0-based for internal use
+		int zeroBasedPage = page - 1;
 		int maxPage = getTotalPages() - 1; // 0-based
-		currentPage = Math.max(0, Math.min(page, maxPage));
+		currentPage = Math.max(0, Math.min(zeroBasedPage, maxPage));
 		updatePaginatedAppointments();
 	}
 
@@ -393,11 +395,13 @@ public class RecipientAppointmentController implements Serializable {
 	}
 
 	public int getCurrentPage() {
-		return currentPage ;
+		// Return 1-based page number for display
+		return currentPage + 1;
 	}
 
 	public void setCurrentPage(int currentPage) {
-		this.currentPage = currentPage;
+		// Convert 1-based page to 0-based for internal use
+		this.currentPage = currentPage - 1;
 	}
 
 	public int getTotalPages() {
@@ -435,3 +439,8 @@ public class RecipientAppointmentController implements Serializable {
 		return currentSortOrder;
 	}
 }
+
+
+
+
+
