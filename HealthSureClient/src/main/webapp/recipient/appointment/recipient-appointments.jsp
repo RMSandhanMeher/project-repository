@@ -20,33 +20,33 @@
 
 /* New CSS for clickable rows */
 .clickable-row {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 /* Ensure the hidden button doesn't take up space or interfere with layout */
 .hidden-command-button {
-    display: none;
+	display: none;
 }
 
 /* Styles for sort icons - you might want to move these to your external CSS file */
 .h-panelgroup {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px; /* Space between text and icons */
-    /* Ensure the header text itself doesn't wrap oddly */
-    white-space: nowrap;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px; /* Space between text and icons */
+	/* Ensure the header text itself doesn't wrap oddly */
+	white-space: nowrap;
 }
 
 .sort-icons-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
 }
 
 .sort-icons img {
-    vertical-align: middle;
+	vertical-align: middle;
 }
 </style>
 </head>
@@ -58,7 +58,7 @@
 	<div class="main-container">
 		<h1 class="main-title">My Appointments</h1>
 
-		<h:form id="appointmentForm">
+		<h:form id="appointmentForm" prependId="false">
 			<div id="loadingOverlay" class="loading-overlay">
 				<div class="loading-overlay-content">
 					<svg class="loading-spinner" xmlns="http://www.w3.org/2000/svg"
@@ -302,16 +302,19 @@
 				<h:commandButton value="Previous"
 					action="#{recipientAppointmentController.prevPage}"
 					disabled="#{not recipientAppointmentController.hasPrevPage}"
-					styleClass="pagination-button" />
+					styleClass="pagination-button"
+					onclick="document.getElementById('loadingOverlay').style.display = 'flex'; return true;" />
 
 				<span class="pagination-info"> <h:outputText
 						value="Page #{recipientAppointmentController.currentPage} of #{recipientAppointmentController.totalPages}" />
+						<h:inputHidden id="currentPage" value="#{recipientAppointmentController.currentPage}" />
 				</span>
 
 				<h:commandButton value="Next"
 					action="#{recipientAppointmentController.nextPage}"
 					disabled="#{not recipientAppointmentController.hasNextPage}"
-					styleClass="pagination-button" />
+					styleClass="pagination-button"
+					onclick="document.getElementById('loadingOverlay').style.display = 'flex'; return true;" />
 			</div>
 
 			<h:messages globalOnly="true" styleClass="global-message"
@@ -357,6 +360,11 @@
 				return true;
 			}
 			return false;
+		}
+
+		function showLoading() {
+		    document.getElementById('loadingOverlay').style.display = 'flex';
+		    return true;
 		}
 	</script>
 </body>

@@ -10,6 +10,8 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.faces.view.ViewScoped;
+import javax.inject.Named;
 import javax.servlet.ServletContext;
 
 import org.apache.log4j.Logger; // Added for logging
@@ -23,10 +25,13 @@ import com.infinite.jsf.provider.model.Doctors;
 import com.infinite.jsf.recipient.model.Recipient;
 import com.infinite.jsf.util.MailSend;
 
+@Named
+@ViewScoped
 public class RecipientAppointmentController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = Logger.getLogger(RecipientAppointmentController.class.getName()); // Logger instance
+	private static final Logger LOGGER = Logger.getLogger(RecipientAppointmentController.class.getName()); // Logger
+																											// instance
 
 	private final AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
 
@@ -47,13 +52,12 @@ public class RecipientAppointmentController implements Serializable {
 	// Pagination: Fixed page size
 	private final int pageSize = 5; // Fixed at 5 as per requirement
 	private int currentPage = 0; // 0-based for subList
-	
+
 	// Sorting
 	private String sortField = "start"; // Default sort by appointment start date/time
 	private boolean ascending = true;
 	private String currentSortColumn = "start";
 	private String currentSortOrder = "asc";
-
 
 	@PostConstruct
 	public void init() {
@@ -74,8 +78,10 @@ public class RecipientAppointmentController implements Serializable {
 			hId = recipient.gethId();
 			upcomingAppointments = appointmentDao.getUpcomingAppointmentsByRecipient(hId);
 			pastAppointments = appointmentDao.getPastAppointmentsByRecipient(hId);
-			LOGGER.info("Appointments loaded for recipient: " + hId);
-			updateFilteredAndSortedAppointments(); // This will also handle pagination
+			LOGGER.info("Loaded " + upcomingAppointments.size() + " upcoming and " + pastAppointments.size()
+					+ " past appointments");
+			updateFilteredAndSortedAppointments();
+			LOGGER.info("After filtering: " + filteredAppointments.size() + " appointments");
 		} catch (Exception e) {
 			LOGGER.error("Error loading appointments: " + e.getMessage(), e);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
@@ -89,7 +95,8 @@ public class RecipientAppointmentController implements Serializable {
 	}
 
 	public void updateFilteredAndSortedAppointments() {
-	    LOGGER.info("updateFilteredAndSortedAppointments: Time Filter=" + timeFilterType + ", Status Filter=" + statusFilterType);
+		LOGGER.info("updateFilteredAndSortedAppointments: Time Filter=" + timeFilterType + ", Status Filter="
+				+ statusFilterType);
 		List<Appointment> baseList = "past".equalsIgnoreCase(timeFilterType) ? pastAppointments : upcomingAppointments;
 
 		filteredAppointments = new ArrayList<>();
@@ -103,138 +110,150 @@ public class RecipientAppointmentController implements Serializable {
 				cancellableMap.put(appt.getAppointmentId(), isCancellable(appt));
 			}
 		}
-		
-		sortFilteredAppointments(); // Apply sorting to the filtered list
-		
-		// Reset current page to 0 if the current page is out of bounds after filtering/sorting
-		if (currentPage * pageSize >= filteredAppointments.size() && filteredAppointments.size() > 0) {
-		    currentPage = (int) Math.floor((double)(filteredAppointments.size() - 1) / pageSize);
-		} else if (filteredAppointments.isEmpty()) {
-		    currentPage = 0; // If no results, stay on page 0 (which is page 1 for display)
-		}
 
+		sortFilteredAppointments(); // Apply sorting to the filtered list
+
+		// Reset current page to 0 if the current page is out of bounds after
+		// filtering/sorting
+		if (currentPage * pageSize >= filteredAppointments.size() && filteredAppointments.size() > 0) {
+			currentPage = (int) Math.floor((double) (filteredAppointments.size() - 1) / pageSize);
+		} else if (filteredAppointments.isEmpty()) {
+			currentPage = 0; // If no results, stay on page 0 (which is page 1 for display)
+		}
 
 		updatePaginatedAppointments();
 	}
 
 	/**
-     * Applies actual comparator-based sorting logic using the sortField.
-     */
-    private void sortFilteredAppointments() {
-        try {
-            if (filteredAppointments == null || filteredAppointments.isEmpty()) {
-                return;
-            }
+	 * Applies actual comparator-based sorting logic using the sortField.
+	 */
+	private void sortFilteredAppointments() {
+		try {
+			if (filteredAppointments == null || filteredAppointments.isEmpty()) {
+				return;
+			}
 
-            Comparator<Appointment> comparator;
-            switch (sortField) {
-                case "doctorName":
-                    comparator = Comparator.comparing(
-                        appt -> appt.getDoctor() != null ? appt.getDoctor().getDoctorName() : "",
-                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
-                    );
-                    break;
-                case "status":
-                    comparator = Comparator.comparing(
-                        appt -> appt.getStatus() != null ? appt.getStatus().toString() : "",
-                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
-                    );
-                    break;
-                case "specialization":
-                    comparator = Comparator.comparing(
-                        appt -> appt.getDoctor() != null ? appt.getDoctor().getSpecialization() : "",
-                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
-                    );
-                    break;
-                case "appointmentId":
-                    comparator = Comparator.comparing(
-                        Appointment::getAppointmentId,
-                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)
-                    );
-                    break;
-                case "start": // Default and explicit sort for Timestamp
-                default:
-                    comparator = Comparator.comparing(
-                        Appointment::getStart,
-                        Comparator.nullsLast(Comparator.naturalOrder()) // Natural order for Timestamps
-                    );
-            }
+			Comparator<Appointment> comparator;
+			switch (sortField) {
+			case "doctorName":
+				comparator = Comparator.comparing(
+						appt -> appt.getDoctor() != null ? appt.getDoctor().getDoctorName() : "",
+						Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+				break;
+			case "status":
+				comparator = Comparator.comparing(appt -> appt.getStatus() != null ? appt.getStatus().toString() : "",
+						Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+				break;
+			case "specialization":
+				comparator = Comparator.comparing(
+						appt -> appt.getDoctor() != null ? appt.getDoctor().getSpecialization() : "",
+						Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+				break;
+			case "appointmentId":
+				comparator = Comparator.comparing(Appointment::getAppointmentId,
+						Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+				break;
+			case "start": // Default and explicit sort for Timestamp
+			default:
+				comparator = Comparator.comparing(Appointment::getStart, Comparator.nullsLast(Comparator.naturalOrder()) // Natural
+																															// order
+																															// for
+																															// Timestamps
+				);
+			}
 
-            if (!ascending) {
-                comparator = comparator.reversed();
-            }
+			if (!ascending) {
+				comparator = comparator.reversed();
+			}
 
-            filteredAppointments.sort(comparator);
-            LOGGER.info("Appointments sorted by " + sortField + " in " + (ascending ? "ascending" : "descending") + " order.");
+			filteredAppointments.sort(comparator);
+			LOGGER.info("Appointments sorted by " + sortField + " in " + (ascending ? "ascending" : "descending")
+					+ " order.");
 
-        } catch (Exception e) {
-            LOGGER.warn("sortFilteredAppointments: Sorting exception - " + e.getMessage(), e);
-        }
-    }
-    
-    /**
-     * Sort doctor result list ascending by field.
-     */
-    public void sortByAsc(String field) {
-        this.sortField = field;
-        this.ascending = true;
-        this.currentSortColumn = field;
-        this.currentSortOrder = "asc";
-        currentPage = 0; // Reset to first page on sort change
-        updateFilteredAndSortedAppointments();
-        LOGGER.info("Sorting by " + field + " (Ascending)");
-    }
+		} catch (Exception e) {
+			LOGGER.warn("sortFilteredAppointments: Sorting exception - " + e.getMessage(), e);
+		}
+	}
 
-    /**
-     * Sort doctor result list descending by field.
-     */
-    public void sortByDesc(String field) {
-        this.sortField = field;
-        this.ascending = false;
-        this.currentSortColumn = field;
-        this.currentSortOrder = "desc";
-        currentPage = 0; // Reset to first page on sort change
-        updateFilteredAndSortedAppointments();
-        LOGGER.info("Sorting by " + field + " (Descending)");
-    }
+	/**
+	 * Sort doctor result list ascending by field.
+	 */
+	public void sortByAsc(String field) {
+		this.sortField = field;
+		this.ascending = true;
+		this.currentSortColumn = field;
+		this.currentSortOrder = "asc";
+		currentPage = 0; // Reset to first page on sort change
+		updateFilteredAndSortedAppointments();
+		LOGGER.info("Sorting by " + field + " (Ascending)");
+	}
 
-    /**
-     * Determines whether to show a specific sort button.
-     */
-    public boolean renderSortButton(String column, String order) {
-        if (currentSortColumn == null || !currentSortColumn.equals(column)) {
-            return true; // Always show if not the current sort column
-        }
-        return !currentSortOrder.equals(order); // Show only if different from current order
-    }
+	/**
+	 * Sort doctor result list descending by field.
+	 */
+	public void sortByDesc(String field) {
+		this.sortField = field;
+		this.ascending = false;
+		this.currentSortColumn = field;
+		this.currentSortOrder = "desc";
+		currentPage = 0; // Reset to first page on sort change
+		updateFilteredAndSortedAppointments();
+		LOGGER.info("Sorting by " + field + " (Descending)");
+	}
 
+	/**
+	 * Determines whether to show a specific sort button.
+	 */
+	public boolean renderSortButton(String column, String order) {
+		if (currentSortColumn == null || !currentSortColumn.equals(column)) {
+			return true; // Always show if not the current sort column
+		}
+		return !currentSortOrder.equals(order); // Show only if different from current order
+	}
 
 	public void updatePaginatedAppointments() {
-	    int fromIndex = currentPage * pageSize; // 0-based
-	    int toIndex = Math.min(fromIndex + pageSize, filteredAppointments.size());
+		if (filteredAppointments == null || filteredAppointments.isEmpty()) {
+			paginatedAppointments = new ArrayList<>();
+			return;
+		}
 
-	    if (filteredAppointments.isEmpty() || fromIndex >= filteredAppointments.size()) {
-	        paginatedAppointments = new ArrayList<>();
-	    } else {
-	        paginatedAppointments = filteredAppointments.subList(fromIndex, toIndex);
-	    }
-	    LOGGER.debug("Pagination updated: Page " + (currentPage + 1) + " (0-based: " + currentPage + ") from " + fromIndex + " to " + toIndex + ". Total filtered: " + filteredAppointments.size());
+		int fromIndex = currentPage * pageSize;
+		int toIndex = Math.min(fromIndex + pageSize, filteredAppointments.size());
+
+		// Ensure fromIndex doesn't exceed list size
+		fromIndex = Math.min(fromIndex, filteredAppointments.size());
+
+		paginatedAppointments = new ArrayList<>(filteredAppointments.subList(fromIndex, toIndex));
+
+		LOGGER.debug("Updated pagination - Page: " + (currentPage + 1) + ", Items: " + paginatedAppointments.size()
+				+ ", Total: " + filteredAppointments.size());
 	}
 
 	public void nextPage() {
-		if ((currentPage + 1) * pageSize < filteredAppointments.size()) { // Check if next page exists based on filtered list
+		if (isHasNextPage()) {
 			currentPage++;
 			updatePaginatedAppointments();
-			LOGGER.info("Moved to next page: " + (currentPage + 1));
+			LOGGER.info("Navigated to page " + (currentPage + 1));
 		}
 	}
 
 	public void prevPage() {
-		if (currentPage > 0) { // Check if previous page exists (0-based)
+		if (isHasPrevPage()) {
 			currentPage--;
 			updatePaginatedAppointments();
-			LOGGER.info("Moved to previous page: " + (currentPage + 1));
+			LOGGER.info("Navigated to page " + (currentPage + 1));
 		}
+	}
+
+	private void resetPagination() {
+		currentPage = 0;
+		updatePaginatedAppointments();
+	}
+
+	public void goToPage(int page) {
+		int maxPage = getTotalPages() - 1; // 0-based
+		currentPage = Math.max(0, Math.min(page, maxPage));
+		updatePaginatedAppointments();
 	}
 
 	public boolean isCancellable(Appointment appt) {
@@ -303,9 +322,11 @@ public class RecipientAppointmentController implements Serializable {
 				MailSend.sendMail(recipient.getEmail(), subject, MailSend.appointmentCancellation(slip));
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
 						"Appointment cancelled successfully. A confirmation email has been sent.", null));
-				LOGGER.info("Appointment ID " + selectedAppointment.getAppointmentId() + " cancelled and email sent to " + recipient.getEmail());
+				LOGGER.info("Appointment ID " + selectedAppointment.getAppointmentId() + " cancelled and email sent to "
+						+ recipient.getEmail());
 			} catch (Exception emailEx) {
-				LOGGER.error("Error sending cancellation email for appointment ID " + selectedAppointment.getAppointmentId() + ": " + emailEx.getMessage(), emailEx);
+				LOGGER.error("Error sending cancellation email for appointment ID "
+						+ selectedAppointment.getAppointmentId() + ": " + emailEx.getMessage(), emailEx);
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
 						"Appointment cancelled, but failed to send confirmation email.", null));
 			}
@@ -314,7 +335,9 @@ public class RecipientAppointmentController implements Serializable {
 			return "recipient-appointments?faces-redirect=true";
 
 		} catch (Exception e) {
-			LOGGER.error("An unexpected error occurred during cancellation for appointment ID " + (selectedAppointment != null ? selectedAppointment.getAppointmentId() : "N/A") + ": " + e.getMessage(), e);
+			LOGGER.error("An unexpected error occurred during cancellation for appointment ID "
+					+ (selectedAppointment != null ? selectedAppointment.getAppointmentId() : "N/A") + ": "
+					+ e.getMessage(), e);
 			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					"An unexpected error occurred during cancellation.", null));
 			return null;
@@ -333,20 +356,20 @@ public class RecipientAppointmentController implements Serializable {
 
 	public void setTimeFilterType(String timeFilterType) {
 		this.timeFilterType = timeFilterType;
-		this.currentPage = 0; // Reset to first page on filter change
-		updateFilteredAndSortedAppointments();
-		LOGGER.info("Time filter set to: " + timeFilterType);
-	}
-
-	public String getStatusFilterType() {
-		return statusFilterType;
+		this.currentPage = 0; // Reset to first page
+		LOGGER.info("Time filter changed to: " + timeFilterType);
+		loadAppointments(); // Reload all data
 	}
 
 	public void setStatusFilterType(String statusFilterType) {
 		this.statusFilterType = statusFilterType;
-		this.currentPage = 0; // Reset to first page on filter change
-		updateFilteredAndSortedAppointments();
-		LOGGER.info("Status filter set to: " + statusFilterType);
+		this.currentPage = 0; // Reset to first page
+		LOGGER.info("Status filter changed to: " + statusFilterType);
+		loadAppointments(); // Reload all data
+	}
+
+	public String getStatusFilterType() {
+		return statusFilterType;
 	}
 
 	public Appointment getSelectedAppointment() {
@@ -370,7 +393,11 @@ public class RecipientAppointmentController implements Serializable {
 	}
 
 	public int getCurrentPage() {
-		return currentPage + 1; // 1-based for display
+		return currentPage ;
+	}
+
+	public void setCurrentPage(int currentPage) {
+		this.currentPage = currentPage;
 	}
 
 	public int getTotalPages() {
@@ -383,14 +410,14 @@ public class RecipientAppointmentController implements Serializable {
 	public int getPageSize() {
 		return pageSize; // Page size is now fixed
 	}
-	
-	public boolean isHasNextPage() {
-        return (currentPage + 1) * pageSize < filteredAppointments.size();
-    }
 
-    public boolean isHasPrevPage() {
-        return currentPage > 0;
-    }
+	public boolean isHasNextPage() {
+		return (currentPage + 1) * pageSize < filteredAppointments.size();
+	}
+
+	public boolean isHasPrevPage() {
+		return currentPage > 0;
+	}
 
 	public String getSortField() {
 		return sortField;
