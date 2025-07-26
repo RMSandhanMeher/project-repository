@@ -8,6 +8,9 @@
 <title>My Appointments</title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/appointment/recipientAppointment.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
 <style>
 /* Specific table cell alignment, can also be moved to external CSS if preferred */
 .slots-table-component>tbody>tr>td {
@@ -34,8 +37,7 @@
 	align-items: center;
 	justify-content: center;
 	gap: 5px; /* Space between text and icons */
-	/* Ensure the header text itself doesn't wrap oddly */
-	white-space: nowrap;
+	white-space: nowrap; /* Ensure the header text itself doesn't wrap oddly */
 }
 
 .sort-icons-container {
@@ -48,6 +50,19 @@
 .sort-icons img {
 	vertical-align: middle;
 }
+
+/* Styles for text inputs */
+.filter-item input[type="text"] {
+	padding: 8px 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	font-size: 1rem;
+	width: 150px; /* Adjust as needed */
+	box-sizing: border-box; /* Include padding and border in the element's total width and height */
+}
+
+/* No custom Flatpickr styling here. It will rely on its default CSS. */
+
 </style>
 </head>
 <body class="body-bg min-h-screen-full page-padding">
@@ -72,7 +87,7 @@
 				</div>
 			</div>
 
-			<div class="filter-grid-container">
+			<div class="filter-grid-container" style="display: flex; flex-wrap: wrap; gap: 15px;">
 				<div class="filter-item">
 					<label for="timeFilter" class="filter-label">Time Filter:</label>
 					<h:selectOneMenu id="timeFilter"
@@ -92,20 +107,24 @@
 							value="#{recipientAppointmentController.statusFilterOptions}" />
 					</h:selectOneMenu>
 				</div>
-				<%-- REMOVED Page Size filter as it's now fixed in the controller --%>
-				<%-- The following section was removed:
-				<div class="filter-item">
-					<label for="pageSizeFilter" class="filter-label">Items Per
-						Page:</label>
-					<h:selectOneMenu id="pageSizeFilter"
-						value="#{recipientAppointmentController.pageSize}"
-						styleClass="filter-select" onchange="this.form.submit();">
-						<f:selectItem itemLabel="5" itemValue="5" />
-						<f:selectItem itemLabel="10" itemValue="10" />
-						<f:selectItem itemLabel="20" itemValue="20" />
-					</h:selectOneMenu>
-				</div>
-				--%>
+
+                <div class="filter-item">
+                    <label for="fromDate" class="filter-label">From Date:</label>
+                    <h:inputText id="fromDate"
+                        value="#{recipientAppointmentController.fromDate}"
+                        styleClass="filter-select date-input-field">
+                        <f:convertDateTime pattern="yyyy-MM-dd" />
+                    </h:inputText>
+                </div>
+                <div class="filter-item">
+                    <label for="toDate" class="filter-label">To Date:</label>
+                    <h:inputText id="toDate"
+                        value="#{recipientAppointmentController.toDate}"
+                        styleClass="filter-select date-input-field">
+                        <f:convertDateTime pattern="yyyy-MM-dd" />
+                    </h:inputText>
+                </div>
+
 			</div>
 
 			<h:dataTable
@@ -123,7 +142,6 @@
 									action="#{recipientAppointmentController.sortByAsc('appointmentId')}"
 									rendered="#{recipientAppointmentController.renderSortButton('appointmentId', 'asc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/up-arrow.png"
 										width="9" height="9" title="Sort Ascending" />
 								</h:commandLink>
@@ -131,7 +149,6 @@
 									action="#{recipientAppointmentController.sortByDesc('appointmentId')}"
 									rendered="#{recipientAppointmentController.renderSortButton('appointmentId', 'desc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/down-arrow.png"
 										width="10" height="10" title="Sort Descending" />
 								</h:commandLink>
@@ -161,7 +178,6 @@
 									action="#{recipientAppointmentController.sortByAsc('doctorName')}"
 									rendered="#{recipientAppointmentController.renderSortButton('doctorName', 'asc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/up-arrow.png"
 										width="9" height="9" title="Sort Ascending" />
 								</h:commandLink>
@@ -169,7 +185,6 @@
 									action="#{recipientAppointmentController.sortByDesc('doctorName')}"
 									rendered="#{recipientAppointmentController.renderSortButton('doctorName', 'desc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/down-arrow.png"
 										width="10" height="10" title="Sort Descending" />
 								</h:commandLink>
@@ -192,7 +207,6 @@
 									action="#{recipientAppointmentController.sortByAsc('start')}"
 									rendered="#{recipientAppointmentController.renderSortButton('start', 'asc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/up-arrow.png"
 										width="9" height="9" title="Sort Ascending" />
 								</h:commandLink>
@@ -200,7 +214,6 @@
 									action="#{recipientAppointmentController.sortByDesc('start')}"
 									rendered="#{recipientAppointmentController.renderSortButton('start', 'desc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/down-arrow.png"
 										width="10" height="10" title="Sort Descending" />
 								</h:commandLink>
@@ -224,7 +237,6 @@
 									action="#{recipientAppointmentController.sortByAsc('status')}"
 									rendered="#{recipientAppointmentController.renderSortButton('status', 'asc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/up-arrow.png"
 										width="9" height="9" title="Sort Ascending" />
 								</h:commandLink>
@@ -232,7 +244,6 @@
 									action="#{recipientAppointmentController.sortByDesc('status')}"
 									rendered="#{recipientAppointmentController.renderSortButton('status', 'desc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/down-arrow.png"
 										width="10" height="10" title="Sort Descending" />
 								</h:commandLink>
@@ -254,7 +265,6 @@
 									action="#{recipientAppointmentController.sortByAsc('specialization')}"
 									rendered="#{recipientAppointmentController.renderSortButton('specialization', 'asc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/up-arrow.png"
 										width="9" height="9" title="Sort Ascending" />
 								</h:commandLink>
@@ -262,7 +272,6 @@
 									action="#{recipientAppointmentController.sortByDesc('specialization')}"
 									rendered="#{recipientAppointmentController.renderSortButton('specialization', 'desc')}"
 									styleClass="sort-icons">
-									<%-- Corrected image path: Use f:facet for graphicImage value --%>
 									<h:graphicImage value="/resources/media/images/down-arrow.png"
 										width="10" height="10" title="Sort Descending" />
 								</h:commandLink>
@@ -322,37 +331,50 @@
 				warnClass="warn-message" />
 		</h:form>
 	</div>
-	<script>
-        // This function will be called once the DOM is fully loaded.
-        // It ensures that elements exist before we try to attach listeners.
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all rows with the 'clickable-row' class within the table body
-            const rows = document.querySelectorAll('.slots-table-component tbody tr.clickable-row');
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+	<script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Flatpickr for "From Date"
+            flatpickr("#fromDate", {
+                dateFormat: "Y-m-d", // Matches f:convertDateTime pattern
+                onClose: function(selectedDates, dateStr, instance) {
+                    // When a date is selected and the calendar closes, submit the form
+                    document.getElementById('appointmentForm').submit();
+                }
+            });
+
+            // Initialize Flatpickr for "To Date"
+            flatpickr("#toDate", {
+                dateFormat: "Y-m-d", // Matches f:convertDateTime pattern
+                onClose: function(selectedDates, dateStr, instance) {
+                    // When a date is selected and the calendar closes, submit the form
+                    document.getElementById('appointmentForm').submit();
+                }
+            });
+            // Existing clickable row logic (modified to exclude date input clicks)
+            const rows = document.querySelectorAll('.slots-table-component tbody tr.clickable-row');
             rows.forEach(row => {
                 row.addEventListener('click', function(event) {
-                    // Check if the click originated from the cancel button or its children
-                    // or from any element with the 'no-row-click' class (for other future interactive elements)
-                    if (event.target.closest('.cancel-button') || 
+                    // Check if the click originated from elements that should prevent row click
+                    if (event.target.closest('.cancel-button') ||
                         event.target.closest('.pagination-button') ||
-                        event.target.closest('.sort-icons') || // Added to prevent row click on sort icons
-                        event.target.closest('.filter-select') || // Added to prevent row click on filter dropdowns
-                        event.target.closest('.no-row-click')) {
-                        return; // Do nothing if a specific button or element was clicked
+                        event.target.closest('.sort-icons') ||
+                        event.target.closest('.filter-select') ||
+                        event.target.closest('.date-input-field') || // Exclude clicks on the date input fields
+                        event.target.closest('.no-row-click') ||
+                        event.target.closest('.flatpickr-calendar')) { // Exclude clicks within the flatpickr calendar itself
+                        return; // Do nothing if a specific interactive element was clicked
                     }
 
-                    // Find the hidden commandButton within the clicked row
                     const detailButton = row.querySelector('.hidden-command-button');
-                    
                     if (detailButton) {
-                        // Programmatically click the hidden button
                         detailButton.click();
                     }
                 });
             });
         });
-
-
 		function showLoadingAndConfirm() {
 			const confirmCancel = confirm('Are you sure you want to cancel this appointment?');
 			if (confirmCancel) {
