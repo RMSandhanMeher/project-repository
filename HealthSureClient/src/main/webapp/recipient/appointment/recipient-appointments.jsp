@@ -61,7 +61,22 @@
 	box-sizing: border-box; /* Include padding and border in the element's total width and height */
 }
 
-/* No custom Flatpickr styling here. It will rely on its default CSS. */
+/* Add a style for the reset button */
+.reset-button {
+    padding: 8px 15px;
+    background-color: #6c757d; /* A neutral gray */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.2s ease;
+    margin-top: 25px;
+}
+
+.reset-button:hover {
+    background-color: #5a6268;
+}
 
 </style>
 </head>
@@ -124,6 +139,14 @@
                         <f:convertDateTime pattern="yyyy-MM-dd" />
                     </h:inputText>
                 </div>
+				
+				<div class="filter-item">
+					<%-- New Reset Button --%>
+					<h:commandButton value="Reset Filters"
+						action="#{recipientAppointmentController.resetData()}"
+						styleClass="reset-button"
+						onclick="showLoading(); return true;" />
+				</div>
 
 			</div>
 
@@ -353,6 +376,7 @@
                     document.getElementById('appointmentForm').submit();
                 }
             });
+
             // Existing clickable row logic (modified to exclude date input clicks)
             const rows = document.querySelectorAll('.slots-table-component tbody tr.clickable-row');
             rows.forEach(row => {
@@ -375,6 +399,7 @@
                 });
             });
         });
+
 		function showLoadingAndConfirm() {
 			const confirmCancel = confirm('Are you sure you want to cancel this appointment?');
 			if (confirmCancel) {

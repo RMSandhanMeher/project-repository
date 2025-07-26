@@ -49,9 +49,9 @@ public class RecipientAppointmentController implements Serializable {
 	private String timeFilterType = "future";
 	private String statusFilterType = "ALL";
 
-    // NEW: Date filter properties
-    private Date fromDate;
-    private Date toDate;
+	// NEW: Date filter properties
+	private Date fromDate;
+	private Date toDate;
 
 	private final int pageSize = 5;
 	private int currentPage = 0; // 0-based for sublist operations
@@ -108,22 +108,22 @@ public class RecipientAppointmentController implements Serializable {
 			boolean matchStatus = "ALL".equalsIgnoreCase(statusFilterType)
 					|| (appt.getStatus() != null && appt.getStatus().name().equalsIgnoreCase(statusFilterType));
 
-            // NEW: Date range filtering logic
-            boolean matchDateRange = true;
-            if (fromDate != null && appt.getStart() != null) {
-                // Check if appointment start date is ON OR AFTER fromDate
-                matchDateRange = !appt.getStart().before(new Timestamp(fromDate.getTime()));
-            }
-            if (toDate != null && appt.getStart() != null) {
-                // Check if appointment start date is ON OR BEFORE toDate (end of day)
-                Calendar c = Calendar.getInstance();
-                c.setTime(toDate);
-                c.set(Calendar.HOUR_OF_DAY, 23);
-                c.set(Calendar.MINUTE, 59);
-                c.set(Calendar.SECOND, 59);
-                c.set(Calendar.MILLISECOND, 999);
-                matchDateRange = matchDateRange && !appt.getStart().after(new Timestamp(c.getTimeInMillis()));
-            }
+			// NEW: Date range filtering logic
+			boolean matchDateRange = true;
+			if (fromDate != null && appt.getStart() != null) {
+				// Check if appointment start date is ON OR AFTER fromDate
+				matchDateRange = !appt.getStart().before(new Timestamp(fromDate.getTime()));
+			}
+			if (toDate != null && appt.getStart() != null) {
+				// Check if appointment start date is ON OR BEFORE toDate (end of day)
+				Calendar c = Calendar.getInstance();
+				c.setTime(toDate);
+				c.set(Calendar.HOUR_OF_DAY, 23);
+				c.set(Calendar.MINUTE, 59);
+				c.set(Calendar.SECOND, 59);
+				c.set(Calendar.MILLISECOND, 999);
+				matchDateRange = matchDateRange && !appt.getStart().after(new Timestamp(c.getTimeInMillis()));
+			}
 
 			if (matchStatus && matchDateRange) { // Combine all filters
 				filteredAppointments.add(appt);
@@ -170,7 +170,8 @@ public class RecipientAppointmentController implements Serializable {
 				break;
 			case "start":
 			default:
-				comparator = Comparator.comparing(Appointment::getStart, Comparator.nullsLast(Comparator.naturalOrder()));
+				comparator = Comparator.comparing(Appointment::getStart,
+						Comparator.nullsLast(Comparator.naturalOrder()));
 			}
 
 			if (!ascending) {
@@ -346,6 +347,13 @@ public class RecipientAppointmentController implements Serializable {
 		}
 	}
 
+	public void resetData() {
+		this.timeFilterType = "future";
+		this.statusFilterType = "ALL";
+		this.fromDate = null;
+		this.toDate = null;
+		updateFilteredAndSortedAppointments();
+	}
 	// ======================= GETTERS & SETTERS ========================
 
 	public List<Appointment> getPaginatedAppointments() {
@@ -437,26 +445,26 @@ public class RecipientAppointmentController implements Serializable {
 		return currentSortOrder;
 	}
 
-    // NEW: Getters and Setters for fromDate and toDate
-    public Date getFromDate() {
-        return fromDate;
-    }
+	// NEW: Getters and Setters for fromDate and toDate
+	public Date getFromDate() {
+		return fromDate;
+	}
 
-    public void setFromDate(Date fromDate) {
-        this.fromDate = fromDate;
-        this.currentPage = 0; // Reset page on filter change
-        LOGGER.info("From Date filter changed to: " + fromDate);
-        updateFilteredAndSortedAppointments(); // Re-filter and re-paginate
-    }
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+		this.currentPage = 0; // Reset page on filter change
+		LOGGER.info("From Date filter changed to: " + fromDate);
+		updateFilteredAndSortedAppointments(); // Re-filter and re-paginate
+	}
 
-    public Date getToDate() {
-        return toDate;
-    }
+	public Date getToDate() {
+		return toDate;
+	}
 
-    public void setToDate(Date toDate) {
-        this.toDate = toDate;
-        this.currentPage = 0; // Reset page on filter change
-        LOGGER.info("To Date filter changed to: " + toDate);
-        updateFilteredAndSortedAppointments(); // Re-filter and re-paginate
-    }
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
+		this.currentPage = 0; // Reset page on filter change
+		LOGGER.info("To Date filter changed to: " + toDate);
+		updateFilteredAndSortedAppointments(); // Re-filter and re-paginate
+	}
 }
