@@ -10,6 +10,7 @@ public class AppointmentDetails implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String doctorName;
+    private String doctorId;
     private String doctorSpecialization;
     private Gender doctorGender; // Assuming Gender enum exists
     private String doctorAvailabilityTiming; // e.g., "10:00 AM - 10:30 AM"
@@ -151,7 +152,15 @@ public class AppointmentDetails implements Serializable {
         this.end = end;
     }
 
-    @Override
+    public String getDoctorId() {
+		return doctorId;
+	}
+
+	public void setDoctorId(String doctorId) {
+		this.doctorId = doctorId;
+	}
+
+	@Override
     public String toString() {
         return "AppointmentDetails{" +
                "doctorName='" + doctorName + '\'' +

@@ -32,6 +32,7 @@ public class AppointmentDetailController implements Serializable {
 					appointmentDetailsForDisplay.setSlotNo(appointment.getSlotNo());
 					appointmentDetailsForDisplay.setStart(appointment.getStart());
 					appointmentDetailsForDisplay.setEnd(appointment.getEnd());
+					appointmentDetailsForDisplay.setDoctorId(appointment.getDoctor().getDoctorId());
 					// Doctor details
 					if (appointment.getDoctor() != null) {
 						appointmentDetailsForDisplay.setDoctorName(appointment.getDoctor().getDoctorName());
@@ -77,6 +78,9 @@ public class AppointmentDetailController implements Serializable {
 			appointmentDetailsForDisplay = null;
 		}
 		return null;
+	}
+	public String rescheduleAppointment() {
+		return "/recipient/appointment/updateAppointment?faces-redirect=true";
 	}
 
 //	getter and setter 

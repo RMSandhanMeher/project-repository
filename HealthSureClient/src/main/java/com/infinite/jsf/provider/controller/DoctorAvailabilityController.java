@@ -197,6 +197,11 @@ public class DoctorAvailabilityController implements Serializable {
 		}
 		return null;
 	}
+	
+	public String rescheduleAppointment(String doctorId) {
+		chooseDoctor(doctorId);
+		return "/recipient/appointment/updateAppointment?faces-redirect=true";
+	}
 
 	// Helper methods for time period filtering
 	public List<SlotDisplay> getMorningSlots() {
