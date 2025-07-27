@@ -40,7 +40,7 @@ public class DoctorAvailabilityController implements Serializable {
 	private String selectedAvailabilityId;
 	private int selectedSlotNumber;
 	private Doctors doctor;
-
+	private String appointmentId;
 	private List<String> availabilityTiming;
 
 	@PostConstruct
@@ -100,9 +100,10 @@ public class DoctorAvailabilityController implements Serializable {
 		}
 	}
 
-	public String chooseDoctor(String doctorId) {
+	public String chooseDoctor(String doctorId,String appointmentId) {
 		this.doctorId = doctorId;
-
+		this.appointmentId=appointmentId;
+		System.out.println(doctorId+"        "+appointmentId);
 		if (doctorId == null || doctorId.isEmpty()) {
 			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
 					new FacesMessage(FacesMessage.SEVERITY_WARN, "Please select a doctor.", null));
@@ -197,9 +198,83 @@ public class DoctorAvailabilityController implements Serializable {
 		}
 		return null;
 	}
+	public String updateBookedAppointment() {
+		System.out.println("method ");
+		try {
+			System.out.println("selectedAvailabilityId" + selectedAvailabilityId);
+			FacesContext context = FacesContext.getCurrentInstance();
+			DoctorAvailability availability = availabilityDao.getAvailabilityById(selectedAvailabilityId);
+
+			if (availability == null) {
+				context.addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Time slot no longer available", null));
+				this.selectedAvailabilityId = null;
+				this.selectedSlotNumber = 0;
+				return null;
+			}
+
+			Appointment appointment = new AppointmentDaoImpl().getAppointmentById(appointmentId);
+			appointment.setAvailability(availability);
+			appointment.setDoctor(availability.getDoctor());
+			appointment.setSlotNo(selectedSlotNumber);
+			
+			// Set current user as recipient (should come from session)
+			
+			Recipient recipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("loggedInRecipient");
+			appointment.setRecipient(recipient);
+
+			Provider provider = new Provider();
+			provider.setProviderId("PROV001");
+			appointment.setProvider(provider);
+			
+			System.out.println(appointment.getAppointmentId());
+			String result = appointmentDao.updateAppointment(appointment);
+			if (result.startsWith("Appointment updated successfully")) {
+
+				HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext()
+						.getSession(true);
+				session.setAttribute("confirmationMessage", result);
+				this.selectedAvailabilityId = null;
+				this.selectedSlotNumber = 0;
+				this.selectedDateInput = null;
+				this.selectedDate = null;
+				this.loadAvailableSlots(); // Refresh available slots
+//				Recipient res = new RecipientDaoImpl().searchRecipientById(recipient.gethId());
+//				Doctors doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
+//				ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext()
+//						.getContext();
+//				Appointment ap = new AppointmentDaoImpl()
+//						.getAppointmentById(result.split(" ")[result.split(" ").length - 1]);
+//				String subject = "Appointment update request Received – Awaiting Confirmation";
+//				AppointmentSlip apSli = new AppointmentSlip(res.getFirstName() + " " + res.getLastName(),
+//						ap.getAppointmentId(), "Infinite HealthSure Hospital",
+//						servletContext.getInitParameter("providerEmail"), servletContext.getInitParameter("contact"),
+//						doctor.getDoctorName(), doctor.getSpecialization(), ap.getStart().toString().split(" ")[0],
+//						appointment.getSlotNo(),
+//						ap.getStart().toString().split(" ")[1] + " - " + ap.getEnd().toString().split(" ")[1]);
+//				try {
+//					MailSend.sendMail(res.getEmail(), subject, MailSend.appointmentRequest(apSli));
+//				} catch (Exception e) {
+//					System.out.println("error while sending the mail here ");
+//				}
+				return "appointmentConfirmation?faces-redirect=true";
+			} else {
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, result, null));
+				this.selectedAvailabilityId = null;
+				this.selectedSlotNumber = 0;
+				this.selectedDateInput = null;
+				this.selectedDate = null;
+				this.loadAvailableSlots(); // Refresh available slots
+			}
+		} catch (Exception e) {
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + e.getMessage(), null));
+		}
+		return null;
+	}
 	
-	public String rescheduleAppointment(String doctorId) {
-		chooseDoctor(doctorId);
+	public String rescheduleAppointment(String doctorId,String appointmentId) {
+		chooseDoctor(doctorId,appointmentId);
 		return "/recipient/appointment/updateAppointment?faces-redirect=true";
 	}
 

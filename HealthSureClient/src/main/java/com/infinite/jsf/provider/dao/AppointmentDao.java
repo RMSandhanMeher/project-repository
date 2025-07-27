@@ -29,7 +29,7 @@ public interface AppointmentDao {
     boolean cancelAppointment(String appointmentId);
 
     // Update an existing appointment (change slot etc.)
-    boolean updateAppointment(Appointment appointment);
+    String updateAppointment(Appointment appointment);
 
     // Get current booked count for a slot
     int getBookedCountForAvailability(String availabilityId);

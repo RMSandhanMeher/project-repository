@@ -349,7 +349,7 @@ body {
 
 				<h:form style="display:inline;">
 					<h:commandButton value="Reschedule" styleClass="btn btn-reschedule"
-						action="#{doctorAvailabilityController.rescheduleAppointment(appointmentDetailController.appointmentDetailsForDisplay.doctorId)}">
+						action="#{doctorAvailabilityController.rescheduleAppointment(appointmentDetailController.appointmentDetailsForDisplay.doctorId,appointmentDetailController.appointmentDetailsForDisplay.appointmentId)}">
 						<f:param name="appointmentId"
 							value="#{appointmentDetailController.appointmentDetailsForDisplay.appointmentId}" />
 

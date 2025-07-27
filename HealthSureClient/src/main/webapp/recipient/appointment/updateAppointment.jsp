@@ -28,7 +28,7 @@
 			<path class="opacity-75-svg" fill="currentColor"
 					d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
 		</svg>
-			<p class="mt-2-spacing text-gray-700-color">Booking your
+			<p class="mt-2-spacing text-gray-700-color">updating your
 				appointment...</p>
 
 		</div>
@@ -148,7 +148,7 @@
 								var="slot" styleClass="time-slots-table-component">
 								<h:column>
 									<h:commandButton value="#{slot.formattedTimeRange}"
-										action="#{doctorAvailabilityController.bookAppointment}"
+										action="#{doctorAvailabilityController.updateBookedAppointment}"
 										onclick="return showBookingLoading();"
 										styleClass="time-slot-button ripple">
 
@@ -182,7 +182,7 @@
 								var="slot" styleClass="time-slots-table-component">
 								<h:column>
 									<h:commandButton value="#{slot.formattedTimeRange}"
-										action="#{doctorAvailabilityController.bookAppointment}"
+										action="#{doctorAvailabilityController.updateBookedAppointment}"
 										onclick="return showBookingLoading();"
 										styleClass="time-slot-button ripple">
 
@@ -214,7 +214,7 @@
 								var="slot" styleClass="time-slots-table-component">
 								<h:column>
 									<h:commandButton value="#{slot.formattedTimeRange}"
-										action="#{doctorAvailabilityController.bookAppointment}"
+										action="#{doctorAvailabilityController.updateBookedAppointment}"
 										onclick="return showBookingLoading();"
 										styleClass="time-slot-button ripple">
 

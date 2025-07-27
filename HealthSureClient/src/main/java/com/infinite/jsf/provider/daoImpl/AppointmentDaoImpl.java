@@ -360,69 +360,73 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	}
 
 	@Override
-	public boolean updateAppointment(Appointment updatedAppointment) {
-		Transaction tx = null;
-		try {
-			Session session = SessionHelper.getSessionFactory().openSession();
-			tx = session.beginTransaction();
+	public String updateAppointment(Appointment updatedAppointment) {
+	    Transaction tx = null;
+	    try {
+	        Session session = SessionHelper.getSessionFactory().openSession();
+	        tx = session.beginTransaction();
 
-			// Load the original appointment
-			Appointment existing = (Appointment) session.get(Appointment.class, updatedAppointment.getAppointmentId());
-			if (existing == null)
-				return false;
+	        // Load the original appointment
+	        Appointment existing = (Appointment) session.get(Appointment.class, updatedAppointment.getAppointmentId());
+	        if (existing == null) {
+	            return "Appointment not found.";
+	        }
 
-			// Allow update only if appointment is in the future
-			Timestamp now = new Timestamp(System.currentTimeMillis());
-			if (existing.getStart() != null && existing.getStart().before(now)) {
-				return false; // Cannot update past appointment
-			}
+	        // Allow update only if appointment is in the future
+	        Timestamp now = new Timestamp(System.currentTimeMillis());
+	        if (existing.getStart() != null && existing.getStart().before(now)) {
+	            return "Cannot update past appointments.";
+	        }
 
-			String availabilityId = updatedAppointment.getAvailability().getAvailabilityId();
-			String recipientId = updatedAppointment.getRecipient().gethId();
-			int slotNo = updatedAppointment.getSlotNo();
+	        String availabilityId = updatedAppointment.getAvailability().getAvailabilityId();
+	        String recipientId = updatedAppointment.getRecipient().gethId();
+	        int slotNo = updatedAppointment.getSlotNo();
 
-			// Check if new slot overlaps with another existing appointment of recipient
-			Query overlapQuery = session.createQuery(
-					"FROM Appointment a WHERE a.recipient.hId = :recipientId AND a.status IN ('BOOKED', 'PENDING') "
-							+ "AND ((a.start <= :endTime AND a.end >= :startTime)) AND a.appointmentId != :currentId");
-			overlapQuery.setParameter("recipientId", recipientId);
-			overlapQuery.setParameter("startTime", updatedAppointment.getStart());
-			overlapQuery.setParameter("endTime", updatedAppointment.getEnd());
-			overlapQuery.setParameter("currentId", updatedAppointment.getAppointmentId());
+	        // Check if new slot overlaps with another existing appointment of recipient
+	        Query overlapQuery = session.createQuery(
+	            "FROM Appointment a WHERE a.recipient.hId = :recipientId AND a.status IN ('BOOKED', 'PENDING') " +
+	            "AND ((a.start <= :endTime AND a.end >= :startTime)) AND a.appointmentId != :currentId"
+	        );
+	        overlapQuery.setParameter("recipientId", recipientId);
+	        overlapQuery.setParameter("startTime", updatedAppointment.getStart());
+	        overlapQuery.setParameter("endTime", updatedAppointment.getEnd());
+	        overlapQuery.setParameter("currentId", updatedAppointment.getAppointmentId());
 
-			if (!overlapQuery.list().isEmpty()) {
-				return false; // Overlapping found
-			}
+	        if (!overlapQuery.list().isEmpty()) {
+	            return "Overlapping appointment exists for the recipient.";
+	        }
 
-			// Check if the new slot number is already taken in same availability
-			Query slotQuery = session.createQuery(
-					"FROM Appointment a WHERE a.availability.availabilityId = :availabilityId AND a.slotNo = :slotNo "
-							+ "AND a.status IN ('BOOKED', 'PENDING') AND a.appointmentId != :currentId");
-			slotQuery.setParameter("availabilityId", availabilityId);
-			slotQuery.setParameter("slotNo", slotNo);
-			slotQuery.setParameter("currentId", updatedAppointment.getAppointmentId());
+	        // Check if the new slot number is already taken in same availability
+	        Query slotQuery = session.createQuery(
+	            "FROM Appointment a WHERE a.availability.availabilityId = :availabilityId AND a.slotNo = :slotNo " +
+	            "AND a.status IN ('BOOKED', 'PENDING') AND a.appointmentId != :currentId"
+	        );
+	        slotQuery.setParameter("availabilityId", availabilityId);
+	        slotQuery.setParameter("slotNo", slotNo);
+	        slotQuery.setParameter("currentId", updatedAppointment.getAppointmentId());
 
-			if (!slotQuery.list().isEmpty()) {
-				return false; // Slot taken
-			}
+	        if (!slotQuery.list().isEmpty()) {
+	            return "Slot already booked in the selected availability.";
+	        }
 
-			// Update details
-			existing.setAvailability(updatedAppointment.getAvailability());
-			existing.setSlotNo(slotNo);
-			existing.setStart(updatedAppointment.getStart());
-			existing.setEnd(updatedAppointment.getEnd());
-			existing.setNotes(updatedAppointment.getNotes());
+	        // Update details
+	        existing.setAvailability(updatedAppointment.getAvailability());
+	        existing.setSlotNo(slotNo);
+	        existing.setStart(updatedAppointment.getStart());
+	        existing.setEnd(updatedAppointment.getEnd());
+	        existing.setNotes(updatedAppointment.getNotes());
 
-			session.update(existing);
-			tx.commit();
-			return true;
-		} catch (Exception e) {
-			if (tx != null)
-				tx.rollback();
-			e.printStackTrace();
-			return false;
-		}
+	        session.update(existing);
+	        tx.commit();
+	        return "Appointment updated successfully.";
+	    } catch (Exception e) {
+	        if (tx != null)
+	            tx.rollback();
+	        e.printStackTrace();
+	        return "Error occurred while updating the appointment.";
+	    }
 	}
+
 
 	@Override
 	public int getBookedCountForAvailability(String availabilityId) {
