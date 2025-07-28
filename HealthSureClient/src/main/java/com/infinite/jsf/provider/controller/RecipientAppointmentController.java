@@ -357,6 +357,7 @@ public class RecipientAppointmentController implements Serializable {
 	// ======================= GETTERS & SETTERS ========================
 
 	public List<Appointment> getPaginatedAppointments() {
+		loadAppointments();
 		return paginatedAppointments;
 	}
 
