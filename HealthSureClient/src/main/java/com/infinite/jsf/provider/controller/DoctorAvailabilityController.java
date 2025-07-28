@@ -113,7 +113,18 @@ public class DoctorAvailabilityController implements Serializable {
 		loadAllUpcomingAvailability();
 		return "/recipient/appointment/doctorAvailabilityList.jsf?faces-redirect=true";
 	}
+	public String chooseDoctor(String doctorId) {
+		this.doctorId = doctorId;
 
+		if (doctorId == null || doctorId.isEmpty()) {
+			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
+					new FacesMessage(FacesMessage.SEVERITY_WARN, "Please select a doctor.", null));
+			return null;
+		}
+		doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
+		loadAllUpcomingAvailability();
+		return "/recipient/appointment/doctorAvailabilityList.jsf?faces-redirect=true";
+	}
 	public void handleDateSelection() {
 		try {
 			if (selectedDateInput != null && !selectedDateInput.isEmpty()) {

@@ -371,6 +371,23 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	        if (existing == null) {
 	            return "Appointment not found.";
 	        }
+	    	DoctorAvailabilityDaoImpl availabilityDao = new DoctorAvailabilityDaoImpl();
+			DoctorAvailability doctoravail = availabilityDao
+					.getAvailabilityById(updatedAppointment.getAvailability().getAvailabilityId());
+
+			if (doctoravail == null) {
+				return "Invalid availability slot. Please select a valid time slot.";
+			}
+
+			// 2. Set calculated start and end times for the appointment
+			updatedAppointment.setAvailability(doctoravail);
+			long slotSt = Timestamp
+					.valueOf(doctoravail.getStartTime().toLocalTime()
+							.atDate(((Date) doctoravail.getAvailableDate()).toLocalDate()))
+					.getTime() + (updatedAppointment.getSlotNo() - 1) * doctoravail.getPatientWindow() * 60 * 1000;
+			long slotEn = slotSt + doctoravail.getPatientWindow() * 60 * 1000;
+			updatedAppointment.setStart(new Timestamp(slotSt));
+			updatedAppointment.setEnd(new Timestamp(slotEn));
 
 	        // Allow update only if appointment is in the future
 	        Timestamp now = new Timestamp(System.currentTimeMillis());
