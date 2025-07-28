@@ -1,3 +1,17 @@
+/*
+* -----------------------------------------------------------------------------
+* Copyright © 2025 Infinite Computer Solution. All rights reserved.
+* -----------------------------------------------------------------------------
+*
+* @Author   : Sandhan Meher
+* @Purpose  : This class serves as the controller for managing appointment
+* details and operations from the recipient's perspective. It handles fetching,
+* filtering, sorting, and pagination of upcoming and past appointments.
+* It also provides functionality for cancelling appointments and sending
+* corresponding email notifications.
+*
+* -----------------------------------------------------------------------------
+*/
 package com.infinite.jsf.provider.controller;
 
 import java.io.Serializable;
@@ -61,12 +75,21 @@ public class RecipientAppointmentController implements Serializable {
 	private String currentSortColumn = "start";
 	private String currentSortOrder = "asc";
 
+	/**
+	 * Initializes the controller after its construction. This method is annotated with {@code @PostConstruct}
+	 * and is called by the JSF runtime. It loads the recipient's appointments.
+	 */
 	@PostConstruct
 	public void init() {
 		LOGGER.info("RecipientAppointmentController initialized.");
 		loadAppointments();
 	}
 
+	/**
+	 * Loads all upcoming and past appointments for the logged-in recipient from the database.
+	 * It also initializes filtering and sorting based on default or previously set criteria.
+	 * If no recipient is found in the session, it redirects to the login page.
+	 */
 	public void loadAppointments() {
 		try {
 			recipient = ((Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
@@ -96,6 +119,12 @@ public class RecipientAppointmentController implements Serializable {
 		}
 	}
 
+	/**
+	 * Updates the list of {@code filteredAppointments} based on the current {@code timeFilterType},
+	 * {@code statusFilterType}, {@code fromDate}, and {@code toDate}. After filtering, it applies
+	 * the current sorting criteria and resets pagination if necessary. This method is called
+	 * whenever a filter or sort option changes.
+	 */
 	public void updateFilteredAndSortedAppointments() {
 		LOGGER.info("updateFilteredAndSortedAppointments: Time Filter=" + timeFilterType + ", Status Filter="
 				+ statusFilterType + ", From Date=" + fromDate + ", To Date=" + toDate);
@@ -133,6 +162,7 @@ public class RecipientAppointmentController implements Serializable {
 
 		sortFilteredAppointments();
 
+		// Adjust current page if current page index is out of bounds after filtering
 		if (currentPage * pageSize >= filteredAppointments.size() && filteredAppointments.size() > 0) {
 			currentPage = (int) Math.floor((double) (filteredAppointments.size() - 1) / pageSize);
 		} else if (filteredAppointments.isEmpty()) {
@@ -142,6 +172,11 @@ public class RecipientAppointmentController implements Serializable {
 		updatePaginatedAppointments();
 	}
 
+	/**
+	 * Sorts the {@code filteredAppointments} list based on the current {@code sortField}
+	 * and {@code ascending} order. Supports sorting by doctor name, status, specialization,
+	 * appointment ID, and start time.
+	 */
 	private void sortFilteredAppointments() {
 		try {
 			if (filteredAppointments == null || filteredAppointments.isEmpty()) {
@@ -187,33 +222,57 @@ public class RecipientAppointmentController implements Serializable {
 		}
 	}
 
+	/**
+	 * Sets the sorting field and order to ascending, then triggers a re-filter
+	 * and re-pagination of appointments.
+	 *
+	 * @param field The field name to sort by (e.g., "doctorName", "start").
+	 */
 	public void sortByAsc(String field) {
 		this.sortField = field;
 		this.ascending = true;
 		this.currentSortColumn = field;
 		this.currentSortOrder = "asc";
-		currentPage = 0;
+		currentPage = 0; // Reset pagination on new sort
 		updateFilteredAndSortedAppointments();
 		LOGGER.info("Sorting by " + field + " (Ascending)");
 	}
 
+	/**
+	 * Sets the sorting field and order to descending, then triggers a re-filter
+	 * and re-pagination of appointments.
+	 *
+	 * @param field The field name to sort by (e.g., "doctorName", "start").
+	 */
 	public void sortByDesc(String field) {
 		this.sortField = field;
 		this.ascending = false;
 		this.currentSortColumn = field;
 		this.currentSortOrder = "desc";
-		currentPage = 0;
+		currentPage = 0; // Reset pagination on new sort
 		updateFilteredAndSortedAppointments();
 		LOGGER.info("Sorting by " + field + " (Descending)");
 	}
 
+	/**
+	 * Determines whether a sort button for a specific column and order should be rendered.
+	 * This helps to hide the active sort button and show only the alternative sort option.
+	 *
+	 * @param column The name of the column.
+	 * @param order The sort order ("asc" or "desc").
+	 * @return {@code true} if the sort button should be rendered, {@code false} otherwise.
+	 */
 	public boolean renderSortButton(String column, String order) {
 		if (currentSortColumn == null || !currentSortColumn.equals(column)) {
-			return true;
+			return true; // Render if it's not the currently sorted column
 		}
-		return !currentSortOrder.equals(order);
+		return !currentSortOrder.equals(order); // Render if it's the current column but opposite order
 	}
 
+	/**
+	 * Updates the {@code paginatedAppointments} list based on the current {@code currentPage}
+	 * and {@code pageSize}. This method is called after filtering/sorting or pagination changes.
+	 */
 	public void updatePaginatedAppointments() {
 		if (filteredAppointments == null || filteredAppointments.isEmpty()) {
 			paginatedAppointments = new ArrayList<>();
@@ -223,6 +282,7 @@ public class RecipientAppointmentController implements Serializable {
 		int fromIndex = currentPage * pageSize;
 		int toIndex = Math.min(fromIndex + pageSize, filteredAppointments.size());
 
+		// Ensure fromIndex does not exceed list size if filtered list becomes smaller
 		fromIndex = Math.min(fromIndex, filteredAppointments.size());
 
 		paginatedAppointments = new ArrayList<>(filteredAppointments.subList(fromIndex, toIndex));
@@ -231,6 +291,9 @@ public class RecipientAppointmentController implements Serializable {
 				+ ", Total: " + filteredAppointments.size());
 	}
 
+	/**
+	 * Navigates to the next page of appointments if available.
+	 */
 	public void nextPage() {
 		if (isHasNextPage()) {
 			currentPage++;
@@ -239,6 +302,9 @@ public class RecipientAppointmentController implements Serializable {
 		}
 	}
 
+	/**
+	 * Navigates to the previous page of appointments if available.
+	 */
 	public void prevPage() {
 		if (isHasPrevPage()) {
 			currentPage--;
@@ -247,11 +313,19 @@ public class RecipientAppointmentController implements Serializable {
 		}
 	}
 
+	/**
+	 * Resets the pagination to the first page.
+	 */
 	private void resetPagination() {
 		currentPage = 0;
 		updatePaginatedAppointments();
 	}
 
+	/**
+	 * Navigates directly to a specified page number.
+	 *
+	 * @param page The 1-based page number to navigate to.
+	 */
 	public void goToPage(int page) {
 		int zeroBasedPage = page - 1;
 		int maxPage = getTotalPages() - 1;
@@ -259,6 +333,13 @@ public class RecipientAppointmentController implements Serializable {
 		updatePaginatedAppointments();
 	}
 
+	/**
+	 * Checks if a given appointment is cancellable. An appointment is cancellable
+	 * if its start time is in the future and its status is either BOOKED or PENDING.
+	 *
+	 * @param appt The {@code Appointment} object to check.
+	 * @return {@code true} if the appointment can be cancelled, {@code false} otherwise.
+	 */
 	public boolean isCancellable(Appointment appt) {
 		if (appt == null || appt.getStart() == null)
 			return false;
@@ -267,6 +348,12 @@ public class RecipientAppointmentController implements Serializable {
 				&& (appt.getStatus() == AppointmentStatus.BOOKED || appt.getStatus() == AppointmentStatus.PENDING);
 	}
 
+	/**
+	 * Provides a list of {@code SelectItem} options for the status filter dropdown in the UI.
+	 * Includes "All", "Pending", "Booked", "Cancelled", and "Completed" (for past appointments).
+	 *
+	 * @return A {@code List} of {@code SelectItem} objects for status filtering.
+	 */
 	public List<SelectItem> getStatusFilterOptions() {
 		List<SelectItem> options = new ArrayList<>();
 		options.add(new SelectItem("ALL", "All"));
@@ -279,6 +366,13 @@ public class RecipientAppointmentController implements Serializable {
 		return options;
 	}
 
+	/**
+	 * Handles the cancellation of the {@code selectedAppointment}. It updates the appointment status
+	 * in the database, sends a cancellation email to the recipient, and refreshes the appointment lists.
+	 * Displays appropriate success or error messages to the user.
+	 *
+	 * @return A navigation outcome string to the recipient appointments page if successful, or {@code null} on failure.
+	 */
 	public String cancelAppointment() {
 		if (selectedAppointment == null) {
 			FacesContext.getCurrentInstance().addMessage(null,
@@ -296,6 +390,7 @@ public class RecipientAppointmentController implements Serializable {
 				return null;
 			}
 
+			// Retrieve recipient and doctor details for email
 			recipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
 					.get("loggedInRecipient");
 			Doctors doctor = new DoctorDaoImpl().searchADoctorById(selectedAppointment.getDoctor().getDoctorId());
@@ -305,6 +400,7 @@ public class RecipientAppointmentController implements Serializable {
 
 			String subject = "Appointment Cancelled – Infinite HealthSure";
 
+			// Format dates and times for the email slip
 			String date = (selectedAppointment.getStart() != null)
 					? selectedAppointment.getStart().toString().split(" ")[0]
 					: "N/A";
@@ -334,7 +430,7 @@ public class RecipientAppointmentController implements Serializable {
 						"Appointment cancelled, but failed to send confirmation email.", null));
 			}
 
-			loadAppointments();
+			loadAppointments(); // Refresh the list after cancellation
 			return "recipient-appointments?faces-redirect=true";
 
 		} catch (Exception e) {
@@ -347,6 +443,10 @@ public class RecipientAppointmentController implements Serializable {
 		}
 	}
 
+	/**
+	 * Resets all filters (time, status, date range) to their default values
+	 * and re-applies filtering and sorting to refresh the displayed appointments.
+	 */
 	public void resetData() {
 		this.timeFilterType = "future";
 		this.statusFilterType = "ALL";
@@ -356,61 +456,132 @@ public class RecipientAppointmentController implements Serializable {
 	}
 	// ======================= GETTERS & SETTERS ========================
 
+	/**
+	 * Gets the list of appointments currently displayed on the active page after filtering and sorting.
+	 * Note: This method calls {@code loadAppointments()} which might be inefficient if called frequently
+	 * by the JSF lifecycle. Ensure it's called appropriately.
+	 *
+	 * @return A {@code List} of {@code Appointment} objects for the current page.
+	 */
 	public List<Appointment> getPaginatedAppointments() {
+		// Calling loadAppointments() here might lead to redundant data loads if this getter is invoked multiple times
+		// during a single JSF request cycle (e.g., by multiple components).
+		// Consider if loadAppointments() should only be called once in init() or on explicit user actions.
+		// For now, it's left as is based on the original structure.
 		loadAppointments();
 		return paginatedAppointments;
 	}
 
+	/**
+	 * Gets the current time filter type ("future" or "past").
+	 *
+	 * @return The time filter type {@code String}.
+	 */
 	public String getTimeFilterType() {
 		return timeFilterType;
 	}
 
+	/**
+	 * Sets the time filter type and triggers a re-filter and re-pagination of appointments.
+	 *
+	 * @param timeFilterType The time filter type to set ("future" or "past").
+	 */
 	public void setTimeFilterType(String timeFilterType) {
 		this.timeFilterType = timeFilterType;
-		this.currentPage = 0;
+		this.currentPage = 0; // Reset page on filter change
 		LOGGER.info("Time filter changed to: " + timeFilterType);
 		updateFilteredAndSortedAppointments(); // Call update after filter change
 	}
 
+	/**
+	 * Sets the status filter type and triggers a re-filter and re-pagination of appointments.
+	 *
+	 * @param statusFilterType The status filter type to set (e.g., "ALL", "PENDING", "BOOKED").
+	 */
 	public void setStatusFilterType(String statusFilterType) {
 		this.statusFilterType = statusFilterType;
-		this.currentPage = 0;
+		this.currentPage = 0; // Reset page on filter change
 		LOGGER.info("Status filter changed to: " + statusFilterType);
 		updateFilteredAndSortedAppointments(); // Call update after filter change
 	}
 
+	/**
+	 * Gets the current status filter type.
+	 *
+	 * @return The status filter type {@code String}.
+	 */
 	public String getStatusFilterType() {
 		return statusFilterType;
 	}
 
+	/**
+	 * Gets the currently selected appointment, typically used for detail viewing or cancellation.
+	 *
+	 * @return The {@code Appointment} object that is selected.
+	 */
 	public Appointment getSelectedAppointment() {
 		return selectedAppointment;
 	}
 
+	/**
+	 * Sets the currently selected appointment.
+	 *
+	 * @param selectedAppointment The {@code Appointment} object to set as selected.
+	 */
 	public void setSelectedAppointment(Appointment selectedAppointment) {
 		this.selectedAppointment = selectedAppointment;
 	}
 
+	/**
+	 * Gets the recipient's Health ID.
+	 *
+	 * @return The recipient's Health ID {@code String}.
+	 */
 	public String getHId() {
 		return hId;
 	}
 
+	/**
+	 * Sets the recipient's Health ID.
+	 *
+	 * @param hId The recipient's Health ID {@code String}.
+	 */
 	public void setHId(String hId) {
 		this.hId = hId;
 	}
 
+	/**
+	 * Gets a map indicating whether each appointment (by ID) is cancellable.
+	 *
+	 * @return A {@code Map} where the key is appointment ID and value is a {@code Boolean} indicating cancellability.
+	 */
 	public Map<String, Boolean> getCancellableMap() {
 		return cancellableMap;
 	}
 
+	/**
+	 * Gets the current page number (1-based for UI display).
+	 *
+	 * @return The current page number.
+	 */
 	public int getCurrentPage() {
 		return currentPage + 1; // Return 1-based page number for display
 	}
 
+	/**
+	 * Sets the current page number (expects 1-based input from UI and converts to 0-based for internal use).
+	 *
+	 * @param currentPage The current page number (1-based).
+	 */
 	public void setCurrentPage(int currentPage) {
 		this.currentPage = currentPage - 1; // Convert 1-based page to 0-based for internal use
 	}
 
+	/**
+	 * Calculates and returns the total number of pages required for the filtered appointments.
+	 *
+	 * @return The total number of pages.
+	 */
 	public int getTotalPages() {
 		if (filteredAppointments.isEmpty()) {
 			return 1;
@@ -418,39 +589,83 @@ public class RecipientAppointmentController implements Serializable {
 		return (int) Math.ceil((double) filteredAppointments.size() / pageSize);
 	}
 
+	/**
+	 * Gets the number of appointments to display per page.
+	 *
+	 * @return The page size.
+	 */
 	public int getPageSize() {
 		return pageSize;
 	}
 
+	/**
+	 * Checks if there is a next page of appointments.
+	 *
+	 * @return {@code true} if a next page exists, {@code false} otherwise.
+	 */
 	public boolean isHasNextPage() {
 		return (currentPage + 1) * pageSize < filteredAppointments.size();
 	}
 
+	/**
+	 * Checks if there is a previous page of appointments.
+	 *
+	 * @return {@code true} if a previous page exists, {@code false} otherwise.
+	 */
 	public boolean isHasPrevPage() {
 		return currentPage > 0;
 	}
 
+	/**
+	 * Gets the current field by which the appointments are sorted.
+	 *
+	 * @return The sort field {@code String}.
+	 */
 	public String getSortField() {
 		return sortField;
 	}
 
+	/**
+	 * Checks if the current sort order is ascending.
+	 *
+	 * @return {@code true} if sorting is ascending, {@code false} if descending.
+	 */
 	public boolean isAscending() {
 		return ascending;
 	}
 
+	/**
+	 * Gets the name of the column currently used for sorting.
+	 *
+	 * @return The current sort column {@code String}.
+	 */
 	public String getCurrentSortColumn() {
 		return currentSortColumn;
 	}
 
+	/**
+	 * Gets the current sort order ("asc" or "desc").
+	 *
+	 * @return The current sort order {@code String}.
+	 */
 	public String getCurrentSortOrder() {
 		return currentSortOrder;
 	}
 
-	// NEW: Getters and Setters for fromDate and toDate
+	/**
+	 * Gets the start date for filtering appointments.
+	 *
+	 * @return The {@code Date} representing the 'from' date.
+	 */
 	public Date getFromDate() {
 		return fromDate;
 	}
 
+	/**
+	 * Sets the start date for filtering appointments and triggers a re-filter and re-pagination.
+	 *
+	 * @param fromDate The {@code Date} to set as the 'from' date.
+	 */
 	public void setFromDate(Date fromDate) {
 		this.fromDate = fromDate;
 		this.currentPage = 0; // Reset page on filter change
@@ -458,10 +673,20 @@ public class RecipientAppointmentController implements Serializable {
 		updateFilteredAndSortedAppointments(); // Re-filter and re-paginate
 	}
 
+	/**
+	 * Gets the end date for filtering appointments.
+	 *
+	 * @return The {@code Date} representing the 'to' date.
+	 */
 	public Date getToDate() {
 		return toDate;
 	}
 
+	/**
+	 * Sets the end date for filtering appointments and triggers a re-filter and re-pagination.
+	 *
+	 * @param toDate The {@code Date} to set as the 'to' date.
+	 */
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
 		this.currentPage = 0; // Reset page on filter change
@@ -469,3 +694,9 @@ public class RecipientAppointmentController implements Serializable {
 		updateFilteredAndSortedAppointments(); // Re-filter and re-paginate
 	}
 }
+
+
+
+
+
+

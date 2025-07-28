@@ -1,3 +1,17 @@
+/*
+* -----------------------------------------------------------------------------
+* Copyright © 2025 Infinite Computer Solution. All rights reserved.
+* -----------------------------------------------------------------------------
+*
+* @Author   : Sandhan Meher
+* @Purpose  : This class serves as the controller for displaying detailed
+* information about a specific appointment. It retrieves appointment data
+* from the DAO layer, processes it, and populates an AppointmentDetails DTO
+* for presentation in the JSF UI. It also handles navigation related to
+* viewing and rescheduling appointments.
+*
+* -----------------------------------------------------------------------------
+*/
 package com.infinite.jsf.provider.controller;
 
 import java.io.Serializable;
@@ -16,6 +30,16 @@ public class AppointmentDetailController implements Serializable {
 	private AppointmentDetails appointmentDetailsForDisplay;
 	private AppointmentDao appointmentDao=new AppointmentDaoImpl();
 
+	/**
+	 * Loads the detailed information for a specific appointment based on its ID.
+	 * This method retrieves the appointment from the database, transforms it into an
+	 * {@code AppointmentDetails} DTO, and makes it available for display in the UI.
+	 * It also handles error messages if the appointment is not found or if an exception occurs.
+	 *
+	 * @param selectedAppointmentIdForDetail The unique ID of the appointment to load details for.
+	 * @return A navigation outcome string (e.g., "/recipient/appointment/appointmentDetail.jsf?faces-redirect=true")
+	 * if successful, or {@code null} if there's an error or the appointment is not found.
+	 */
 	public String loadAppointmentDetailsForDisplay(String selectedAppointmentIdForDetail) {
 		if (selectedAppointmentIdForDetail != null && !selectedAppointmentIdForDetail.isEmpty()) {
 			try {
@@ -79,30 +103,61 @@ public class AppointmentDetailController implements Serializable {
 		}
 		return null;
 	}
+
+	/**
+	 * Navigates to the appointment rescheduling page.
+	 *
+	 * @return A navigation outcome string to the update appointment page with a faces-redirect.
+	 */
 	public String rescheduleAppointment() {
 		return "/recipient/appointment/updateAppointment?faces-redirect=true";
 	}
 
-//	getter and setter 
-
+    /**
+     * Gets the ID of the currently selected appointment for detail viewing.
+     *
+     * @return The selected appointment ID as a {@code String}.
+     */
 	public String getSelectedAppointmentIdForDetail() {
 		return selectedAppointmentIdForDetail;
 	}
 
+    /**
+     * Sets the ID of the appointment to be displayed in detail.
+     *
+     * @param selectedAppointmentIdForDetail The ID of the appointment.
+     */
 	public void setSelectedAppointmentIdForDetail(String selectedAppointmentIdForDetail) {
 		this.selectedAppointmentIdForDetail = selectedAppointmentIdForDetail;
 	}
 
+    /**
+     * Gets the {@code AppointmentDetails} DTO object populated with the details
+     * of the currently displayed appointment.
+     *
+     * @return The {@code AppointmentDetails} object.
+     */
 	public AppointmentDetails getAppointmentDetailsForDisplay() {
 		return appointmentDetailsForDisplay;
 	}
 
+    /**
+     * Sets the {@code AppointmentDetails} DTO object for display.
+     *
+     * @param appointmentDetailsForDisplay The {@code AppointmentDetails} object to set.
+     */
 	public void setAppointmentDetailsForDisplay(AppointmentDetails appointmentDetailsForDisplay) {
 		this.appointmentDetailsForDisplay = appointmentDetailsForDisplay;
 	}
 
+    /**
+     * Gets the serial version UID for serialization.
+     *
+     * @return The serial version UID as a {@code long}.
+     */
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
 }
+
