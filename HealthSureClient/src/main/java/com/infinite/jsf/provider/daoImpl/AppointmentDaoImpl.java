@@ -1,17 +1,17 @@
 /*
-* -----------------------------------------------------------------------------
-* Copyright © 2025 Infinite Computer Solution. All rights reserved.
-* -----------------------------------------------------------------------------
-*
-* @Author   : Sandhan Meher
-* @Purpose  : This class provides the data access object (DAO) implementation
-* for managing appointments. It handles CRUD operations for appointments,
-* including booking, cancellation, and retrieval based on various criteria.
-* It also incorporates business logic validations related to appointment scheduling,
-* such as checking for overlaps, doctor/recipient status, and availability capacity.
-*
-* -----------------------------------------------------------------------------
-*/
+ * -----------------------------------------------------------------------------
+ * Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ * -----------------------------------------------------------------------------
+ *
+ * @Author   : Sandhan Meher
+ * @Purpose  : This class provides the data access object (DAO) implementation
+ * for managing appointments. It handles CRUD operations for appointments,
+ * including booking, cancellation, and retrieval based on various criteria.
+ * It also incorporates business logic validations related to appointment scheduling,
+ * such as checking for overlaps, doctor/recipient status, and availability capacity.
+ *
+ * -----------------------------------------------------------------------------
+ */
 package com.infinite.jsf.provider.daoImpl;
 
 import java.math.BigInteger;
@@ -30,6 +30,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import com.infinite.jsf.constant.AppointmentConstantMessage; // Import the constants class
 import com.infinite.jsf.provider.dao.AppointmentDao;
 import com.infinite.jsf.provider.model.Appointment;
 import com.infinite.jsf.provider.model.AppointmentStatus;
@@ -92,7 +93,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 					.getAvailabilityById(appointment.getAvailability().getAvailabilityId());
 
 			if (doctoravail == null) {
-				return "Invalid availability slot. Please select a valid time slot.";
+				return AppointmentConstantMessage.INVALID_AVAILABILITY_SLOT;
 			}
 
 			// 2. Set calculated start and end times for the appointment based on availability and slot number
@@ -116,7 +117,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 
 			// VALIDATION 1: Prevent booking in the past
 			if (appointment.getStart().before(now)) {
-				return "Cannot book an appointment in the past.";
+				return AppointmentConstantMessage.CANNOT_BOOK_PAST_APPOINTMENT;
 			}
 
 			// VALIDATION 2: Check if doctor is active
@@ -126,7 +127,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			DoctorStatus doctorStatus = (DoctorStatus) doctorStatusQuery.uniqueResult();
 
 			if (doctorStatus == null || !"ACTIVE".equals(doctorStatus.name())) {
-				return "Doctor is not currently active. Please select another doctor.";
+				return AppointmentConstantMessage.DOCTOR_NOT_ACTIVE;
 			}
 
 			// VALIDATION 3: Check if recipient is active
@@ -136,7 +137,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			RecipientStatus recipientStatus = (RecipientStatus) recipientStatusQuery.uniqueResult();
 
 			if (recipientStatus == null || !"ACTIVE".equals(recipientStatus.name())) {
-				return "Your account is not active. Please contact support.";
+				return AppointmentConstantMessage.RECIPIENT_NOT_ACTIVE;
 			}
 
 			// VALIDATION 4: Check if recipient already has overlapping appointment
@@ -149,7 +150,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			overlapQuery.setParameter("endTime", appointment.getEnd());
 
 			if (!overlapQuery.list().isEmpty()) {
-				return "You already have an appointment scheduled during this time.";
+				return AppointmentConstantMessage.RECIPIENT_OVERLAPPING_APPOINTMENT;
 			}
 
 			// VALIDATION 5: Check if the slot number is already booked in this availability
@@ -160,7 +161,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			slotQuery.setParameter("slotNo", slotNo);
 
 			if (!slotQuery.list().isEmpty()) {
-				return "This time slot is already booked. Please choose another time.";
+				return AppointmentConstantMessage.SLOT_ALREADY_BOOKED;
 			}
 
 			// VALIDATION 6: Check if max capacity is reached for this availability
@@ -172,7 +173,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 
 			int maxCapacity = appointment.getAvailability().getMaxCapacity();
 			if (bookedCount >= maxCapacity) {
-				return "All slots for this availability are already full.";
+				return AppointmentConstantMessage.AVAILABILITY_FULL;
 			}
 
 			// VALIDATION 7: Check if recipient already has 10 upcoming appointments
@@ -184,7 +185,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 
 			long upcomingCount = (Long) upcomingQuery.uniqueResult();
 			if (upcomingCount >= 10) {
-				return "You can only have 10 upcoming appointments at a time.";
+				return AppointmentConstantMessage.RECIPIENT_MAX_UPCOMING_APPOINTMENTS_REACHED;
 			}
 
 			// VALIDATION 8: Check if recipient has any pending/booked appointments with same doctor
@@ -204,18 +205,19 @@ public class AppointmentDaoImpl implements AppointmentDao {
 				String formattedDate = existingAppointment.getStart().toLocalDateTime().format(dateFormatter);
 				String formattedTime = existingAppointment.getStart().toLocalDateTime().format(timeFormatter);
 
-				return "You already have a pending / booked appointment with this doctor on " + formattedDate + " at "
-						+ formattedTime + ". Please complete or cancel that appointment first.";
+				return AppointmentConstantMessage.PENDING_APPOINTMENT_WITH_DOCTOR_PREFIX + formattedDate
+						+ AppointmentConstantMessage.PENDING_APPOINTMENT_WITH_DOCTOR_AT + formattedTime
+						+ AppointmentConstantMessage.PENDING_APPOINTMENT_WITH_DOCTOR_SUFFIX;
 			}
 
 			// VALIDATION 9: Check if slot number is within valid range
 			if (slotNo < 1 || slotNo > maxCapacity) {
-				return "Invalid slot number. Please select a valid slot.";
+				return AppointmentConstantMessage.INVALID_SLOT_NUMBER;
 			}
 
 			// VALIDATION 10: Check if availability date is in the future (or today)
 			if (doctoravail.getAvailableDate().before(Date.valueOf(LocalDate.now()))) {
-				return "Cannot book appointments for past dates.";
+				return AppointmentConstantMessage.CANNOT_BOOK_PAST_DATE;
 			}
 
 			// VALIDATION 11: Check if doctor has any scheduling conflicts
@@ -227,25 +229,25 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			doctorOverlapQuery.setParameter("endTime", appointment.getEnd());
 
 			if (!doctorOverlapQuery.list().isEmpty()) {
-				return "Doctor has a scheduling conflict during this time.";
+				return AppointmentConstantMessage.DOCTOR_SCHEDULING_CONFLICT;
 			}
 
 			// VALIDATION 12: Check if the appointment is too far in the future (e.g., 6 months)
 			LocalDate maxFutureDate = LocalDate.now().plusMonths(6);
 			if (doctoravail.getAvailableDate().after(Date.valueOf(maxFutureDate))) {
-				return "Appointments can only be booked up to 6 months in advance.";
+				return AppointmentConstantMessage.APPOINTMENT_TOO_FAR_IN_FUTURE;
 			}
 
 			// VALIDATION 13: Check if the appointment is within working hours (8 AM to 8 PM)
 			if (appointment.getStart().toLocalDateTime().toLocalTime().isBefore(LocalTime.of(8, 0))
 					|| appointment.getEnd().toLocalDateTime().toLocalTime().isAfter(LocalTime.of(20, 0))) {
-				return "Appointments must be between 8:00 AM and 8:00 PM.";
+				return AppointmentConstantMessage.APPOINTMENT_OUTSIDE_WORKING_HOURS;
 			}
 
 			// VALIDATION 14: Check minimum notice period (e.g., 2 hours before appointment)
 			LocalDateTime minNoticeTime = LocalDateTime.now().plusHours(2);
 			if (appointment.getStart().toLocalDateTime().isBefore(minNoticeTime)) {
-				return "Appointments must be booked at least 2 hours in advance.";
+				return AppointmentConstantMessage.MINIMUM_NOTICE_PERIOD_REQUIRED;
 			}
 
 			// All validations passed - save the appointment
@@ -256,13 +258,13 @@ public class AppointmentDaoImpl implements AppointmentDao {
 			session.save(appointment);
 			tx.commit();
 
-			result = "Appointment requested successfully with ID: " + appointment.getAppointmentId();
+			result = AppointmentConstantMessage.APPOINTMENT_REQUESTED_SUCCESS + appointment.getAppointmentId();
 		} catch (Exception e) {
 			if (tx != null) {
 				tx.rollback();
 			}
 			e.printStackTrace();
-			result = "Error booking appointment: " + e.getMessage();
+			result = AppointmentConstantMessage.ERROR_BOOKING_APPOINTMENT + e.getMessage();
 		} finally {
 			if (session != null) {
 				session.close();
@@ -453,14 +455,14 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	        // Load the original appointment
 	        Appointment existing = (Appointment) session.get(Appointment.class, updatedAppointment.getAppointmentId());
 	        if (existing == null) {
-	            return "Appointment not found.";
+	            return AppointmentConstantMessage.APPOINTMENT_NOT_FOUND;
 	        }
 	    	DoctorAvailabilityDaoImpl availabilityDao = new DoctorAvailabilityDaoImpl();
 			DoctorAvailability doctoravail = availabilityDao
 					.getAvailabilityById(updatedAppointment.getAvailability().getAvailabilityId());
 
 			if (doctoravail == null) {
-				return "Invalid availability slot. Please select a valid time slot.";
+				return AppointmentConstantMessage.INVALID_AVAILABILITY_SLOT;
 			}
 
 			// Set calculated start and end times for the updated appointment
@@ -476,7 +478,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	        // Allow update only if appointment is in the future
 	        Timestamp now = new Timestamp(System.currentTimeMillis());
 	        if (existing.getStart() != null && existing.getStart().before(now)) {
-	            return "Cannot update past appointments.";
+	            return AppointmentConstantMessage.CANNOT_UPDATE_PAST_APPOINTMENTS;
 	        }
 
 	        String availabilityId = updatedAppointment.getAvailability().getAvailabilityId();
@@ -494,7 +496,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	        overlapQuery.setParameter("currentId", updatedAppointment.getAppointmentId());
 
 	        if (!overlapQuery.list().isEmpty()) {
-	            return "You already have an appointment scheduled during this new time.";
+	            return AppointmentConstantMessage.NEW_SLOT_OVERLAPS_EXISTING;
 	        }
 
 	        // Check if the new slot number is already taken in same availability (excluding the current one being updated)
@@ -507,12 +509,12 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	        slotQuery.setParameter("currentId", updatedAppointment.getAppointmentId());
 
 	        if (!slotQuery.list().isEmpty()) {
-	            return "This new time slot is already booked by someone else. Please choose another slot.";
+	            return AppointmentConstantMessage.NEW_SLOT_ALREADY_BOOKED_BY_SOMEONE_ELSE;
 	        }
 	        
 	        // VALIDATION: Check if the updated appointment time is in the past
 	        if (updatedAppointment.getStart().before(now)) {
-	            return "Cannot reschedule an appointment to a past time.";
+	            return AppointmentConstantMessage.CANNOT_RESCHEDULE_TO_PAST;
 	        }
 
 	        // Update details of the existing appointment object
@@ -525,12 +527,12 @@ public class AppointmentDaoImpl implements AppointmentDao {
 
 	        session.update(existing);
 	        tx.commit();
-	        return "Appointment updated successfully.";
+	        return AppointmentConstantMessage.APPOINTMENT_UPDATED_SUCCESS;
 	    } catch (Exception e) {
 	        if (tx != null)
 	            tx.rollback();
 	        e.printStackTrace();
-	        return "Error occurred while updating the appointment: " + e.getMessage();
+	        return AppointmentConstantMessage.ERROR_UPDATING_APPOINTMENT + e.getMessage();
 	    } finally {
 	        if (session != null) {
 	            session.close();
@@ -795,7 +797,3 @@ public class AppointmentDaoImpl implements AppointmentDao {
 		}
 	}
 }
-
-
-
-
