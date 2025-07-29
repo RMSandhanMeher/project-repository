@@ -15,10 +15,13 @@
 package com.infinite.jsf.provider.controller;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat; // Added import
+import java.util.Date; // Added import
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 
+import com.infinite.jsf.constant.AppointmentConstantMessage; // Import the constants class
 import com.infinite.jsf.provider.dao.AppointmentDao;
 import com.infinite.jsf.provider.daoImpl.AppointmentDaoImpl;
 import com.infinite.jsf.provider.dto.AppointmentDetails;
@@ -28,7 +31,7 @@ public class AppointmentDetailController implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String selectedAppointmentIdForDetail; // New property to hold the ID
 	private AppointmentDetails appointmentDetailsForDisplay;
-	private AppointmentDao appointmentDao=new AppointmentDaoImpl();
+	private AppointmentDao appointmentDao = new AppointmentDaoImpl();
 
 	/**
 	 * Loads the detailed information for a specific appointment based on its ID.
@@ -71,9 +74,9 @@ public class AppointmentDetailController implements Serializable {
 					// Doctor Availability Timing (format as a string)
 					if (appointment.getStart() != null && appointment.getEnd() != null) {
 						// Using SimpleDateFormat to format the Timestamp to HH:mm
-						java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("HH:mm");
-						String startTimeStr = sdf.format(new java.util.Date(appointment.getStart().getTime()));
-						String endTimeStr = sdf.format(new java.util.Date(appointment.getEnd().getTime()));
+						SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
+						String startTimeStr = sdf.format(new Date(appointment.getStart().getTime()));
+						String endTimeStr = sdf.format(new Date(appointment.getEnd().getTime()));
 						appointmentDetailsForDisplay.setDoctorAvailabilityTiming(startTimeStr + " - " + endTimeStr);
 					} else {
 						appointmentDetailsForDisplay.setDoctorAvailabilityTiming("N/A");
@@ -83,22 +86,23 @@ public class AppointmentDetailController implements Serializable {
 					System.out.println("Loaded AppointmentDetails DTO: " + appointmentDetailsForDisplay);
 					return "/recipient/appointment/appointmentDetail.jsf?faces-redirect=true";
 				} else {
-					System.err.println("Appointment with ID " + selectedAppointmentIdForDetail + " not found.");
+					System.err.println(AppointmentConstantMessage.LOG_APPOINTMENT_NOT_FOUND_PREFIX
+							+ selectedAppointmentIdForDetail + AppointmentConstantMessage.LOG_APPOINTMENT_NOT_FOUND_SUFFIX);
 					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Appointment details not found."));
+							new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", AppointmentConstantMessage.APPOINTMENT_DETAILS_NOT_FOUND_UI));
 					appointmentDetailsForDisplay = null; // Ensure it's null if not found
 				}
 			} catch (Exception e) {
-				System.err.println("Error fetching appointment details for ID " + selectedAppointmentIdForDetail + ": "
-						+ e.getMessage());
+				System.err.println(AppointmentConstantMessage.LOG_ERROR_FETCHING_APPOINTMENT_DETAILS_PREFIX
+						+ selectedAppointmentIdForDetail + ": " + e.getMessage());
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						"Error", "An error occurred while loading appointment details."));
+						"Error", AppointmentConstantMessage.ERROR_LOADING_APPOINTMENT_DETAILS_UI));
 				appointmentDetailsForDisplay = null;
 			}
 		} else {
-			System.err.println("No appointment ID provided for detail view.");
+			System.err.println(AppointmentConstantMessage.NO_APPOINTMENT_ID_PROVIDED_UI);
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Invalid appointment request."));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", AppointmentConstantMessage.INVALID_APPOINTMENT_REQUEST_UI));
 			appointmentDetailsForDisplay = null;
 		}
 		return null;
@@ -160,4 +164,3 @@ public class AppointmentDetailController implements Serializable {
 	}
 
 }
-

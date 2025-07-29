@@ -28,6 +28,7 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 
+import com.infinite.jsf.constant.AppointmentConstantMessage; // Import the constants class
 import com.infinite.jsf.provider.daoImpl.AppointmentDaoImpl;
 import com.infinite.jsf.provider.daoImpl.DoctorAvailabilityDaoImpl;
 import com.infinite.jsf.provider.daoImpl.DoctorDaoImpl;
@@ -144,7 +145,7 @@ public class DoctorAvailabilityController implements Serializable {
 		System.out.println(doctorId+"        "+appointmentId);
 		if (doctorId == null || doctorId.isEmpty()) {
 			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
-					new FacesMessage(FacesMessage.SEVERITY_WARN, "Please select a doctor.", null));
+					new FacesMessage(FacesMessage.SEVERITY_WARN, AppointmentConstantMessage.PLEASE_SELECT_DOCTOR, null));
 			return null;
 		}
 		doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
@@ -164,7 +165,7 @@ public class DoctorAvailabilityController implements Serializable {
 
 		if (doctorId == null || doctorId.isEmpty()) {
 			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
-					new FacesMessage(FacesMessage.SEVERITY_WARN, "Please select a doctor.", null));
+					new FacesMessage(FacesMessage.SEVERITY_WARN, AppointmentConstantMessage.PLEASE_SELECT_DOCTOR, null));
 			return null;
 		}
 		doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
@@ -185,7 +186,7 @@ public class DoctorAvailabilityController implements Serializable {
 			}
 		} catch (IllegalArgumentException e) {
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid date format. Please use YYYY-MM-DD", null));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.INVALID_DATE_FORMAT, null));
 		}
 	}
 
@@ -204,7 +205,7 @@ public class DoctorAvailabilityController implements Serializable {
 
 			if (availability == null) {
 				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Time slot no longer available", null));
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.TIME_SLOT_NO_LONGER_AVAILABLE, null));
 				this.selectedAvailabilityId = null;
 				this.selectedSlotNumber = 0;
 				return null;
@@ -225,7 +226,7 @@ public class DoctorAvailabilityController implements Serializable {
 			appointment.setProvider(provider);
 
 			String result = appointmentDao.bookAnAppointment(appointment);
-			if (result.startsWith("Appointment requested successfully")) {
+			if (result.startsWith(AppointmentConstantMessage.APPOINTMENT_REQUESTED_SUCCESS)) {
 
 				HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext()
 						.getSession(true);
@@ -251,9 +252,9 @@ public class DoctorAvailabilityController implements Serializable {
 				try {
 					MailSend.sendMail(res.getEmail(), subject, MailSend.appointmentRequest(apSli));
 				} catch (Exception e) {
-					System.out.println("error while sending the mail here ");
+					System.out.println(AppointmentConstantMessage.ERROR_SENDING_MAIL);
 				}
-				return "appointmentConfirmation?faces-redirect=true";
+				return AppointmentConstantMessage.APPOINTMENT_CONFIRMATION_NAVIGATION;
 			} else {
 				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, result, null));
 				this.selectedAvailabilityId = null;
@@ -264,7 +265,7 @@ public class DoctorAvailabilityController implements Serializable {
 			}
 		} catch (Exception e) {
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + e.getMessage(), null));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.ERROR_GENERIC_PREFIX + e.getMessage(), null));
 		}
 		return null;
 	}
@@ -285,7 +286,7 @@ public class DoctorAvailabilityController implements Serializable {
 
 			if (availability == null) {
 				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Time slot no longer available", null));
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.TIME_SLOT_NO_LONGER_AVAILABLE, null));
 				this.selectedAvailabilityId = null;
 				this.selectedSlotNumber = 0;
 				return null;
@@ -307,7 +308,7 @@ public class DoctorAvailabilityController implements Serializable {
 			
 			System.out.println(appointment.getAppointmentId());
 			String result = appointmentDao.updateAppointment(appointment);
-			if (result.startsWith("Appointment updated successfully")) {
+			if (result.startsWith(AppointmentConstantMessage.APPOINTMENT_UPDATED_SUCCESS)) {
 
 				HttpSession session = (HttpSession) FacesContext.getCurrentInstance().getExternalContext()
 						.getSession(true);
@@ -333,9 +334,9 @@ public class DoctorAvailabilityController implements Serializable {
 //				try {
 //					MailSend.sendMail(res.getEmail(), subject, MailSend.appointmentRequest(apSli));
 //				} catch (Exception e) {
-//					System.out.println("error while sending the mail here ");
+//					System.out.println(AppointmentConstantMessage.ERROR_SENDING_MAIL);
 //				}
-				return "appointmentConfirmation?faces-redirect=true";
+				return AppointmentConstantMessage.APPOINTMENT_CONFIRMATION_NAVIGATION;
 			} else {
 				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, result, null));
 				this.selectedAvailabilityId = null;
@@ -346,7 +347,7 @@ public class DoctorAvailabilityController implements Serializable {
 			}
 		} catch (Exception e) {
 			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error: " + e.getMessage(), null));
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.ERROR_GENERIC_PREFIX + e.getMessage(), null));
 		}
 		return null;
 	}
@@ -553,67 +554,38 @@ public class DoctorAvailabilityController implements Serializable {
 	/**
 	 * Inner class representing a summary of doctor availability for a specific day.
 	 * It includes the date, a formatted display date, and the total number of available slots for that day.
-	 */
+	 */// Inner classes
 	public static class DayAvailabilitySummary {
 		private final Date date;
 		private final String displayDate;
 		private final int totalSlots;
 
-		/**
-		 * Constructs a new {@code DayAvailabilitySummary}.
-		 * @param date The {@code java.sql.Date} of the availability.
-		 * @param displayDate A formatted {@code String} representation of the date.
-		 * @param totalSlots The total number of available slots for this date.
-		 */
 		public DayAvailabilitySummary(Date date, String displayDate, int totalSlots) {
 			this.date = date;
 			this.displayDate = displayDate;
 			this.totalSlots = totalSlots;
 		}
 
-		/**
-		 * Gets the raw date object.
-		 * @return The {@code java.sql.Date}.
-		 */
 		public Date getDate() {
 			return date;
 		}
 
-		/**
-		 * Gets the formatted display date string.
-		 * @return The display date {@code String}.
-		 */
 		public String getDisplayDate() {
 			return displayDate;
 		}
 
-		/**
-		 * Gets the total number of slots available for this day.
-		 * @return The total slots as an {@code int}.
-		 */
 		public int getTotalSlots() {
 			return totalSlots;
 		}
 	}
 
-	/**
-	 * Inner class representing a specific time slot within a doctor's availability.
-	 * It includes the availability ID, slot number, and formatted start and end times for the slot.
-	 */
-	public static class SlotDisplay implements Serializable { // Add Serializable to inner classes if they are part of controller state
-		private static final long serialVersionUID = 1L; // Add serialVersionUID
+	public static class SlotDisplay implements Serializable {
+		private static final long serialVersionUID = 1L;
 		private final String availabilityId;
 		private final int slotNumber;
 		private final String startTime;
 		private final String endTime;
 
-		/**
-		 * Constructs a new {@code SlotDisplay} object.
-		 * @param availabilityId The ID of the parent {@code DoctorAvailability} record.
-		 * @param slotNumber The specific slot number within that availability.
-		 * @param startTime The formatted start time of the slot (e.g., "09:00").
-		 * @param endTime The formatted end time of the slot (e.g., "09:30").
-		 */
 		public SlotDisplay(String availabilityId, int slotNumber, String startTime, String endTime) {
 			this.availabilityId = availabilityId;
 			this.slotNumber = slotNumber;
@@ -621,42 +593,22 @@ public class DoctorAvailabilityController implements Serializable {
 			this.endTime = endTime;
 		}
 
-		/**
-		 * Gets the availability ID associated with this slot.
-		 * @return The availability ID {@code String}.
-		 */
 		public String getAvailabilityId() {
 			return availabilityId;
 		}
 
-		/**
-		 * Gets the slot number.
-		 * @return The slot number as an {@code int}.
-		 */
 		public int getSlotNumber() {
 			return slotNumber;
 		}
 
-		/**
-		 * Gets the formatted start time of the slot.
-		 * @return The start time {@code String}.
-		 */
 		public String getStartTime() {
 			return startTime;
 		}
 
-		/**
-		 * Gets the formatted end time of the slot.
-		 * @return The end time {@code String}.
-		 */
 		public String getEndTime() {
 			return endTime;
 		}
 
-		/**
-		 * Gets a formatted string representing the time range of the slot (e.g., "09:00 - 09:30").
-		 * @return The formatted time range {@code String}.
-		 */
 		public String getFormattedTimeRange() {
 			return startTime + " - " + endTime;
 		}
@@ -695,7 +647,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 *
 	 * @param availabilityTiming The {@code List} of {@code String} to set.
 	 */
-	public void setAvailabilityTiming(List<String> availabilityTiming) {
+	public  void setAvailabilityTiming(List<String> availabilityTiming) {
 		this.availabilityTiming = availabilityTiming;
 	}
 
