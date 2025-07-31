@@ -493,6 +493,10 @@ public class RecipientLoginController implements Serializable{
 					FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("fullName", recipient);
 
 				}
+				String requestUri=(String)FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("requestUri");
+				if(requestUri!=null) {
+					return requestUri;
+				}
 				return "RecipientDashBoard.jsp?faces-redirect=true";
 			} else {
 				context.addMessage(null,

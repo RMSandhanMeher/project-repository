@@ -40,12 +40,14 @@ import com.infinite.jsf.provider.model.Doctors;
 import com.infinite.jsf.provider.model.Provider;
 import com.infinite.jsf.recipient.model.Recipient;
 import com.infinite.jsf.util.MailSend;
+import org.apache.log4j.Logger;
 
 public class DoctorAvailabilityController implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private final DoctorAvailabilityDaoImpl availabilityDao = new DoctorAvailabilityDaoImpl();
 	private final AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
+	private static final Logger LOGGER = Logger.getLogger(DoctorAvailabilityController.class.getName());
 
 	private String doctorId;
 	private List<DayAvailabilitySummary> groupedAvailabilityList;
@@ -74,6 +76,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * populating {@code groupedAvailabilityList} for display.
 	 */
 	public void loadAllUpcomingAvailability() {
+		LOGGER.info("method call :loadAllUpcomingAvailability");
 		Date today = new Date(System.currentTimeMillis());
 		List<DoctorAvailability> futureSlots = availabilityDao.getUpcomingAvailabilitiesForDoctor(doctorId, today);
 
@@ -95,11 +98,13 @@ public class DoctorAvailabilityController implements Serializable {
 	 * and filters out already booked slots. The results are stored in {@code availableSlots}.
 	 */
 	public void loadAvailableSlots() {
+		LOGGER.info("method call :loadAvailableSlots");
 		availabilityTiming = new ArrayList<String>();
 		for (DoctorAvailability a : new DoctorAvailabilityDaoImpl().getAvailabilityByDoctorAndDate(doctorId,
 				selectedDate)) {
 			availabilityTiming.add(
 					a.getStartTime().toString().substring(0, 5) + " - " + a.getEndTime().toString().substring(0, 5));
+			LOGGER.info("slot timing added");
 		}
 		availableSlots = new ArrayList<>();
 		if (selectedDate == null)
@@ -140,6 +145,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A navigation outcome string to the doctor availability list page, or {@code null} if validation fails.
 	 */
 	public String chooseDoctor(String doctorId,String appointmentId) {
+		LOGGER.info("method call :chooseDoctor");
 		this.doctorId = doctorId;
 		this.appointmentId=appointmentId;
 		System.out.println(doctorId+"        "+appointmentId);
@@ -161,6 +167,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A navigation outcome string to the doctor availability list page, or {@code null} if validation fails.
 	 */
 	public String chooseDoctor(String doctorId) {
+		LOGGER.info("method call :chooseDoctor");
 		this.doctorId = doctorId;
 
 		if (doctorId == null || doctorId.isEmpty()) {
@@ -179,6 +186,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * for that date. Displays an error message for invalid date formats.
 	 */
 	public void handleDateSelection() {
+		LOGGER.info("method call :handleDateSelection");
 		try {
 			if (selectedDateInput != null && !selectedDateInput.isEmpty()) {
 				selectedDate = Date.valueOf(selectedDateInput);
@@ -198,6 +206,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A navigation outcome string to the appointment confirmation page if successful, or {@code null} if an error occurs.
 	 */
 	public String bookAppointment() {
+		LOGGER.info("method call :bookAppointment");
 		try {
 			System.out.println("selectedAvailabilityId" + selectedAvailabilityId);
 			FacesContext context = FacesContext.getCurrentInstance();
@@ -278,6 +287,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A navigation outcome string to the appointment confirmation page if successful, or {@code null} if an error occurs.
 	 */
 	public String updateBookedAppointment() {
+		LOGGER.info("method call :updateBookedAppointment");
 		System.out.println("method ");
 		try {
 			System.out.println("selectedAvailabilityId" + selectedAvailabilityId);
@@ -361,6 +371,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A navigation outcome string to the update appointment page with a faces-redirect.
 	 */
 	public String rescheduleAppointment(String doctorId,String appointmentId) {
+		LOGGER.info("method call :rescheduleAppointment");
 		chooseDoctor(doctorId,appointmentId);
 		return "/recipient/appointment/updateAppointment?faces-redirect=true";
 	}

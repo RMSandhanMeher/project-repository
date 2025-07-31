@@ -16,12 +16,12 @@
         <!-- PROVIDER NAV LINKS -->
         <ul class="nav-links">
         
-            <li><a href="RecipientDashBoard.jsf" class="nav-link">DashBoard</a></li>
+            <li><a href="${pageContext.request.contextPath}/recipient/RecipientDashBoard.jsf" class="nav-link">DashBoard</a></li>
             <li><a href="${pageContext.request.contextPath}/recipient/appointment/doctorAvailabilityList.jsf" class="nav-link">My Appointments</a></li>
-            <li><a href="ShowInsurance.jsf" class="nav-link">My Insurance</a></li>
+            <li><a href="${pageContext.request.contextPath}/recipient/ShowInsurance.jsf" class="nav-link">My Insurance</a></li>
             <li><a href="${pageContext.request.contextPath}/recipient/SearchProviders.jsf" class="nav-link">Find Doctors</a></li>
 			<li><a href="Reports.jsf" class="nav-link">Reports</a></li>
-			<li><a href="Home.jsf" class="nav-link">About Us</a></li>
+			<li><a href="${pageContext.request.contextPath}/home/Home.jsf" class="nav-link">About Us</a></li>
         </ul>
 
         <!-- LOGOUT BUTTON -->

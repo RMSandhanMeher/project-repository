@@ -19,7 +19,7 @@ public class RecipientFilter implements Filter {
 
 		HttpServletRequest req = (HttpServletRequest) request;
 		HttpServletResponse res = (HttpServletResponse) response;
-		HttpSession session = req.getSession(false);
+		HttpSession session = req.getSession(true);
 
 		// Validate: Check if recipient is logged in
 		Object recipientUser = (session != null) ? session.getAttribute("loggedInRecipient") : null;
@@ -36,6 +36,9 @@ public class RecipientFilter implements Filter {
 			chain.doFilter(request, response);
 		} else {
 			// Not logged in, redirect to login
+			uri=uri.substring(req.getContextPath().length()).split(";")[0];
+			System.out.println(uri);
+			session.setAttribute("requestUri", uri);
 			res.sendRedirect(loginPage);
 		}
 	}

@@ -26,12 +26,14 @@ import com.infinite.jsf.provider.dao.AppointmentDao;
 import com.infinite.jsf.provider.daoImpl.AppointmentDaoImpl;
 import com.infinite.jsf.provider.dto.AppointmentDetails;
 import com.infinite.jsf.provider.model.Appointment;
+import org.apache.log4j.Logger;
 
 public class AppointmentDetailController implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String selectedAppointmentIdForDetail; // New property to hold the ID
 	private AppointmentDetails appointmentDetailsForDisplay;
 	private AppointmentDao appointmentDao = new AppointmentDaoImpl();
+	private static final Logger LOGGER = Logger.getLogger(AppointmentDetailController.class.getName());
 
 	/**
 	 * Loads the detailed information for a specific appointment based on its ID.

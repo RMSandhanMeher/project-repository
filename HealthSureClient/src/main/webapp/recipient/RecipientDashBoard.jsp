@@ -26,7 +26,7 @@
     <div class="max-w-5xl mx-auto px-4 mt-4 mb-12">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <h:form>
-                <h:commandLink action="SearchProviders.jsp" styleClass="block bg-white p-5 rounded-xl shadow-md text-center hover:shadow-xl transition">
+                <h:commandLink action="./appointment/SearchProviders.jsp" styleClass="block bg-white p-5 rounded-xl shadow-md text-center hover:shadow-xl transition">
                     <h3 class="text-md font-semibold text-blue-500 uppercase tracking-wide">Book Appointments</h3>
                     <p class="mt-2 text-4xl font-bold text-gray-800">
                         <h:outputText value="#{recipientBean.upcomingAppointments}" />
