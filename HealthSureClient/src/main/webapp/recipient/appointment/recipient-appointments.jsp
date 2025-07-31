@@ -84,7 +84,6 @@
 	<jsp:include page="./../../navbar/NavRecipient.jsp" />
 	<div class="header-spacing"></div>
 	<jsp:include page="NavBar.jsp" />
-	<div class="header-spacing"></div>
 	<div class="main-container">
 		<h1 class="main-title">My Appointments</h1>
 

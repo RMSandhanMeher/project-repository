@@ -38,8 +38,10 @@ import com.infinite.jsf.provider.model.DoctorAvailability;
 import com.infinite.jsf.provider.model.DoctorStatus;
 import com.infinite.jsf.recipient.model.RecipientStatus;
 import com.infinite.jsf.util.SessionHelper;
+import org.apache.log4j.Logger;
 
 public class AppointmentDaoImpl implements AppointmentDao {
+	private static final Logger LOGGER = Logger.getLogger(AppointmentDaoImpl.class.getName());
 
 	/**
 	 * Generates the next unique appointment ID in "APPTXXXXXX" format (e.g., APPT000101).
@@ -53,18 +55,23 @@ public class AppointmentDaoImpl implements AppointmentDao {
 		String prefix = "APPT";
 
 		try {
+			LOGGER.info("Generating next appointment ID using session: ");
 			// Native SQL for extracting numeric part
 			String sql = "SELECT MAX(CAST(SUBSTRING(appointment_id, 5) AS UNSIGNED)) FROM appointment";
 			Query query = session.createSQLQuery(sql);
 
+	        LOGGER.info("Executing SQL query: " + sql);
+
 			Number result = (Number) query.uniqueResult(); // It returns Long or BigInteger
 			int nextNumber = (result != null) ? result.intValue() + 1 : 101;
+
+	        LOGGER.info("Generated new appointment ID: " + prefix + String.format("%06d", nextNumber));
 
 			// Format to 6-digit padded number: APPT000101, APPT000124
 			return prefix + String.format("%06d", nextNumber);
 
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOGGER.warn("Error generating appointment ID: " + e.getMessage(), e);
 			// In case of any error, fallback to APPT000001
 			return prefix + "000001";
 		}
@@ -82,6 +89,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 * along with the new appointment ID if successful.
 	 */
 	public String bookAnAppointment(Appointment appointment) {
+		LOGGER.info(" method bookAnappointment call");
 		Transaction tx = null;
 		String result = null;
 		Session session = null;
@@ -93,6 +101,8 @@ public class AppointmentDaoImpl implements AppointmentDao {
 					.getAvailabilityById(appointment.getAvailability().getAvailabilityId());
 
 			if (doctoravail == null) {
+
+		        LOGGER.warn("method bookAnAppointment : doctoravail is null"); 
 				return AppointmentConstantMessage.INVALID_AVAILABILITY_SLOT;
 			}
 
@@ -282,6 +292,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public boolean isAvailabilitySlotFull(String availabilityId) {
+		LOGGER.info(" method isAvailabilitySlotFull call");
 		try {
 			Session session = SessionHelper.getSessionFactory().openSession();
 			// Step 1: Get total booked/pending appointments for the availability
@@ -321,6 +332,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public List<Appointment> getUpcomingAppointmentsByRecipient(String recipientId) {
+		LOGGER.info(" method getUpcomingAppointmentsByRecipient call");
 		try {
 			Session session = SessionHelper.getSessionFactory().openSession();
 			Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -352,6 +364,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public List<Appointment> getPastAppointmentsByRecipient(String recipientId) {
+		LOGGER.info(" method getPastAppointmentsByRecipient call");
 		try {
 			Session session = SessionHelper.getSessionFactory().openSession();
 			Timestamp now = new Timestamp(System.currentTimeMillis());
@@ -379,6 +392,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public Appointment getAppointmentById(String appointmentId) {
+		LOGGER.info(" method getAppointmentById call");
 		try {
 			Session session = SessionHelper.getSessionFactory().openSession();
 			return (Appointment) session.get(Appointment.class, appointmentId);
@@ -398,6 +412,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public boolean cancelAppointment(String appointmentId) {
+		LOGGER.info(" method cancelAppointment call");
 		Transaction tx = null;
 		try {
 			Session session = SessionHelper.getSessionFactory().openSession();
@@ -446,6 +461,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public String updateAppointment(Appointment updatedAppointment) {
+		LOGGER.info(" method updateAppointment call");
 	    Transaction tx = null;
 	    Session session = null;
 	    try {
@@ -549,6 +565,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public int getBookedCountForAvailability(String availabilityId) {
+		LOGGER.info(" method getBookedCountForAvailability call");
 		int count = 0;
 		Session session = null;
 		try {
@@ -597,6 +614,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public List<Integer> getAvailableSlotNumbers(String availabilityId) {
+		LOGGER.info(" method getAvailableSlotNumbers call");
 		List<Integer> availableSlots = new ArrayList<>();
 		Session session = null;
 		try {
@@ -644,6 +662,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public boolean isSlotAlreadyBooked(String availabilityId, int slotNo) {
+		LOGGER.info(" method isSlotAlreadyBooked call");
 		Session session = null;
 		try {
 			session = SessionHelper.getSessionFactory().openSession();
@@ -674,6 +693,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public List<Appointment> getAppointmentsByAvailability(String availabilityId) {
+		LOGGER.info(" method getAppointmentsByAvailability call");
 		List<Appointment> appointments = new ArrayList<>(); // Initialize to empty list
 		Session session = null;
 		try {
@@ -702,6 +722,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public boolean isAppointmentInPast(String appointmentId) {
+		LOGGER.info(" method isAppointmentInPast call");
 		Session session = null;
 		try {
 			session = SessionHelper.getSessionFactory().openSession();
@@ -731,6 +752,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public List<Appointment> getAppointmentsByDoctorAndDate(String doctorId, Date date) {
+		LOGGER.info(" method getAppointmentsByDoctorAndDate call");
 		List<Appointment> appointments = new ArrayList<>(); // Initialize to empty list
 		Session session = null;
 		try {
@@ -762,6 +784,7 @@ public class AppointmentDaoImpl implements AppointmentDao {
 	 */
 	@Override
 	public boolean isSlotTimeInFuture(String availabilityId, int slotNo) {
+		LOGGER.info(" method isSlotTimeInFuture call");
 		Session session = null;
 		try {
 			session = SessionHelper.getSessionFactory().openSession();

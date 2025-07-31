@@ -34,7 +34,7 @@
 		</div>
 	</div>
 
-	<div class="main-container-card" style=" margin-top: 165px">
+	<div class="main-container-card" style=" margin-top: 90px">
 		<div class="header-section-flex">
 			<h1 class="header-title transform-hover">
 				<i class="fas fa-calendar-alt mr-2-spacing"></i> Book Appointment
