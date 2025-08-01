@@ -400,6 +400,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A {@code List} of {@code SlotDisplay} objects for afternoon slots.
 	 */
 	public List<SlotDisplay> getAfternoonSlots() {
+		LOGGER.info("method getMorningSlots call ");
 		return filterSlotsByTime(LocalTime.NOON, LocalTime.of(17, 0));
 	}
 
@@ -409,6 +410,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A {@code List} of {@code SlotDisplay} objects for evening slots.
 	 */
 	public List<SlotDisplay> getEveningSlots() {
+		LOGGER.info("method getEveningSlots call ");
 		return filterSlotsByTime(LocalTime.of(17, 0), LocalTime.MAX);
 	}
 
@@ -420,6 +422,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A {@code List} of {@code SlotDisplay} objects that fall within the given time range.
 	 */
 	private List<SlotDisplay> filterSlotsByTime(LocalTime start, LocalTime end) {
+		LOGGER.info("method filterSlotsByTime call ");
 		if (availableSlots == null)
 			return Collections.emptyList();
 
@@ -436,6 +439,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A formatted date string.
 	 */
 	private String formatDisplayDate(Date date) {
+		LOGGER.info("method formatDisplayDate call ");
 		return new SimpleDateFormat("E d, MMM", Locale.ENGLISH).format(date);
 	}
 
@@ -446,6 +450,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A formatted time string.
 	 */
 	private String formatTime(LocalTime time) {
+		LOGGER.info("method formatTime call ");
 		return String.format("%02d:%02d", time.getHour(), time.getMinute());
 	}
 
@@ -458,6 +463,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A {@code List} of {@code DayAvailabilitySummary}.
 	 */
 	public List<DayAvailabilitySummary> getGroupedAvailabilityList() {
+		LOGGER.info("method getGroupedAvailabilityList call ");
 		return groupedAvailabilityList;
 	}
 
@@ -467,6 +473,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return The selected {@code java.sql.Date}.
 	 */
 	public Date getSelectedDate() {
+		LOGGER.info("method getSelectedDate call ");
 		return selectedDate;
 	}
 
@@ -476,6 +483,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @param selectedDate The {@code java.sql.Date} to set.
 	 */
 	public void setSelectedDate(Date selectedDate) {
+		LOGGER.info("method setSelectedDate call ");
 		this.selectedDate = selectedDate;
 	}
 
@@ -485,6 +493,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return The selected date input string.
 	 */
 	public String getSelectedDateInput() {
+		LOGGER.info("method getSelectedDateInput call ");
 		return selectedDateInput;
 	}
 
@@ -494,6 +503,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @param selectedDateInput The date string to set.
 	 */
 	public void setSelectedDateInput(String selectedDateInput) {
+		LOGGER.info("method setSelectedDateInput call ");
 		this.selectedDateInput = selectedDateInput;
 	}
 
@@ -503,6 +513,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A {@code List} of {@code SlotDisplay}.
 	 */
 	public List<SlotDisplay> getAvailableSlots() {
+		LOGGER.info("method getAvailableSlots call ");
 		return availableSlots;
 	}
 
@@ -512,6 +523,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return The number of morning slots.
 	 */
 	public int getMorningSlotCount() {
+		LOGGER.info("method getMorningSlots call ");
 		return getMorningSlots().size();
 	}
 
@@ -521,6 +533,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return The number of afternoon slots.
 	 */
 	public int getAfternoonSlotCount() {
+		LOGGER.info("method getMorningSlots call ");
 		return getAfternoonSlots().size();
 	}
 
@@ -530,6 +543,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return The number of evening slots.
 	 */
 	public int getEveningSlotCount() {
+		LOGGER.info("method getEveningSlotCount call ");
 		return getEveningSlots().size();
 	}
 
@@ -539,6 +553,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return The selected availability ID as a {@code String}.
 	 */
 	public String getSelectedAvailabilityId() {
+		LOGGER.info("method getSelectedAvailabilityId call ");
 		return selectedAvailabilityId;
 	}
 
@@ -548,6 +563,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @param selectedAvailabilityId The availability ID to set.
 	 */
 	public void setSelectedAvailabilityId(String selectedAvailabilityId) {
+		LOGGER.info("method setSelectedAvailabilityId call ");
 		this.selectedAvailabilityId = selectedAvailabilityId;
 	}
 
@@ -557,6 +573,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return The selected slot number as an {@code int}.
 	 */
 	public int getSelectedSlotNumber() {
+		LOGGER.info("method getSelectedSlotNumber call ");
 		return selectedSlotNumber;
 	}
 
@@ -566,6 +583,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @param selectedSlotNumber The slot number to set.
 	 */
 	public void setSelectedSlotNumber(int selectedSlotNumber) {
+		LOGGER.info("method setSelectedSlotNumber call ");
 		this.selectedSlotNumber = selectedSlotNumber;
 	}
 
