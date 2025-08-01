@@ -1,3 +1,9 @@
+<%-- 
+This page is for update a requested appointment which may be pending or book appointment and must be in the future 
+this page will come after when need to reschedule the appointment  
+--%>
+
+
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core"%>
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html"%>
@@ -17,8 +23,14 @@
 	href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body class="body-bg-color min-h-screen-full p-4-spacing">
+
+	<%-- Recipient navbar --%>
 	<jsp:include page="./../../navbar/NavRecipient.jsp" />
+	
+	<%-- Appointment navbar  --%>
 	<jsp:include page="NavBar.jsp" />
+	
+	<%-- Loading animation for update appointment --%>
 	<div id="bookingOverlay" class="booking-overlay">
 		<div class="booking-overlay-content">
 			<svg class="spinner-icon mx-auto-spacing"
@@ -39,6 +51,7 @@
 			<h1 class="header-title transform-hover">
 				<i class="fas fa-calendar-alt mr-2-spacing"></i> Update Booked Appointment
 			</h1>
+			<%-- Name of the doctor to whom wanna update the appointment --%>
 			<div class="doctor-info-text-right">
 				<span class="doctor-name-text"> <h:outputText
 						value="#{doctorAvailabilityController.doctor.doctorName}" />
@@ -53,6 +66,7 @@
 		<h:form id="appointmentForm">
 			<div class="date-picker-row-layout mb-4-spacing md:mb-6-spacing">
 				<div class="flex-col-flex-1">
+					<%-- New date for reschedule recipient appointment --%>
 					<h2 class="section-title mb-2-spacing">Select Date</h2>
 					<div class="date-picker-input-group">
 						<h:inputText id="datePicker"
@@ -67,7 +81,7 @@
 						</div>
 					</div>
 				</div>
-
+				<%-- The doctor availability timing of a doctor for a perticular date --%>
 				<div class="doctor-availability-table-wrapper">
 					<h6 class="section-title">Available Timings</h6>
 					<h:dataTable

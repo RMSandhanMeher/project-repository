@@ -115,6 +115,7 @@ public class DoctorAvailabilityController implements Serializable {
 			return;
 
 		for (DoctorAvailability availability : dailyAvailabilities) {
+			LOGGER.info("method loadAvailableSlots : iterating through daily availabilities ");
 			String availabilityId = availability.getAvailabilityId();
 			List<Integer> availableSlotNumbers = appointmentDao.getAvailableSlotNumbers(availabilityId);
 
@@ -150,6 +151,7 @@ public class DoctorAvailabilityController implements Serializable {
 		this.appointmentId=appointmentId;
 		System.out.println(doctorId+"        "+appointmentId);
 		if (doctorId == null || doctorId.isEmpty()) {
+			LOGGER.warn("No doctor is selected ");
 			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
 					new FacesMessage(FacesMessage.SEVERITY_WARN, AppointmentConstantMessage.PLEASE_SELECT_DOCTOR, null));
 			return null;
@@ -171,6 +173,7 @@ public class DoctorAvailabilityController implements Serializable {
 		this.doctorId = doctorId;
 
 		if (doctorId == null || doctorId.isEmpty()) {
+			LOGGER.warn("No doctor is selected ");
 			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
 					new FacesMessage(FacesMessage.SEVERITY_WARN, AppointmentConstantMessage.PLEASE_SELECT_DOCTOR, null));
 			return null;
@@ -193,6 +196,7 @@ public class DoctorAvailabilityController implements Serializable {
 				loadAvailableSlots();
 			}
 		} catch (IllegalArgumentException e) {
+			LOGGER.warn("Invalid date format");
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.INVALID_DATE_FORMAT, null));
 		}
@@ -213,6 +217,7 @@ public class DoctorAvailabilityController implements Serializable {
 			DoctorAvailability availability = availabilityDao.getAvailabilityById(selectedAvailabilityId);
 
 			if (availability == null) {
+				LOGGER.warn("Time slot is no longer available");
 				context.addMessage(null,
 						new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.TIME_SLOT_NO_LONGER_AVAILABLE, null));
 				this.selectedAvailabilityId = null;
@@ -261,7 +266,7 @@ public class DoctorAvailabilityController implements Serializable {
 				try {
 					MailSend.sendMail(res.getEmail(), subject, MailSend.appointmentRequest(apSli));
 				} catch (Exception e) {
-					System.out.println(AppointmentConstantMessage.ERROR_SENDING_MAIL);
+					LOGGER.warn(AppointmentConstantMessage.ERROR_SENDING_MAIL);
 				}
 				return AppointmentConstantMessage.APPOINTMENT_CONFIRMATION_NAVIGATION;
 			} else {
@@ -273,6 +278,7 @@ public class DoctorAvailabilityController implements Serializable {
 				this.loadAvailableSlots(); // Refresh available slots
 			}
 		} catch (Exception e) {
+			LOGGER.warn("Error at generic prefix at bookAppointment method ");
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.ERROR_GENERIC_PREFIX + e.getMessage(), null));
 		}
@@ -290,11 +296,12 @@ public class DoctorAvailabilityController implements Serializable {
 		LOGGER.info("method call :updateBookedAppointment");
 		System.out.println("method ");
 		try {
-			System.out.println("selectedAvailabilityId" + selectedAvailabilityId);
+			LOGGER.info("selectedAvailabilityId" + selectedAvailabilityId);
 			FacesContext context = FacesContext.getCurrentInstance();
 			DoctorAvailability availability = availabilityDao.getAvailabilityById(selectedAvailabilityId);
 
 			if (availability == null) {
+				LOGGER.warn("Time slot is no longer available at updateBookedAppointment ");
 				context.addMessage(null,
 						new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.TIME_SLOT_NO_LONGER_AVAILABLE, null));
 				this.selectedAvailabilityId = null;
@@ -356,6 +363,7 @@ public class DoctorAvailabilityController implements Serializable {
 				this.loadAvailableSlots(); // Refresh available slots
 			}
 		} catch (Exception e) {
+			LOGGER.warn("Error at generic prefix in the updateBookedAppointment method ");
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.ERROR_GENERIC_PREFIX + e.getMessage(), null));
 		}
@@ -382,6 +390,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 * @return A {@code List} of {@code SlotDisplay} objects for morning slots.
 	 */
 	public List<SlotDisplay> getMorningSlots() {
+		LOGGER.info("method getMorningSlots call ");
 		return filterSlotsByTime(LocalTime.MIN, LocalTime.NOON);
 	}
 

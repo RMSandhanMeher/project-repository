@@ -37,15 +37,20 @@ public class AppointmentDetailController implements Serializable {
 
 	/**
 	 * Loads the detailed information for a specific appointment based on its ID.
-	 * This method retrieves the appointment from the database, transforms it into an
-	 * {@code AppointmentDetails} DTO, and makes it available for display in the UI.
-	 * It also handles error messages if the appointment is not found or if an exception occurs.
+	 * This method retrieves the appointment from the database, transforms it into
+	 * an {@code AppointmentDetails} DTO, and makes it available for display in the
+	 * UI. It also handles error messages if the appointment is not found or if an
+	 * exception occurs.
 	 *
-	 * @param selectedAppointmentIdForDetail The unique ID of the appointment to load details for.
-	 * @return A navigation outcome string (e.g., "/recipient/appointment/appointmentDetail.jsf?faces-redirect=true")
-	 * if successful, or {@code null} if there's an error or the appointment is not found.
+	 * @param selectedAppointmentIdForDetail The unique ID of the appointment to
+	 *                                       load details for.
+	 * @return A navigation outcome string (e.g.,
+	 *         "/recipient/appointment/appointmentDetail.jsf?faces-redirect=true")
+	 *         if successful, or {@code null} if there's an error or the appointment
+	 *         is not found.
 	 */
 	public String loadAppointmentDetailsForDisplay(String selectedAppointmentIdForDetail) {
+		LOGGER.info("method loadAppointmentDetailsForDisplay call");
 		if (selectedAppointmentIdForDetail != null && !selectedAppointmentIdForDetail.isEmpty()) {
 			try {
 				Appointment appointment = appointmentDao.getAppointmentById(selectedAppointmentIdForDetail);
@@ -64,6 +69,7 @@ public class AppointmentDetailController implements Serializable {
 					appointmentDetailsForDisplay.setDoctorId(appointment.getDoctor().getDoctorId());
 					// Doctor details
 					if (appointment.getDoctor() != null) {
+						LOGGER.warn("No such doctor");
 						appointmentDetailsForDisplay.setDoctorName(appointment.getDoctor().getDoctorName());
 						appointmentDetailsForDisplay
 								.setDoctorSpecialization(appointment.getDoctor().getSpecialization());
@@ -75,6 +81,7 @@ public class AppointmentDetailController implements Serializable {
 
 					// Doctor Availability Timing (format as a string)
 					if (appointment.getStart() != null && appointment.getEnd() != null) {
+						LOGGER.info("method loadAppointmentDetailsForDisplay setting timing for appointment");
 						// Using SimpleDateFormat to format the Timestamp to HH:mm
 						SimpleDateFormat sdf = new SimpleDateFormat("HH:mm");
 						String startTimeStr = sdf.format(new Date(appointment.getStart().getTime()));
@@ -85,26 +92,27 @@ public class AppointmentDetailController implements Serializable {
 					}
 
 					// For debugging:
-					System.out.println("Loaded AppointmentDetails DTO: " + appointmentDetailsForDisplay);
+					LOGGER.warn("Loaded AppointmentDetails DTO: " + appointmentDetailsForDisplay);
 					return "/recipient/appointment/appointmentDetail.jsf?faces-redirect=true";
 				} else {
-					System.err.println(AppointmentConstantMessage.LOG_APPOINTMENT_NOT_FOUND_PREFIX
-							+ selectedAppointmentIdForDetail + AppointmentConstantMessage.LOG_APPOINTMENT_NOT_FOUND_SUFFIX);
-					FacesContext.getCurrentInstance().addMessage(null,
-							new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", AppointmentConstantMessage.APPOINTMENT_DETAILS_NOT_FOUND_UI));
+					LOGGER.warn(
+							AppointmentConstantMessage.LOG_APPOINTMENT_NOT_FOUND_PREFIX + selectedAppointmentIdForDetail
+									+ AppointmentConstantMessage.LOG_APPOINTMENT_NOT_FOUND_SUFFIX);
+					FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"Error", AppointmentConstantMessage.APPOINTMENT_DETAILS_NOT_FOUND_UI));
 					appointmentDetailsForDisplay = null; // Ensure it's null if not found
 				}
 			} catch (Exception e) {
-				System.err.println(AppointmentConstantMessage.LOG_ERROR_FETCHING_APPOINTMENT_DETAILS_PREFIX
+				LOGGER.warn(AppointmentConstantMessage.LOG_ERROR_FETCHING_APPOINTMENT_DETAILS_PREFIX
 						+ selectedAppointmentIdForDetail + ": " + e.getMessage());
 				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 						"Error", AppointmentConstantMessage.ERROR_LOADING_APPOINTMENT_DETAILS_UI));
 				appointmentDetailsForDisplay = null;
 			}
 		} else {
-			System.err.println(AppointmentConstantMessage.NO_APPOINTMENT_ID_PROVIDED_UI);
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", AppointmentConstantMessage.INVALID_APPOINTMENT_REQUEST_UI));
+			LOGGER.warn(AppointmentConstantMessage.NO_APPOINTMENT_ID_PROVIDED_UI);
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+					AppointmentConstantMessage.INVALID_APPOINTMENT_REQUEST_UI));
 			appointmentDetailsForDisplay = null;
 		}
 		return null;
@@ -113,55 +121,63 @@ public class AppointmentDetailController implements Serializable {
 	/**
 	 * Navigates to the appointment rescheduling page.
 	 *
-	 * @return A navigation outcome string to the update appointment page with a faces-redirect.
+	 * @return A navigation outcome string to the update appointment page with a
+	 *         faces-redirect.
 	 */
 	public String rescheduleAppointment() {
+		LOGGER.info("method rescheduleAppointment call");
 		return "/recipient/appointment/updateAppointment?faces-redirect=true";
 	}
 
-    /**
-     * Gets the ID of the currently selected appointment for detail viewing.
-     *
-     * @return The selected appointment ID as a {@code String}.
-     */
+	/**
+	 * Gets the ID of the currently selected appointment for detail viewing.
+	 *
+	 * @return The selected appointment ID as a {@code String}.
+	 */
 	public String getSelectedAppointmentIdForDetail() {
+		LOGGER.info("method getSelectedAppointmentIdForDetail call");
 		return selectedAppointmentIdForDetail;
 	}
 
-    /**
-     * Sets the ID of the appointment to be displayed in detail.
-     *
-     * @param selectedAppointmentIdForDetail The ID of the appointment.
-     */
+	/**
+	 * Sets the ID of the appointment to be displayed in detail.
+	 *
+	 * @param selectedAppointmentIdForDetail The ID of the appointment.
+	 */
 	public void setSelectedAppointmentIdForDetail(String selectedAppointmentIdForDetail) {
+		LOGGER.info("method setSelectedAppointmentIdForDetail call");
 		this.selectedAppointmentIdForDetail = selectedAppointmentIdForDetail;
 	}
 
-    /**
-     * Gets the {@code AppointmentDetails} DTO object populated with the details
-     * of the currently displayed appointment.
-     *
-     * @return The {@code AppointmentDetails} object.
-     */
+	/**
+	 * Gets the {@code AppointmentDetails} DTO object populated with the details of
+	 * the currently displayed appointment.
+	 *
+	 * @return The {@code AppointmentDetails} object.
+	 */
 	public AppointmentDetails getAppointmentDetailsForDisplay() {
+		LOGGER.info("method getAppointmentDetailsForDisplay call");
 		return appointmentDetailsForDisplay;
 	}
 
-    /**
-     * Sets the {@code AppointmentDetails} DTO object for display.
-     *
-     * @param appointmentDetailsForDisplay The {@code AppointmentDetails} object to set.
-     */
+	/**
+	 * Sets the {@code AppointmentDetails} DTO object for display.
+	 *
+	 * @param appointmentDetailsForDisplay The {@code AppointmentDetails} object to
+	 *                                     set.
+	 */
 	public void setAppointmentDetailsForDisplay(AppointmentDetails appointmentDetailsForDisplay) {
+		LOGGER.info("method setAppointmentDetailsForDisplay call");
 		this.appointmentDetailsForDisplay = appointmentDetailsForDisplay;
 	}
 
-    /**
-     * Gets the serial version UID for serialization.
-     *
-     * @return The serial version UID as a {@code long}.
-     */
+	/**
+	 * Gets the serial version UID for serialization.
+	 *
+	 * @return The serial version UID as a {@code long}.
+	 */
 	public static long getSerialversionuid() {
+		LOGGER.info("method getSerialversionuid call");
 		return serialVersionUID;
 	}
 

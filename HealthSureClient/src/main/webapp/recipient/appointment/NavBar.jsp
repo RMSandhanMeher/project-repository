@@ -1,3 +1,8 @@
+<%-- 
+Appointment page navbar which will navigate among the pages like doctor pick for appointment , select a perticular date for the appointment ,
+see all the future and past appointment 
+--%>
+
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="${pageContext.request.contextPath}/resources/js/nav.js"></script>
 <nav
@@ -5,13 +10,20 @@
 	<div
 		class="px-10 max-w-screen-xl mx-auto flex justify-center items-center">
 		<div class="space-x-4 flex">
+			<%-- The page for doctor selection for appointment request link  --%>
 			<a
 				href="${pageContext.request.contextPath}/recipient/appointment/SearchProviders.jsf"
 				class="nav-link text-nowrap px-4 py-2 rounded-xl transition duration-200 border border-gray-300"
-				onclick="setActiveLink(this)"> Select Doctor </a> <a
+				onclick="setActiveLink(this)"> Select Doctor </a> 
+				
+				<%-- Page for date and timing select for appointment  --%>
+				<a
 				href="${pageContext.request.contextPath}/recipient/appointment/doctorAvailabilityList.jsf"
 				class="nav-link text-nowrap px-4 py-2 rounded-xl transition duration-200 border border-gray-300"
-				onclick="setActiveLink(this)"> Book Appointment </a> <a
+				onclick="setActiveLink(this)"> Book Appointment </a> 
+				
+				<%-- Page for see past and future appointment  --%>
+				<a
 				href="${pageContext.request.contextPath}/recipient/appointment/recipient-appointments.jsf"
 				class="nav-link text-nowrap px-4 py-2 rounded-xl transition duration-200 border border-gray-300"
 				onclick="setActiveLink(this)"> My Appointments </a>

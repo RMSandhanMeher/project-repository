@@ -1,3 +1,9 @@
+<%--
+This page is for showing that the appointment is successfully requested and so some necessary information releted 
+to appointment and the provider 
+ --%>
+
+
 <%@ taglib uri="http://java.sun.com/jsf/html" prefix="h"%>
 <%@ taglib uri="http://java.sun.com/jsf/core" prefix="f"%>
 
@@ -35,6 +41,7 @@
 						<div class="success-icon">
 							<i class="fas fa-check-circle"></i>
 						</div>
+						<%-- A confirmation message --%>
 						<div>
 							<p class="success-text">
 								<h:outputText value="#{sessionScope.confirmationMessage}" />

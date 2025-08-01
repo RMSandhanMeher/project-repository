@@ -1,3 +1,9 @@
+<%-- 
+This page is to show all the details for the user 
+appointment with a necessary informantion about the doctor
+--%>
+
+
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core"%>
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html"%>
@@ -205,12 +211,13 @@ body {
 
 	<div class="card">
 		<div class="card-header">
+			<%-- Appoinemtnt Id of the recipient --%>
 			<h2>
 				<i class="fas fa-calendar-check"></i> Appointment #
 				<h:outputText
 					value="#{appointmentDetailController.appointmentDetailsForDisplay.appointmentId}" />
 			</h2>
-
+			<%-- Show the status of the appointment --%>
 			<!-- Dynamic Status Rendering -->
 			<h:panelGroup
 				rendered="#{appointmentDetailController.appointmentDetailsForDisplay.status == 'BOOKED'}">
@@ -234,27 +241,32 @@ body {
 			<div class="detail-grid">
 				<div>
 					<div class="detail-item">
+					<%-- Show the Doctor Name to whom the recipient request for the appointment --%>
 						<span class="detail-label">Doctor:</span> <span
 							class="detail-value"><h:outputText
 								value="#{appointmentDetailController.appointmentDetailsForDisplay.doctorName}" /></span>
 					</div>
 					<div class="detail-item">
+					<%-- Show the doctor specialization of the doctor --%>
 						<span class="detail-label">Specialization:</span> <span
 							class="detail-value"><h:outputText
 								value="#{appointmentDetailController.appointmentDetailsForDisplay.doctorSpecialization}" /></span>
 					</div>
 					<div class="detail-item">
+					<%-- Doctor gender --%>
 						<span class="detail-label">Gender:</span> <span
 							class="detail-value"><h:outputText
 								value="#{appointmentDetailController.appointmentDetailsForDisplay.doctorGender}" /></span>
 					</div>
 					<div class="detail-item">
+					<%-- Hospital ( Provider) name --%>
 						<span class="detail-label">Provider:</span> <span
 							class="detail-value">HealthSure Hospital</span>
 					</div>
 				</div>
 				<div>
 					<div class="detail-item">
+					<%-- Appointment Date --%>
 						<span class="detail-label">Date:</span> <span class="detail-value">
 							<h:outputText
 								value="#{appointmentDetailController.appointmentDetailsForDisplay.start}">
@@ -263,6 +275,7 @@ body {
 						</span>
 					</div>
 					<div class="detail-item">
+					<%-- Appointment timing --%>
 						<span class="detail-label">Time:</span> <span class="detail-value">
 							<h:outputText
 								value="#{appointmentDetailController.appointmentDetailsForDisplay.start}">
@@ -273,6 +286,7 @@ body {
 							</h:outputText>
 						</span>
 					</div>
+					<%-- Show the slot number of that appointment of the recipient --%>
 					<div class="detail-item">
 						<span class="detail-label">Slot:</span> <span class="detail-value">#<h:outputText
 								value="#{appointmentDetailController.appointmentDetailsForDisplay.slotNo}" /></span>
@@ -281,6 +295,7 @@ body {
 			</div>
 
 			<div class="timeline">
+				<%-- Appointment request date --%>
 				<h:panelGroup
 					rendered="#{not empty appointmentDetailController.appointmentDetailsForDisplay.requestedAt}">
 					<div class="timeline-item">
@@ -294,7 +309,7 @@ body {
 						<div>Appointment requested</div>
 					</div>
 				</h:panelGroup>
-
+				<%-- Appointment book timing --%>
 				<h:panelGroup
 					rendered="#{not empty appointmentDetailController.appointmentDetailsForDisplay.bookedAt}">
 					<div class="timeline-item">
@@ -308,7 +323,7 @@ body {
 						<div>Appointment confirmed</div>
 					</div>
 				</h:panelGroup>
-
+				<%-- Appointment cancel timing --%>
 				<h:panelGroup
 					rendered="#{not empty appointmentDetailController.appointmentDetailsForDisplay.cancelledAt}">
 					<div class="timeline-item">
@@ -322,7 +337,7 @@ body {
 						<div>Appointment cancelled</div>
 					</div>
 				</h:panelGroup>
-
+				<%-- Appointment complete timing --%>
 				<h:panelGroup
 					rendered="#{not empty appointmentDetailController.appointmentDetailsForDisplay.completedAt}">
 					<div class="timeline-item">
@@ -340,13 +355,14 @@ body {
 		</div>
 
 		<div class="actions">
+			<%-- Back button --%>
 			<a href="recipient-appointments.jsf" class="btn btn-back"> <i
 				class="fas fa-arrow-left"></i> Back
 			</a>
 
 			<h:panelGroup
 				rendered="#{appointmentDetailController.appointmentDetailsForDisplay.status == 'BOOKED' || appointmentDetailController.appointmentDetailsForDisplay.status == 'PENDING'}">
-
+			<%-- Appointment reschedule button --%>
 				<h:form style="display:inline;">
 					<h:commandButton value="Reschedule" styleClass="btn btn-reschedule"
 						action="#{doctorAvailabilityController.rescheduleAppointment(appointmentDetailController.appointmentDetailsForDisplay.doctorId,appointmentDetailController.appointmentDetailsForDisplay.appointmentId)}">

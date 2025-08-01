@@ -86,7 +86,7 @@
 	<jsp:include page="NavBar.jsp" />
 	<div class="main-container">
 		<h1 class="main-title">My Appointments</h1>
-
+		<%-- The loading animation --%>
 		<h:form id="appointmentForm" prependId="false">
 			<div id="loadingOverlay" class="loading-overlay">
 				<div class="loading-overlay-content">
@@ -100,7 +100,7 @@
 					<p class="loading-text">Loading details...</p>
 				</div>
 			</div>
-
+			<%-- time filter for the user appointment --%>
 			<div class="filter-grid-container" style="display: flex; flex-wrap: wrap; gap: 15px;">
 				<div class="filter-item">
 					<label for="timeFilter" class="filter-label">Time Filter:</label>
@@ -111,6 +111,7 @@
 						<f:selectItem itemLabel="Past" itemValue="past" />
 					</h:selectOneMenu>
 				</div>
+				<%-- status filter for the user appointment the status are pending book complete and cancel  --%>
 				<div class="filter-item">
 					<label for="statusFilter" class="filter-label">Status
 						Filter:</label>
@@ -121,7 +122,7 @@
 							value="#{recipientAppointmentController.statusFilterOptions}" />
 					</h:selectOneMenu>
 				</div>
-
+				<%-- show all the appointment after this date --%>
                 <div class="filter-item">
                     <label for="fromDate" class="filter-label">From Date:</label>
                     <h:inputText id="fromDate"
@@ -130,6 +131,7 @@
                         <f:convertDateTime pattern="yyyy-MM-dd" />
                     </h:inputText>
                 </div>
+                <%-- show all the appointment after this date --%>
                 <div class="filter-item">
                     <label for="toDate" class="filter-label">To Date:</label>
                     <h:inputText id="toDate"
@@ -138,7 +140,7 @@
                         <f:convertDateTime pattern="yyyy-MM-dd" />
                     </h:inputText>
                 </div>
-				
+				<%-- reset all the filter data  --%>
 				<div class="filter-item">
 					<%-- New Reset Button --%>
 					<h:commandButton value="Reset Filters"
@@ -148,7 +150,7 @@
 				</div>
 
 			</div>
-
+			<%-- show filter appointments with button for sorting --%>
 			<h:dataTable
 				value="#{recipientAppointmentController.paginatedAppointments}"
 				var="appt" styleClass="slots-table-component appointment-table"
@@ -330,17 +332,18 @@
 					this filter.</div>
 			</h:panelGroup>
 			<div class="pagination-container">
+			<%-- Button for move to previous--%>
 				<h:commandButton value="Previous"
 					action="#{recipientAppointmentController.prevPage}"
 					disabled="#{not recipientAppointmentController.hasPrevPage}"
 					styleClass="pagination-button"
 					onclick="document.getElementById('loadingOverlay').style.display = 'flex'; return true;" />
-
+			<%-- Show current page with total number of pages --%>
 				<span class="pagination-info"> <h:outputText
 						value="Page #{recipientAppointmentController.currentPage} of #{recipientAppointmentController.totalPages}" />
 						<h:inputHidden id="currentPage" value="#{recipientAppointmentController.currentPage}" />
 				</span>
-
+			<%-- Button for move to next --%>
 				<h:commandButton value="Next"
 					action="#{recipientAppointmentController.nextPage}"
 					disabled="#{not recipientAppointmentController.hasNextPage}"
