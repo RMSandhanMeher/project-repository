@@ -148,8 +148,16 @@
 						styleClass="reset-button"
 						onclick="showLoading(); return true;" />
 				</div>
-
+					<h:commandLink
+						action="#{recipientAppointmentController.resetPagination}"
+						rendered="#{true}"
+						styleClass="sort-icons">
+							<h:graphicImage value="/resources/media/images/icons/reset.png"
+								style="height: 25px;position: absolute;top: 220px;right: 90px;" title="reset button" />
+					</h:commandLink>
+			
 			</div>
+			
 			<%-- show filter appointments with button for sorting --%>
 			<h:dataTable
 				value="#{recipientAppointmentController.paginatedAppointments}"

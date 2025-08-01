@@ -316,7 +316,8 @@ public class RecipientAppointmentController implements Serializable {
 	/**
 	 * Resets the pagination to the first page.
 	 */
-	private void resetPagination() {
+	public void resetPagination() {
+		LOGGER.info("reset method ");
 		currentPage = 0;
 		updatePaginatedAppointments();
 	}
