@@ -36,7 +36,7 @@
             </h:form>
  
             <h:form>
-                <h:commandLink action="#{recipientBean.viewPrescriptions}" styleClass="block bg-white p-5 rounded-xl shadow-md text-center hover:shadow-xl transition">
+                <h:commandLink action="null" styleClass="block bg-white p-5 rounded-xl shadow-md text-center hover:shadow-xl transition">
                     <h3 class="text-md font-semibold text-purple-600 uppercase tracking-wide">Prescriptions</h3>
                     <p class="mt-2 text-4xl font-bold text-gray-800">
                         <h:outputText value="#{recipientBean.totalPrescriptions}" />
@@ -56,7 +56,7 @@
             </h:form>
  
             <h:form>
-                <h:commandLink action="#{recipientBean.viewTestReports}" styleClass="block bg-white p-5 rounded-xl shadow-md text-center hover:shadow-xl transition">
+                <h:commandLink action="null" styleClass="block bg-white p-5 rounded-xl shadow-md text-center hover:shadow-xl transition">
                     <h3 class="text-md font-semibold text-red-500 uppercase tracking-wide">Test Reports</h3>
                     <p class="mt-2 text-4xl font-bold text-gray-800">
                         <h:outputText value="#{recipientBean.recentTests}" />
@@ -79,19 +79,19 @@
         <h3 class="text-xl font-semibold text-gray-700 mb-4">Quick Access</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <h:form>
-                <h:commandButton value="📖 My Medical History" action="#{recipientBean.viewHistory}"
+                <h:commandButton value="📖 My Medical History" action="null" 
                     styleClass="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition" />
             </h:form>
             <h:form>
-                <h:commandButton value="🧾 Claim Insurance" action="#{recipientBean.claimInsurance}"
+                <h:commandButton value="🧾 Claim Insurance" action="null" 
                     styleClass="w-full py-3 bg-gradient-to-r from-purple-500 to-purple-700 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition" />
             </h:form>
             <h:form>
-                <h:commandButton value="💊 My Prescriptions" action="#{recipientBean.viewPrescriptions}"
+                <h:commandButton value="💊 My Prescriptions" action="null" 
                     styleClass="w-full py-3 bg-gradient-to-r from-teal-500 to-teal-700 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition" />
             </h:form>
             <h:form>
-                <h:commandButton value="📞 Contact Provider" action="#{recipientBean.contactProvider}"
+                <h:commandButton value="📞 Contact Provider" action="null" 
                     styleClass="w-full py-3 bg-gradient-to-r from-pink-500 to-pink-700 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition" />
             </h:form>
         </div>

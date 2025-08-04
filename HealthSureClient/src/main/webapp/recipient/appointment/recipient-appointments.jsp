@@ -9,7 +9,7 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/appointment/recipientAppointment.css">
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/appointment/datePicker.css">
 
 <style>
 /* Specific table cell alignment, can also be moved to external CSS if preferred */
@@ -365,7 +365,7 @@
 		</h:form>
 	</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/appointment/datePicker.js"></script>
 
 	<script>
         document.addEventListener('DOMContentLoaded', function() {

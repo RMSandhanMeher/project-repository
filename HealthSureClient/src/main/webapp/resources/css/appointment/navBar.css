@@ -1,0 +1,48 @@
+.nav-bar {
+	position: fixed;
+	top: 4rem;
+	left: 20%;
+	z-index: 30;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	padding-left: 1.5rem;
+	padding-right: 1.5rem;
+	margin-bottom: 1.5rem;
+	border-radius: 1rem;
+	border-width: 1px;
+	border-color: #E5E7EB;
+	width: fit-content;
+	color: #1F2937;
+	background-color: #ffffff;
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px
+		rgba(0, 0, 0, 0.05);
+	backdrop-blur: blur(12px);
+}
+
+.nav-bar-outer {
+	display: flex;
+	padding-left: 2.5rem;
+	padding-right: 2.5rem;
+	justify-content: center;
+	align-items: center;
+	max-width: 1280px;
+}
+
+.nav {
+	margin-left: 1rem;
+}
+
+.nav-element {
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	border-radius: 0.75rem;
+	border-width: 1px;
+	border-color: #D1D5DB;
+	transition-property: background-color, border-color, color, fill, stroke,
+		opacity, box-shadow, transform;
+	transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+	transition-duration: 300ms;
+	transition-duration: 200ms;
+}

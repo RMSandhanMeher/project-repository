@@ -14,14 +14,16 @@
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+	href="${pageContext.request.contextPath}/resources/css/appointment/datePicker.css">
+	
+
 </head>
 <body class="body-bg-color min-h-screen-full p-4-spacing">
-<%--recipient navbar --%>
+	<%--recipient navbar --%>
 	<jsp:include page="./../../navbar/NavRecipient.jsp" />
 	<%-- appoinement sub navbar --%>
 	<jsp:include page="NavBar.jsp" />
-	
+
 	<%-- loader show loading when booking the appoinemtnt  --%>
 	<div id="bookingOverlay" class="booking-overlay">
 		<div class="booking-overlay-content">
@@ -38,13 +40,13 @@
 		</div>
 	</div>
 
-	<div class="main-container-card" style=" margin-top: 90px">
+	<div class="main-container-card" style="margin-top: 90px">
 		<div class="header-section-flex">
 			<h1 class="header-title transform-hover">
 				<i class="fas fa-calendar-alt mr-2-spacing"></i> Book Appointment
 			</h1>
 			<div class="doctor-info-text-right">
-			<%-- show selected doctor name and specialization  --%>
+				<%-- show selected doctor name and specialization  --%>
 				<span class="doctor-name-text"> <h:outputText
 						value="#{doctorAvailabilityController.doctor.doctorName}" />
 				</span> <span class="doctor-specialization-text"> <h:outputText
@@ -58,7 +60,7 @@
 		<h:form id="appointmentForm">
 			<div class="date-picker-row-layout mb-4-spacing md:mb-6-spacing">
 				<div class="flex-col-flex-1">
-				<%-- A date picker for manual date picking  --%>
+					<%-- A date picker for manual date picking  --%>
 					<h2 class="section-title mb-2-spacing">Select Date</h2>
 					<div class="date-picker-input-group">
 						<h:inputText id="datePicker"
@@ -87,7 +89,7 @@
 			</div>
 
 
-			
+
 			<%-- Show the list of all  the available dates with total rolledout slots  --%>
 			<div class="mb-6-spacing md:mb-8-spacing">
 				<div class="date-scroll-container">
@@ -125,7 +127,7 @@
 						</span>
 					</h2>
 				</div>
-			<%-- Message that no the doctor is not available for that perticular selected date --%>
+				<%-- Message that no the doctor is not available for that perticular selected date --%>
 				<h:panelGroup
 					rendered="#{empty doctorAvailabilityController.morningSlots and empty doctorAvailabilityController.afternoonSlots and empty doctorAvailabilityController.eveningSlots}">
 					<div class="empty-state p-6-spacing text-center mb-6-spacing">
@@ -204,7 +206,7 @@
 						</div>
 					</div>
 				</h:panelGroup>
-					<%-- Show all the evening and available slots  --%>
+				<%-- Show all the evening and available slots  --%>
 				<h:panelGroup
 					rendered="#{not empty doctorAvailabilityController.eveningSlots}">
 					<div class="time-group-style mb-3-spacing md:mb-4-spacing">
@@ -240,7 +242,10 @@
 		</h:form>
 	</div>
 
-	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<script
+		src="${pageContext.request.contextPath}/resources/js/appointment/datePicker.js"></script>
+
+
 	<script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize date picker
