@@ -106,7 +106,7 @@ body {
 }
 
 .card-body {
-	padding: 20px;
+    padding: 20px 20px 0px 20px;
 }
 
 .detail-grid {
@@ -206,7 +206,7 @@ body {
 </head>
 <body class="body-bg min-h-screen-full page-padding">
 	<jsp:include page="../../navbar/NavRecipient.jsp" />
-	<div class="header-spacing"></div>
+	<div class="header-spacing" style="height:45px"></div>
 	<jsp:include page="NavBar.jsp" />
 	<div class="header-spacing"></div>
 
