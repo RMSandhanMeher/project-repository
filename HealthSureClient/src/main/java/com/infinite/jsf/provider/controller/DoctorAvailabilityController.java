@@ -62,8 +62,9 @@ public class DoctorAvailabilityController implements Serializable {
 	private List<String> availabilityTiming;
 
 	/**
-	 * Initializes the controller after its construction. This method is annotated with {@code @PostConstruct}
-	 * and is called by the JSF runtime. It loads the initial set of upcoming doctor availabilities.
+	 * Initializes the controller after its construction. This method is annotated
+	 * with {@code @PostConstruct} and is called by the JSF runtime. It loads the
+	 * initial set of upcoming doctor availabilities.
 	 */
 	@PostConstruct
 	public void init() {
@@ -71,9 +72,10 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Loads all upcoming doctor availabilities for the {@code doctorId} set in this controller.
-	 * It groups the availabilities by date and calculates the total remaining slots for each day,
-	 * populating {@code groupedAvailabilityList} for display.
+	 * Loads all upcoming doctor availabilities for the {@code doctorId} set in this
+	 * controller. It groups the availabilities by date and calculates the total
+	 * remaining slots for each day, populating {@code groupedAvailabilityList} for
+	 * display.
 	 */
 	public void loadAllUpcomingAvailability() {
 		LOGGER.info("method call :loadAllUpcomingAvailability");
@@ -93,9 +95,10 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Loads and populates the available time slots for the {@code selectedDate}.
-	 * It calculates individual slot timings based on availability's start/end times and max capacity,
-	 * and filters out already booked slots. The results are stored in {@code availableSlots}.
+	 * Loads and populates the available time slots for the {@code selectedDate}. It
+	 * calculates individual slot timings based on availability's start/end times
+	 * and max capacity, and filters out already booked slots. The results are
+	 * stored in {@code availableSlots}.
 	 */
 	public void loadAvailableSlots() {
 		LOGGER.info("method call :loadAvailableSlots");
@@ -138,22 +141,23 @@ public class DoctorAvailabilityController implements Serializable {
 
 	/**
 	 * Sets the doctor ID and an existing appointment ID (for rescheduling context),
-	 * then loads the doctor's details and their upcoming availability.
-	 * This method is typically used when navigating from an existing appointment to reschedule.
+	 * then loads the doctor's details and their upcoming availability. This method
+	 * is typically used when navigating from an existing appointment to reschedule.
 	 *
-	 * @param doctorId The ID of the doctor whose availability is to be viewed.
+	 * @param doctorId      The ID of the doctor whose availability is to be viewed.
 	 * @param appointmentId The ID of the appointment being rescheduled.
-	 * @return A navigation outcome string to the doctor availability list page, or {@code null} if validation fails.
+	 * @return A navigation outcome string to the doctor availability list page, or
+	 *         {@code null} if validation fails.
 	 */
-	public String chooseDoctor(String doctorId,String appointmentId) {
+	public String chooseDoctor(String doctorId, String appointmentId) {
 		LOGGER.info("method call :chooseDoctor");
 		this.doctorId = doctorId;
-		this.appointmentId=appointmentId;
-		System.out.println(doctorId+"        "+appointmentId);
+		this.appointmentId = appointmentId;
+		System.out.println(doctorId + "        " + appointmentId);
 		if (doctorId == null || doctorId.isEmpty()) {
 			LOGGER.warn("No doctor is selected ");
-			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
-					new FacesMessage(FacesMessage.SEVERITY_WARN, AppointmentConstantMessage.PLEASE_SELECT_DOCTOR, null));
+			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages", new FacesMessage(
+					FacesMessage.SEVERITY_WARN, AppointmentConstantMessage.PLEASE_SELECT_DOCTOR, null));
 			return null;
 		}
 		doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
@@ -162,11 +166,13 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Sets the doctor ID and then loads the doctor's details and their upcoming availability.
-	 * This method is typically used when selecting a doctor for a new appointment.
+	 * Sets the doctor ID and then loads the doctor's details and their upcoming
+	 * availability. This method is typically used when selecting a doctor for a new
+	 * appointment.
 	 *
 	 * @param doctorId The ID of the doctor whose availability is to be viewed.
-	 * @return A navigation outcome string to the doctor availability list page, or {@code null} if validation fails.
+	 * @return A navigation outcome string to the doctor availability list page, or
+	 *         {@code null} if validation fails.
 	 */
 	public String chooseDoctor(String doctorId) {
 		LOGGER.info("method call :chooseDoctor");
@@ -174,8 +180,8 @@ public class DoctorAvailabilityController implements Serializable {
 
 		if (doctorId == null || doctorId.isEmpty()) {
 			LOGGER.warn("No doctor is selected ");
-			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages",
-					new FacesMessage(FacesMessage.SEVERITY_WARN, AppointmentConstantMessage.PLEASE_SELECT_DOCTOR, null));
+			FacesContext.getCurrentInstance().addMessage("searchForm:searchFieldMessages", new FacesMessage(
+					FacesMessage.SEVERITY_WARN, AppointmentConstantMessage.PLEASE_SELECT_DOCTOR, null));
 			return null;
 		}
 		doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
@@ -184,9 +190,10 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Handles the selection of a date from the UI. It parses the {@code selectedDateInput}
-	 * and, if valid, sets it as {@code selectedDate} and triggers the loading of available slots
-	 * for that date. Displays an error message for invalid date formats.
+	 * Handles the selection of a date from the UI. It parses the
+	 * {@code selectedDateInput} and, if valid, sets it as {@code selectedDate} and
+	 * triggers the loading of available slots for that date. Displays an error
+	 * message for invalid date formats.
 	 */
 	public void handleDateSelection() {
 		LOGGER.info("method call :handleDateSelection");
@@ -197,17 +204,20 @@ public class DoctorAvailabilityController implements Serializable {
 			}
 		} catch (IllegalArgumentException e) {
 			LOGGER.warn("Invalid date format");
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.INVALID_DATE_FORMAT, null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					AppointmentConstantMessage.INVALID_DATE_FORMAT, null));
 		}
 	}
 
 	/**
-	 * Books a new appointment for the logged-in recipient based on the {@code selectedAvailabilityId}
-	 * and {@code selectedSlotNumber}. It validates the availability, creates an {@code Appointment} object,
-	 * persists it via the DAO, and sends a confirmation email. Resets form fields and navigates to a confirmation page on success.
+	 * Books a new appointment for the logged-in recipient based on the
+	 * {@code selectedAvailabilityId} and {@code selectedSlotNumber}. It validates
+	 * the availability, creates an {@code Appointment} object, persists it via the
+	 * DAO, and sends a confirmation email. Resets form fields and navigates to a
+	 * confirmation page on success.
 	 *
-	 * @return A navigation outcome string to the appointment confirmation page if successful, or {@code null} if an error occurs.
+	 * @return A navigation outcome string to the appointment confirmation page if
+	 *         successful, or {@code null} if an error occurs.
 	 */
 	public String bookAppointment() {
 		LOGGER.info("method call :bookAppointment");
@@ -218,8 +228,8 @@ public class DoctorAvailabilityController implements Serializable {
 
 			if (availability == null) {
 				LOGGER.warn("Time slot is no longer available");
-				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.TIME_SLOT_NO_LONGER_AVAILABLE, null));
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						AppointmentConstantMessage.TIME_SLOT_NO_LONGER_AVAILABLE, null));
 				this.selectedAvailabilityId = null;
 				this.selectedSlotNumber = 0;
 				return null;
@@ -231,8 +241,9 @@ public class DoctorAvailabilityController implements Serializable {
 			appointment.setSlotNo(selectedSlotNumber);
 
 			// Set current user as recipient (should come from session)
-			
-			Recipient recipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("loggedInRecipient");
+
+			Recipient recipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+					.get("loggedInRecipient");
 			appointment.setRecipient(recipient);
 
 			Provider provider = new Provider();
@@ -279,18 +290,20 @@ public class DoctorAvailabilityController implements Serializable {
 			}
 		} catch (Exception e) {
 			LOGGER.warn("Error at generic prefix at bookAppointment method ");
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.ERROR_GENERIC_PREFIX + e.getMessage(), null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					AppointmentConstantMessage.ERROR_GENERIC_PREFIX + e.getMessage(), null));
 		}
 		return null;
 	}
 
 	/**
-	 * Updates an existing appointment with a new time slot. It retrieves the existing appointment
-	 * using {@code appointmentId}, sets the new availability and slot number, and then persists
-	 * the changes via the DAO. Resets form fields and navigates to a confirmation page on success.
+	 * Updates an existing appointment with a new time slot. It retrieves the
+	 * existing appointment using {@code appointmentId}, sets the new availability
+	 * and slot number, and then persists the changes via the DAO. Resets form
+	 * fields and navigates to a confirmation page on success.
 	 *
-	 * @return A navigation outcome string to the appointment confirmation page if successful, or {@code null} if an error occurs.
+	 * @return A navigation outcome string to the appointment confirmation page if
+	 *         successful, or {@code null} if an error occurs.
 	 */
 	public String updateBookedAppointment() {
 		LOGGER.info("method call :updateBookedAppointment");
@@ -302,8 +315,8 @@ public class DoctorAvailabilityController implements Serializable {
 
 			if (availability == null) {
 				LOGGER.warn("Time slot is no longer available at updateBookedAppointment ");
-				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.TIME_SLOT_NO_LONGER_AVAILABLE, null));
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						AppointmentConstantMessage.TIME_SLOT_NO_LONGER_AVAILABLE, null));
 				this.selectedAvailabilityId = null;
 				this.selectedSlotNumber = 0;
 				return null;
@@ -313,16 +326,17 @@ public class DoctorAvailabilityController implements Serializable {
 			appointment.setAvailability(availability);
 			appointment.setDoctor(availability.getDoctor());
 			appointment.setSlotNo(selectedSlotNumber);
-			
+
 			// Set current user as recipient (should come from session)
-			
-			Recipient recipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("loggedInRecipient");
+
+			Recipient recipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
+					.get("loggedInRecipient");
 			appointment.setRecipient(recipient);
 
 			Provider provider = new Provider();
 			provider.setProviderId("PROV001"); // Assuming a fixed provider ID for now
 			appointment.setProvider(provider);
-			
+
 			System.out.println(appointment.getAppointmentId());
 			String result = appointmentDao.updateAppointment(appointment);
 			if (result.startsWith(AppointmentConstantMessage.APPOINTMENT_UPDATED_SUCCESS)) {
@@ -364,28 +378,32 @@ public class DoctorAvailabilityController implements Serializable {
 			}
 		} catch (Exception e) {
 			LOGGER.warn("Error at generic prefix in the updateBookedAppointment method ");
-			FacesContext.getCurrentInstance().addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, AppointmentConstantMessage.ERROR_GENERIC_PREFIX + e.getMessage(), null));
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					AppointmentConstantMessage.ERROR_GENERIC_PREFIX + e.getMessage(), null));
 		}
 		return null;
 	}
-	
+
 	/**
-	 * Prepares the controller for rescheduling an existing appointment by setting the doctor ID
-	 * and the appointment ID, then navigates to the update appointment page.
+	 * Prepares the controller for rescheduling an existing appointment by setting
+	 * the doctor ID and the appointment ID, then navigates to the update
+	 * appointment page.
 	 *
-	 * @param doctorId The ID of the doctor for the appointment to be rescheduled.
+	 * @param doctorId      The ID of the doctor for the appointment to be
+	 *                      rescheduled.
 	 * @param appointmentId The ID of the appointment to be rescheduled.
-	 * @return A navigation outcome string to the update appointment page with a faces-redirect.
+	 * @return A navigation outcome string to the update appointment page with a
+	 *         faces-redirect.
 	 */
-	public String rescheduleAppointment(String doctorId,String appointmentId) {
+	public String rescheduleAppointment(String doctorId, String appointmentId) {
 		LOGGER.info("method call :rescheduleAppointment");
-		chooseDoctor(doctorId,appointmentId);
+		chooseDoctor(doctorId, appointmentId);
 		return "/recipient/appointment/updateAppointment?faces-redirect=true";
 	}
 
 	/**
-	 * Returns a filtered list of available slots that fall within the morning time period (midnight to noon).
+	 * Returns a filtered list of available slots that fall within the morning time
+	 * period (midnight to noon).
 	 *
 	 * @return A {@code List} of {@code SlotDisplay} objects for morning slots.
 	 */
@@ -395,7 +413,8 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Returns a filtered list of available slots that fall within the afternoon time period (noon to 5 PM).
+	 * Returns a filtered list of available slots that fall within the afternoon
+	 * time period (noon to 5 PM).
 	 *
 	 * @return A {@code List} of {@code SlotDisplay} objects for afternoon slots.
 	 */
@@ -405,7 +424,8 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Returns a filtered list of available slots that fall within the evening time period (5 PM to midnight).
+	 * Returns a filtered list of available slots that fall within the evening time
+	 * period (5 PM to midnight).
 	 *
 	 * @return A {@code List} of {@code SlotDisplay} objects for evening slots.
 	 */
@@ -415,11 +435,13 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Helper method to filter the {@code availableSlots} list based on a specified time range.
+	 * Helper method to filter the {@code availableSlots} list based on a specified
+	 * time range.
 	 *
 	 * @param start The start {@code LocalTime} for filtering (inclusive).
-	 * @param end The end {@code LocalTime} for filtering (exclusive).
-	 * @return A {@code List} of {@code SlotDisplay} objects that fall within the given time range.
+	 * @param end   The end {@code LocalTime} for filtering (exclusive).
+	 * @return A {@code List} of {@code SlotDisplay} objects that fall within the
+	 *         given time range.
 	 */
 	private List<SlotDisplay> filterSlotsByTime(LocalTime start, LocalTime end) {
 		LOGGER.info("method filterSlotsByTime call ");
@@ -433,7 +455,8 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Formats a {@code java.sql.Date} object into a display-friendly string (e.g., "Mon 1, Jan").
+	 * Formats a {@code java.sql.Date} object into a display-friendly string (e.g.,
+	 * "Mon 1, Jan").
 	 *
 	 * @param date The {@code Date} to format.
 	 * @return A formatted date string.
@@ -498,7 +521,8 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Sets the input string for the selected date. This property is often bound to a text input field in the UI.
+	 * Sets the input string for the selected date. This property is often bound to
+	 * a text input field in the UI.
 	 *
 	 * @param selectedDateInput The date string to set.
 	 */
@@ -508,7 +532,8 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Gets the list of available {@code SlotDisplay} objects for the {@code selectedDate}.
+	 * Gets the list of available {@code SlotDisplay} objects for the
+	 * {@code selectedDate}.
 	 *
 	 * @return A {@code List} of {@code SlotDisplay}.
 	 */
@@ -548,7 +573,8 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Gets the ID of the selected doctor availability record, representing a specific date and time range of a doctor's availability.
+	 * Gets the ID of the selected doctor availability record, representing a
+	 * specific date and time range of a doctor's availability.
 	 *
 	 * @return The selected availability ID as a {@code String}.
 	 */
@@ -565,6 +591,11 @@ public class DoctorAvailabilityController implements Serializable {
 	public void setSelectedAvailabilityId(String selectedAvailabilityId) {
 		LOGGER.info("method setSelectedAvailabilityId call ");
 		this.selectedAvailabilityId = selectedAvailabilityId;
+	}
+
+	public void resetDate() {
+		this.selectedDate = null;
+		this.selectedDateInput=null;
 	}
 
 	/**
@@ -591,7 +622,8 @@ public class DoctorAvailabilityController implements Serializable {
 
 	/**
 	 * Inner class representing a summary of doctor availability for a specific day.
-	 * It includes the date, a formatted display date, and the total number of available slots for that day.
+	 * It includes the date, a formatted display date, and the total number of
+	 * available slots for that day.
 	 */// Inner classes
 	public static class DayAvailabilitySummary {
 		private final Date date;
@@ -653,7 +685,8 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Gets the {@code Doctors} object currently associated with this controller (the selected doctor).
+	 * Gets the {@code Doctors} object currently associated with this controller
+	 * (the selected doctor).
 	 *
 	 * @return The {@code Doctors} object.
 	 */
@@ -671,8 +704,9 @@ public class DoctorAvailabilityController implements Serializable {
 	}
 
 	/**
-	 * Gets a list of strings representing the overall availability timings for the selected date.
-	 * This typically includes the broader time blocks a doctor is available (e.g., "09:00 - 13:00").
+	 * Gets a list of strings representing the overall availability timings for the
+	 * selected date. This typically includes the broader time blocks a doctor is
+	 * available (e.g., "09:00 - 13:00").
 	 *
 	 * @return A {@code List} of {@code String} representing availability timings.
 	 */
@@ -685,7 +719,7 @@ public class DoctorAvailabilityController implements Serializable {
 	 *
 	 * @param availabilityTiming The {@code List} of {@code String} to set.
 	 */
-	public  void setAvailabilityTiming(List<String> availabilityTiming) {
+	public void setAvailabilityTiming(List<String> availabilityTiming) {
 		this.availabilityTiming = availabilityTiming;
 	}
 

@@ -586,3 +586,7 @@
         opacity: 0;
     }
 }
+
+.sort-icons img {
+	vertical-align: middle;
+}

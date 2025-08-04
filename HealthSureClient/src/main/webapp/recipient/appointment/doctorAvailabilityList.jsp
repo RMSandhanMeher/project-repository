@@ -68,7 +68,15 @@
 							styleClass="flatpickr-input date-input-field" />
 						<h:commandButton id="datePickerSubmit" value="Go"
 							styleClass="go-button"
+							style="display:none;"
 							action="#{doctorAvailabilityController.handleDateSelection}" />
+							<h:commandLink
+							action="#{doctorAvailabilityController.resetDate}"
+							rendered="#{true}" styleClass="sort-icons">
+							<h:graphicImage value="/resources/media/images/icons/reset.png"
+								style="height: 25px;position: absolute;top: 230px;left: 280px;"
+								title="reset button" />
+						</h:commandLink>
 						<div class="message-container date-picker-message">
 							<h:messages globalOnly="true" styleClass="message-full-width"
 								infoClass="info-message-style" errorClass="error-message-style" />
