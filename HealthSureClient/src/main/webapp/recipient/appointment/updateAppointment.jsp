@@ -19,8 +19,9 @@ this page will come after when need to reschedule the appointment
 	href="${pageContext.request.contextPath}/resources/css/appointment/doctorAvailability.css">
 <link rel="stylesheet"
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/appointment/datePicker.css">
+
+
 </head>
 <body class="body-bg-color min-h-screen-full p-4-spacing">
 
@@ -248,7 +249,9 @@ this page will come after when need to reschedule the appointment
 		</h:form>
 	</div>
 
-	<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+	<script
+		src="${pageContext.request.contextPath}/resources/js/appointment/datePicker.js"></script>
+
 	<script>
         document.addEventListener('DOMContentLoaded', function() {
             // Initialize date picker

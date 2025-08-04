@@ -25,6 +25,7 @@ appointment with a necessary informantion about the doctor
 <!-- Your custom CSS -->
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/appointment/recipientAppointment.css" />
+	
 
 <style>
 :root {
