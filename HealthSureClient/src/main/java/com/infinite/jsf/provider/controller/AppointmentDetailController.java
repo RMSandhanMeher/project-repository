@@ -32,7 +32,7 @@ public class AppointmentDetailController implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String selectedAppointmentIdForDetail; // New property to hold the ID
 	private AppointmentDetails appointmentDetailsForDisplay;
-	private AppointmentDao appointmentDao = new AppointmentDaoImpl();
+	private AppointmentDao appointmentDao = AppointmentDaoImpl.getInstance();
 	private static final Logger LOGGER = Logger.getLogger(AppointmentDetailController.class.getName());
 
 	/**

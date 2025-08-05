@@ -41,6 +41,13 @@ import com.infinite.jsf.util.SessionHelper;
 import org.apache.log4j.Logger;
 
 public class AppointmentDaoImpl implements AppointmentDao {
+	private static AppointmentDaoImpl instance;
+	public static synchronized AppointmentDaoImpl getInstance() {
+		if(instance==null) {
+			instance=new AppointmentDaoImpl();
+		}
+		return instance;
+	}
 	private static final Logger LOGGER = Logger.getLogger(AppointmentDaoImpl.class.getName());
 
 	/**

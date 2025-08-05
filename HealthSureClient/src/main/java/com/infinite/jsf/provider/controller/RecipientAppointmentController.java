@@ -47,7 +47,7 @@ public class RecipientAppointmentController implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(RecipientAppointmentController.class.getName());
 
-	private final AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
+	private final AppointmentDaoImpl appointmentDao = AppointmentDaoImpl.getInstance();
 
 	private String hId;
 	private Recipient recipient;

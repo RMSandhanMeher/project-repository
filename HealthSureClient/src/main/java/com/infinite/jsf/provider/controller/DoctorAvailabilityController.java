@@ -46,7 +46,7 @@ public class DoctorAvailabilityController implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private final DoctorAvailabilityDaoImpl availabilityDao = new DoctorAvailabilityDaoImpl();
-	private final AppointmentDaoImpl appointmentDao = new AppointmentDaoImpl();
+	private final AppointmentDaoImpl appointmentDao = AppointmentDaoImpl.getInstance();
 	private static final Logger LOGGER = Logger.getLogger(DoctorAvailabilityController.class.getName());
 
 	private String doctorId;
@@ -265,7 +265,7 @@ public class DoctorAvailabilityController implements Serializable {
 				Doctors doctor = new DoctorDaoImpl().searchADoctorById(doctorId);
 				ServletContext servletContext = (ServletContext) FacesContext.getCurrentInstance().getExternalContext()
 						.getContext();
-				Appointment ap = new AppointmentDaoImpl()
+				Appointment ap = AppointmentDaoImpl.getInstance()
 						.getAppointmentById(result.split(" ")[result.split(" ").length - 1]);
 				String subject = "Appointment Request Received – Awaiting Confirmation";
 				AppointmentSlip apSli = new AppointmentSlip(res.getFirstName() + " " + res.getLastName(),
@@ -322,7 +322,7 @@ public class DoctorAvailabilityController implements Serializable {
 				return null;
 			}
 
-			Appointment appointment = new AppointmentDaoImpl().getAppointmentById(appointmentId);
+			Appointment appointment = AppointmentDaoImpl.getInstance().getAppointmentById(appointmentId);
 			appointment.setAvailability(availability);
 			appointment.setDoctor(availability.getDoctor());
 			appointment.setSlotNo(selectedSlotNumber);
