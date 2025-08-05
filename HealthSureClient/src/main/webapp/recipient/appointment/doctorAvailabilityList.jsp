@@ -148,6 +148,19 @@
 							another date or check back later.</p>
 					</div>
 				</h:panelGroup>
+				
+				<h:panelGroup
+					rendered="#{empty doctorAvailabilityController.morningSlots}">
+					<div class="empty-state p-6-spacing text-center mb-6-spacing">
+						<i
+							class="fas fa-calendar-times empty-state-icon transform-transition"></i>
+						<h3 class="empty-state-title">No Available Slots</h3>
+						<p class="empty-state-text">There are no available time slots
+							for the selected date.</p>
+						<p class="empty-state-text-small mt-2-spacing">Please try
+							another date or check back later.</p>
+					</div>
+				</h:panelGroup>
 				<%-- Show all the morning and available slots  --%>
 				<h:panelGroup
 					rendered="#{not empty doctorAvailabilityController.morningSlots}">
