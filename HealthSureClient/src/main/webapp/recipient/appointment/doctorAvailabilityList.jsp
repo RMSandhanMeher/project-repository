@@ -15,7 +15,7 @@
 	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/appointment/datePicker.css">
-	
+
 
 </head>
 <body class="body-bg-color min-h-screen-full p-4-spacing">
@@ -45,11 +45,16 @@
 			<h1 class="header-title transform-hover">
 				<i class="fas fa-calendar-alt mr-2-spacing"></i> Book Appointment
 			</h1>
-			<div class="doctor-info-text-right">
+			<div class="doctor-info-text-right"
+				style="margin-right: 20px; margin-bottom: 20px;">
 				<%-- show selected doctor name and specialization  --%>
-				<span class="doctor-name-text"> <h:outputText
+				<span class="doctor-name-text"
+					style="background-color: antiquewhite; padding-left: 10px; border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem;">
+					<h:outputText
 						value="#{doctorAvailabilityController.doctor.doctorName}" />
-				</span> <span class="doctor-specialization-text"> <h:outputText
+				</span> <span class="doctor-specialization-text"
+					style="background-color: antiquewhite; padding: 4px 10px 1px; border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem;">
+					<h:outputText
 						value="#{doctorAvailabilityController.doctor.specialization}" />
 				</span>
 			</div>
@@ -67,14 +72,12 @@
 							value="#{doctorAvailabilityController.selectedDateInput}"
 							styleClass="flatpickr-input date-input-field" />
 						<h:commandButton id="datePickerSubmit" value="Go"
-							styleClass="go-button"
-							style="display:none;"
+							styleClass="go-button" style="display:none;"
 							action="#{doctorAvailabilityController.handleDateSelection}" />
-							<h:commandLink
-							action="#{doctorAvailabilityController.resetDate}"
+						<h:commandLink action="#{doctorAvailabilityController.resetDate}"
 							rendered="#{true}" styleClass="sort-icons">
 							<h:graphicImage value="/resources/media/images/icons/reset.png"
-								style="height: 25px;position: absolute;top: 230px;left: 280px;"
+								style="height: 25px;position: absolute;top: 250px;left: 280px;"
 								title="reset button" />
 						</h:commandLink>
 						<div class="message-container date-picker-message">
@@ -105,7 +108,8 @@
 						value="#{doctorAvailabilityController.groupedAvailabilityList}"
 						var="day" styleClass="date-display-table">
 						<h:column>
-							<div class="date-card-style ripple">
+							<div class="date-card-style ripple"
+								style="background-color: #f6f6f6;">
 								<h:commandButton value="#{day.displayDate}"
 									action="#{doctorAvailabilityController.loadAvailableSlots}"
 									styleClass="date-card-button">
@@ -148,7 +152,7 @@
 							another date or check back later.</p>
 					</div>
 				</h:panelGroup>
-				
+
 				<h:panelGroup
 					rendered="#{empty doctorAvailabilityController.morningSlots}">
 					<div class="empty-state p-6-spacing text-center mb-6-spacing">
