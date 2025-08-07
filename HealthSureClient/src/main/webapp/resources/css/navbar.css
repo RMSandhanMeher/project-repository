@@ -130,16 +130,28 @@
 }
 
 .view-profile-btn {
-    padding: 0.5rem 1.5rem;
+    padding: 0.5rem 0.5rem;
     font-size: 1rem;
     font-weight: 600;
     text-decoration: none;
     color: white;
-    border-radius: 9999px;
+    border-radius: 100%;
     background: linear-gradient(to right, #3b82f6, #06b6d4);
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-    transition: all 0.3s ease;
+    transition: all 1s ease;
+    animation: bounce 2s infinite;
+
 }
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(-10%);
+    animationTimingFunction: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(0);
+    animationTimingFunction: cubic-bezier(0, 0, 0.2, 1);
+  }
+} 
 
 .view-profile-btn:hover {
     background: linear-gradient(to right, #2563eb, #0891b2);
