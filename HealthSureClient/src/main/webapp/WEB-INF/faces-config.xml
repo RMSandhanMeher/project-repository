@@ -58,12 +58,6 @@
 
 	<!-- ✅ DAO BEANS -->
 	<managed-bean>
-		<managed-bean-name>insuranceDaoImpl</managed-bean-name>
-		<managed-bean-class>com.infinite.jsf.recipient.daoImpl.InsuranceDaoImpl</managed-bean-class>
-		<managed-bean-scope>session</managed-bean-scope>
-	</managed-bean>
-
-	<managed-bean>
 		<managed-bean-name>loginDao</managed-bean-name>
 		<managed-bean-class>com.infinite.jsf.recipient.daoImpl.LoginDaoImpl</managed-bean-class>
 		<managed-bean-scope>session</managed-bean-scope>
@@ -81,11 +75,6 @@
 			<value>#{medicalProcedure}</value>
 		</managed-property>
 
-		<managed-property>
-			<property-name>insuranceDaoImpl</property-name>
-			<property-class>com.infinite.jsf.recipient.daoImpl.InsuranceDaoImpl</property-class>
-			<value>#{insuranceDaoImpl}</value>
-		</managed-property>
 
 		<managed-property>
 			<property-name>recipient</property-name>
@@ -148,5 +137,6 @@
 	<managed-bean-class>com.infinite.jsf.recipient.filter.RecipientNavigationHelper</managed-bean-class>
 	<managed-bean-scope>session</managed-bean-scope>
   </managed-bean>
+	
 	
 </faces-config>
