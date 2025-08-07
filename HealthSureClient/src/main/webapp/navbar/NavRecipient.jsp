@@ -1,5 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
+<link rel="stylesheet" href="/HealthSureClient/resources/css/navbar.css" />
+
 <link rel="stylesheet" href="/HealthSureClient/resources/css/navProvider.css" />
 
 <nav id="navbar" class="navbar navbar-scrolled"> <!-- Removed navbar-transparent -->
@@ -23,13 +25,9 @@
 			<li><a href="#" class="nav-link">Reports</a></li>
         </ul>
 
-        <!-- LOGOUT BUTTON -->
-        <div class="auth-buttons">
-			<h:form>
-				<h:commandButton value="Logout" action="#{showincController.logout}"
-					styleClass="logout-btn" />
-			</h:form>
-
-		</div>
+         <div class="profile-section">
+		    <h:graphicImage library="media" name="images/defaultProfile.jpg" alt="Profile Avatar" styleClass="profile-avatar" />
+		    <a href="${pageContext.request.contextPath}/recipient/Profile.jsf" class="view-profile-btn">View Profile</a>
+    	</div>
     </div>
 </nav>

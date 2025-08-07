@@ -14,10 +14,7 @@
 		<many-to-one name="insuranceCompany"
 			class="com.infinite.jsf.insurance.model.InsuranceCompany"
 			column="company_id" not-null="true" lazy="false" fetch="join" />
-
-
 		<property name="planName" column="plan_name" type="string" />
-
 		<!-- Map enum via helper method -->
 		<property name="planTypeString" column="plan_type"
 			type="string" />
@@ -36,6 +33,5 @@
 		<property name="activeOn" column="active_on" type="date" />
 		<property name="periodicDiseases" column="periodic_diseases"
 			type="string" />
-
 	</class>
 </hibernate-mapping>

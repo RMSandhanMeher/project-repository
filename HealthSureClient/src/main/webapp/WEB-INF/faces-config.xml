@@ -143,4 +143,10 @@
 		</navigation-case>
 	</navigation-rule>
 	
+  <managed-bean>
+	<managed-bean-name>recipientNavigationHelper</managed-bean-name>
+	<managed-bean-class>com.infinite.jsf.recipient.filter.RecipientNavigationHelper</managed-bean-class>
+	<managed-bean-scope>session</managed-bean-scope>
+  </managed-bean>
+	
 </faces-config>

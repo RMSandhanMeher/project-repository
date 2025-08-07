@@ -254,7 +254,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('memberId', 'asc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/up-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-ascending"/>
 							</h:commandLink>
 
 							<h:commandLink
@@ -262,7 +262,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('memberId', 'desc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/down-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-descending"/>
 							</h:commandLink>
 						</h:panelGroup>
 					</h:panelGroup>
@@ -281,7 +281,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('fullName', 'asc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/up-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-ascending"/>
 							</h:commandLink>
 
 							<h:commandLink
@@ -289,7 +289,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('fullName', 'desc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/down-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-descending"/>
 							</h:commandLink>
 						</h:panelGroup>
 					</h:panelGroup>
@@ -307,14 +307,14 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('age', 'asc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/up-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-ascending"/>
 							</h:commandLink>
 
 							<h:commandLink action="#{showincController.sortByDescMem('age')}"
 								rendered="#{showincController.renderSortButtonMem('age', 'desc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/down-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-descending"/>
 							</h:commandLink>
 						</h:panelGroup>
 					</h:panelGroup>
@@ -333,7 +333,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('gender', 'asc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/up-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-ascending"/>
 							</h:commandLink>
 
 							<h:commandLink
@@ -341,7 +341,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('gender', 'desc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/down-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-descending"/>
 							</h:commandLink>
 						</h:panelGroup>
 					</h:panelGroup>
@@ -360,7 +360,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('relationWithProposer', 'asc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/up-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-ascending"/>
 							</h:commandLink>
 
 							<h:commandLink
@@ -368,7 +368,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('relationWithProposer', 'desc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/down-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-descending"/>
 							</h:commandLink>
 						</h:panelGroup>
 					</h:panelGroup>
@@ -387,7 +387,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('aadharNo', 'asc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/up-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-ascending"/>
 							</h:commandLink>
 
 							<h:commandLink
@@ -395,7 +395,7 @@ h2 {
 								rendered="#{showincController.renderSortButtonMem('aadharNo', 'desc')}"
 								styleClass="sort-icons">
 								<h:graphicImage value="/resources/media/images/down-arrow.png"
-									width="10" height="10" />
+									width="10" height="10" title="sort-descending"/>
 							</h:commandLink>
 						</h:panelGroup>
 					</h:panelGroup>
@@ -426,7 +426,7 @@ h2 {
 					styleClass="btn" />
 
 				<h:outputText styleClass="pagination-label"
-					value="Page #{showincController.memberPage} of #{showincController.totalMemberPages}" />
+					value="Page #{showincController.currentMemberPage} of #{showincController.totalMemberPages}" />
 
 				<h:commandButton value="Next »"
 					action="#{showincController.nextMemberPage}"

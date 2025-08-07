@@ -6,6 +6,10 @@
 	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	id="WebApp_ID" version="2.5">
 
+	<session-config>
+		<session-timeout>60</session-timeout> <!-- Timeout in minutes -->
+	</session-config>
+	
 	<!-- BEGIN new for JSF -->
 	<context-param>
 		<param-name>javax.faces.STATE_SAVING_METHOD</param-name>
@@ -34,7 +38,7 @@
 		<param-name>contact</param-name>
 		<param-value>+91 87432 98324</param-value>
 	</context-param>
-	
+
 	<filter>
 		<filter-name>RecipientFilter</filter-name>
 		<filter-class>com.infinite.jsf.recipient.filter.RecipientFilter</filter-class>

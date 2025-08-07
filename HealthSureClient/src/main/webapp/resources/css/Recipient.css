@@ -1,0 +1,132 @@
+/* General Layout */
+body {
+    background-color: #f3f4f6;
+    padding-top: 5rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 10%;
+    padding: 1rem;
+}
+
+/* Section Headers */
+.section-header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #1e3a8a;
+    margin-bottom: 0.5rem;
+}
+
+.dashboard-grid {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 3rem;
+}
+
+/* Info Box */
+.info-box {
+    background-color: #ffffff;
+    min-width: 200px;
+    padding: 1.25rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    text-align: center;
+    transition: box-shadow 0.3s ease;
+}
+
+.info-box:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.info-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 0.5rem;
+}
+
+.info-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1f2937;
+}
+
+.info-subtext {
+    font-size: 0.75rem;
+    color: #6b7280;
+    margin-top: 0.25rem;
+}
+
+/* Highlight Box */
+.highlight-box {
+    background-color: #ecfdf5;
+    border-left: 4px solid #34d399;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    font-style: italic;
+    color: #065f46;
+}
+
+/* Quick Access */
+.quick-access {
+    text-align: center;
+    margin-bottom: 5rem;
+}
+
+.quick-access-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 1rem;
+}
+
+.quick-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+    .quick-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Button Styles */
+.action-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border: none;
+    border-radius: 0.75rem;
+    font-weight: 600;
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.btn-blue {
+    background: linear-gradient(to right, #3b82f6, #1e40af);
+}
+
+.btn-purple {
+    background: linear-gradient(to right, #8b5cf6, #6b21a8);
+}
+
+.btn-teal {
+    background: linear-gradient(to right, #14b8a6, #0f766e);
+}
+
+.btn-pink {
+    background: linear-gradient(to right, #ec4899, #be185d);
+}

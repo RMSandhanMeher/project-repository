@@ -2,8 +2,8 @@
 
 package com.infinite.jsf.recipient.controller;
 
-import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections; // Import Collections for emptyList
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -12,9 +12,11 @@ import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.infinite.jsf.provider.model.Doctors;
+import com.infinite.jsf.recipient.customException.ProviderSearchException;
 import com.infinite.jsf.recipient.dao.SearchDoctorDao;
 import com.infinite.jsf.recipient.daoImpl.SearchDoctorDaoImpl;
 
@@ -22,18 +24,17 @@ import com.infinite.jsf.recipient.daoImpl.SearchDoctorDaoImpl;
  * Controller for searching doctors by name, specialization, or address.
  * Supports filtering, validation, pagination, and sorting.
  */
-public class RecipientSearchDoctorController implements Serializable {
+public class RecipientSearchDoctorController {
 
-	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = Logger.getLogger(RecipientSearchDoctorController.class.getName());
+	private static final Logger LOGGER=LogManager.getLogger(RecipientSearchDoctorController.class);
 
 	private String searchBy = "doctorName";
 	private String searchValue;
 	private String selectedSpecialization;
-	private String searchMode = "exact";
+	private String searchMode = "exact"; // Initialized to exact match
 
-	private List<SelectItem> searchOptions;
-	private List<SelectItem> specializationOptions;
+	private List<SelectItem> searchOptions; // Holds the option like Doctor Name, Specialization & Address
+	private List<SelectItem> specializationOptions; //Specialization stored in list fetched from the DB 
 
 	private List<Doctors> searchResults = new ArrayList<>();
 
@@ -46,9 +47,10 @@ public class RecipientSearchDoctorController implements Serializable {
 	private boolean searchPerformed = false;
 	private boolean initialized = false;
 
-	private String currentSortColumn = "doctorName";
-	private String currentSortOrder = "asc";
+	private String currentSortColumn;
+	private String currentSortDirection;
 
+	// To simplify dependency management and directly instantiate the DAO.
 	private SearchDoctorDao doctorDAO = new SearchDoctorDaoImpl();
 
 	/**
@@ -56,59 +58,110 @@ public class RecipientSearchDoctorController implements Serializable {
 	 */
 	public RecipientSearchDoctorController() {
 		if (!initialized) {
-			getSearchOptions();
+			getSearchOptions(); 
 		}
 	}
+	
+	public static FacesContext context;
+	
+	
 
 	/**
 	 * Gets the list of search options (doctor name, address, specialization).
 	 */
 	public List<SelectItem> getSearchOptions() {
-		try {
-			if (searchOptions == null) {
-				searchOptions = new ArrayList<>();
-				searchOptions.add(new SelectItem("doctorName", "Doctor Name"));
-				searchOptions.add(new SelectItem("specialization", "Specialization"));
-				searchOptions.add(new SelectItem("address", "Address"));
+		if (searchOptions == null) {
+			searchOptions = new ArrayList<>();
+			searchOptions.add(new SelectItem("doctorName", "Doctor Name"));
+			searchOptions.add(new SelectItem("specialization", "Specialization"));
+			searchOptions.add(new SelectItem("address", "Address"));
 
+			try {
 				loadSpecializationOptions();
-				initialized = true;
+			} 
+			catch (ProviderSearchException e) {
+				LOGGER.error("possible Error while connecting to fetch all the distinct specialization from Databse");
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"An unexpected error occured while retrieving the specializations",e.getMessage()));
+
+			} catch (Exception e) {
+				LOGGER.error("Error fetching all the distinct specialization");
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"An unexpected error occured while retrieving the specializations",e.getMessage()));
 			}
-		} catch (Exception e) {
-			LOGGER.warn("getSearchOptions: Exception occurred - " + e.getMessage());
+			initialized = true;
 		}
 		return searchOptions;
 	}
 
+//	/**
+//	 * Resets UI fields when search type is changed.
+//	 */
+//	public void searchByChanged() {
+//		LOGGER.info("searchByChanged: changed to " + this.searchBy);
+//	}
+	
+	
 	/**
-	 * Resets UI fields when search type is changed.
+	 * Used for handling exposure of fetched specialization from loadSpecializationOptions()
 	 */
-	public void searchByChanged() {
+	public List<SelectItem> getSpecializationOptions() {
+		if (specializationOptions == null || specializationOptions.isEmpty()) {
+			loadSpecializationOptions();
+		}
+		return specializationOptions;
+	}
+
+	/**
+	 * Loads dynamic specialization options into the dropdown and populate all spec. available in the DB
+	 */
+	private void loadSpecializationOptions() {
+		specializationOptions = new ArrayList<>();
+		specializationOptions.add(new SelectItem("", "• Select Specialization •"));
 		try {
-			LOGGER.info("searchByChanged: changed to " + this.searchBy);
-
-			if ("doctorName".equals(searchBy) || "address".equals(searchBy)) {
-				this.searchMode = null;
+			List<String> specializations = doctorDAO.fetchAllSpecialization(); 
+			if (specializations != null && !specializations.isEmpty()) {
+				specializations.sort(String.CASE_INSENSITIVE_ORDER);
+				for (String spec : specializations) {
+					if (spec != null && !spec.trim().isEmpty()) {
+						specializationOptions.add(new SelectItem(spec, spec));
+					}
+				}
 			}
-
-			searchValue = null;
-			selectedSpecialization = "";
-			searchResults = new ArrayList<>();
-			searchPerformed = false;
-			currentPage = 0;
-		} catch (Exception e) {
-			LOGGER.warn("searchByChanged: Exception occurred - " + e.getMessage());
+		} 
+		catch (ProviderSearchException e) {
+			LOGGER.error("loadSpecializationOptions: Database error fetching specializations - " + e.getMessage(), e);
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"Error loading specializations due to a database issue. Please try again.", null));
+			specializationOptions = new ArrayList<>(); 
+			specializationOptions.add(new SelectItem("", "• Error Loading •"));
+		} catch (Exception e) { 
+			LOGGER.error("loadSpecializationOptions: Unexpected error fetching specializations - " + e.getMessage(), e);
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"An unexpected error occurred loading specializations. Please try again.", null));
+			specializationOptions = new ArrayList<>(); 
+			specializationOptions.add(new SelectItem("", "• Error Loading •")); 
 		}
 	}
 
+	
+	
+	
+	
+	
+	
 	/**
 	 * Executes the doctor search based on form parameters.
 	 */
 	public void executeSearch() {
+		this.currentSortDirection=null;
+		this.currentSortColumn = null;
+		this.ascending = true;
 		FacesContext context = FacesContext.getCurrentInstance();
 		searchPerformed = true;
 
 		try {
+//			JSF assigns the chosen value to selectedSpecialization.
 			String currentSearchValue = "specialization".equals(searchBy) ? selectedSpecialization : searchValue;
 
 			if (currentSearchValue == null || currentSearchValue.trim().isEmpty()) {
@@ -130,19 +183,35 @@ public class RecipientSearchDoctorController implements Serializable {
 						"Doctor Name can only contain letters, spaces, and dot (e.g., Dr.).", null));
 				searchResults = new ArrayList<>();
 				return;
-			} else if ("address".equals(searchBy) && !Pattern.matches("^[a-zA-Z0-9.,\\s#/\\-]+$", currentSearchValue)) {
+			}
+			
+			else if ("address".equals(searchBy) && !Pattern.matches("^[a-zA-Z0-9.,\\s#/\\-]+$", currentSearchValue)) {
 				context.addMessage("searchForm:searchValueInput", new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						"Address can only contain letters, numbers, commas, #, /, and -.", null));
+						"Address can only contain letters, numbers, commas", null));
 				searchResults = new ArrayList<>();
 				return;
 			}
+			
+			else if ("doctorName".equals(searchBy) || "address".equals(searchBy)) {
+				if(currentSearchValue.length()<2) {
+					
+					context.addMessage("searchForm:searchValueInput", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"A minimum of 2 character needed for the search",null));
+					searchResults = new ArrayList<>();
+					return;
+				}
+			}
+		
 
 			LOGGER.info(
 					"executeSearch: Searching by " + searchBy + " Value=" + currentSearchValue + " Mode=" + searchMode);
 
+
+
+			
 			// Dispatch to DAO
 			switch (searchBy) {
-			
+
 			case "doctorName":
 				if ("startsWith".equals(searchMode)) {
 					searchResults = doctorDAO.findDoctorsByNameStartsWith(currentSearchValue);
@@ -152,7 +221,7 @@ public class RecipientSearchDoctorController implements Serializable {
 					searchResults = doctorDAO.searchDoctors(searchBy, currentSearchValue);
 				}
 				break;
-				
+
 			case "address":
 				if ("startsWith".equals(searchMode)) {
 					searchResults = doctorDAO.findDoctorsByAddressStartsWith(currentSearchValue);
@@ -162,9 +231,9 @@ public class RecipientSearchDoctorController implements Serializable {
 					searchResults = doctorDAO.searchDoctors(searchBy, currentSearchValue);
 				}
 				break;
-				
+
 			case "specialization":
-				
+
 			default:
 				searchResults = doctorDAO.searchDoctors(searchBy, currentSearchValue);
 				break;
@@ -176,6 +245,11 @@ public class RecipientSearchDoctorController implements Serializable {
 				if ("doctorName".equals(searchBy) && (searchMode == null || "exact".equals(searchMode))) {
 					context.addMessage("searchForm:searchValueInput", new FacesMessage(FacesMessage.SEVERITY_ERROR,
 							"No doctor found with that exact name. Please enter the full and correct name.", null));
+				}
+
+				if ("address".equals(searchBy) && (searchMode == null) || "exact".equals(searchMode)) {
+					context.addMessage("searchForm:searchValueInput", new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							"No address found with the exact name. Please enter full and correct name", null));
 				} else {
 					context.addMessage("searchForm:searchValueInput", new FacesMessage(FacesMessage.SEVERITY_WARN,
 							"No doctors found matching your search criteria.", null));
@@ -184,236 +258,173 @@ public class RecipientSearchDoctorController implements Serializable {
 			}
 
 			sortResults();
+
 			currentPage = 0;
 
-		} catch (Exception e) {
+		}
+
+		catch (ProviderSearchException e) {
+			LOGGER.error("executeSearch: Database error during search: " + e.getMessage(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+					"A database error occurred during search. Please try again later.", null));
+			searchResults = Collections.emptyList();
+		}
+
+		catch (Exception e) {
 			LOGGER.warn("executeSearch: Unexpected error - " + e.getMessage());
 			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
 					"An unexpected error occurred during search. Please try again.", null));
 			searchResults = new ArrayList<>();
 		}
 	}
-
-	/**
-	 * Paginates the current list of search results.
-	 * 
-	 * @return Paginated list
-	 */
+			
+			
+			
+			
+			
+			
+			
+			
 	public List<Doctors> getPaginatedDoctors() {
-		try {
-			if (searchResults == null || searchResults.isEmpty())
-				return new ArrayList<>();
-
-			int fromIndex = currentPage * pageSize;
-			int toIndex = Math.min(fromIndex + pageSize, searchResults.size());
-
-			if (fromIndex >= searchResults.size()) {
-				currentPage = 0;
-				fromIndex = 0;
-				toIndex = Math.min(pageSize, searchResults.size());
-			}
-
-			return searchResults.subList(fromIndex, toIndex);
-		} catch (Exception e) {
-			LOGGER.warn("getPaginatedDoctors: Exception - " + e.getMessage());
+		if (searchResults == null || searchResults.isEmpty())
 			return new ArrayList<>();
+
+		int fromIndex = currentPage * pageSize;
+		int toIndex = Math.min(fromIndex + pageSize, searchResults.size());
+
+		if (fromIndex >= searchResults.size()) {
+			currentPage = 0;
+			fromIndex = 0;
+			toIndex = Math.min(pageSize, searchResults.size());
 		}
+
+		return searchResults.subList(fromIndex, toIndex);
 	}
 
-	/** Move to next result page */
 	public void nextPage() {
-		if ((currentPage + 1) * pageSize < searchResults.size()) {
+		if (searchResults != null && (currentPage + 1) * pageSize < searchResults.size()) {
 			currentPage++;
 		}
 	}
 
-	/** Move to previous result page */
 	public void prevPage() {
 		if (currentPage > 0) {
 			currentPage--;
 		}
 	}
 
-	/**
-	 * Sort doctor result list ascending by field.
-	 */
 	public void sortByAsc(String field) {
 		this.sortField = field;
 		this.ascending = true;
 		this.currentSortColumn = field;
-		this.currentSortOrder = "asc";
+		this.currentSortDirection = "asc";
 		sortResults();
 		currentPage = 0;
 	}
 
-	/**
-	 * Sort doctor result list descending by field.
-	 */
 	public void sortByDesc(String field) {
 		this.sortField = field;
 		this.ascending = false;
 		this.currentSortColumn = field;
-		this.currentSortOrder = "desc";
+		this.currentSortDirection = "desc";
 		sortResults();
 		currentPage = 0;
 	}
-
-	/**
-	 * Applies actual comparator-based sorting logic using field.
-	 */
+	
 	private void sortResults() {
-		try {
-			if (searchResults == null || searchResults.isEmpty())
-				return;
+		if (searchResults == null || searchResults.isEmpty())
+			return;
 
-			Comparator<Doctors> comparator;
-			switch (sortField) {
-			case "specialization":
-				comparator = Comparator.comparing(Doctors::getSpecialization,
-						Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
-				break;
-			case "address":
-				comparator = Comparator.comparing(Doctors::getAddress,
-						Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
-				break;
-			case "email":
-				comparator = Comparator.comparing(Doctors::getEmail,
-						Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
-				break;
-			case "status":
-				comparator = Comparator.comparing(d -> d.getStatus() != null ? d.getStatus().toString() : "",
-						String.CASE_INSENSITIVE_ORDER);
-				break;
-			case "type":
-				comparator = Comparator.comparing(d -> d.getType() != null ? d.getType().toString() : "",
-						String.CASE_INSENSITIVE_ORDER);
-				break;
-			default:
-				comparator = Comparator.comparing(Doctors::getDoctorName,
-						Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
-			}
-
-			if (!ascending) {
-				comparator = comparator.reversed();
-			}
-
-			searchResults.sort(comparator);
-
-		} catch (Exception e) {
-			LOGGER.warn("sortResults: Sorting exception - " + e.getMessage());
+		Comparator<Doctors> comparator;
+		switch (sortField) {
+		case "specialization":
+			comparator = Comparator.comparing(Doctors::getSpecialization,
+					Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+			break;
+		case "address":
+			comparator = Comparator.comparing(Doctors::getAddress, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+			break;
+		case "email":
+			comparator = Comparator.comparing(Doctors::getEmail, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
+			break;
+		case "status":
+			comparator = Comparator.comparing(d -> d.getStatus() != null ? d.getStatus().toString() : "",
+					String.CASE_INSENSITIVE_ORDER);
+			break;
+		case "type":
+			comparator = Comparator.comparing(d -> d.getType() != null ? d.getType().toString() : "",
+					String.CASE_INSENSITIVE_ORDER);
+			break;
+		default:
+			comparator = Comparator.comparing(Doctors::getDoctorName,
+					Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER));
 		}
+
+		if (!ascending) {
+			comparator = comparator.reversed();
+		}
+
+		searchResults.sort(comparator);
 	}
-
-	/** Returns a user-friendly pagination summary */
+	
 	public String getPaginationDocSummary() {
-		try {
-			if (searchResults == null || searchResults.isEmpty())
-				return "";
-		} catch (Exception e) {
-			LOGGER.warn("getPaginationDocSummary: Exception - " + e.getMessage());
+		if (searchResults == null || searchResults.isEmpty())
 			return "";
-		}
 
 		int from = Math.min((currentPage + 1) * pageSize, searchResults.size());
 		int total = searchResults.size();
 		return "Showing " + from + " of " + total + " Results";
 	}
-
-	/**
-	 * Determines whether to show a specific sort button.
-	 */
+	
 	public boolean renderSortButton(String column, String order) {
-		try {
-			if (currentSortColumn == null || !currentSortColumn.equals(column)) {
-				return true;
-			}
-		} catch (Exception e) {
-			LOGGER.warn("renderSortButton: Exception - " + e.getMessage());
+		if (currentSortColumn == null || !currentSortColumn.equals(column)) {
+			return true;
 		}
-		return !currentSortOrder.equals(order);
+		return !currentSortDirection.equals(order);
 	}
-
-	/**
-	 * Resets filters, sorting, and values to default.
-	 */
+	
 	public String resetSearch() {
-		try {
-			this.searchBy = "doctorName";
-			this.searchValue = null;
-			this.selectedSpecialization = "";
-			this.searchResults = new ArrayList<>();
-			this.currentPage = 0;
-			this.searchPerformed = false;
-			this.sortField = "doctorName";
-			this.ascending = true;
-			this.currentSortColumn = "doctorName";
-			this.currentSortOrder = "asc";
-			this.searchMode = "exact";
-
-			LOGGER.info("resetSearch: Search reset.");
-		} catch (Exception e) {
-			LOGGER.warn("resetSearch: Exception occurred - " + e.getMessage());
-		}
+		this.searchBy = "doctorName";
+		this.searchValue = null;
+		this.selectedSpecialization = "";
+		this.searchResults = new ArrayList<>();
+		this.currentPage = 0;
+		this.searchPerformed = false;
+		this.sortField = "doctorName";
+		this.ascending = true;
+		this.currentSortColumn = "doctorName";
+		this.currentSortDirection = "asc";
+		this.searchMode = "exact"; // Aligned with the UI radio button
+		LOGGER.info("resetSearch: Search reset.");
 		return "findDoctor";
 	}
 
-	// ---------------------------
-	// Specialization Helper
-	// ---------------------------
-	public List<SelectItem> getSpecializationOptions() {
-		try {
-			if (specializationOptions == null || specializationOptions.isEmpty()) {
-				loadSpecializationOptions();
-			}
-		} catch (Exception e) {
-			LOGGER.warn("getSpecializationOptions: Exception - " + e.getMessage());
-		}
-		return specializationOptions;
-	}
-
-	/**
-	 * Loads dynamic specialization options into the dropdown.
-	 */
-	private void loadSpecializationOptions() {
-		specializationOptions = new ArrayList<>();
-		specializationOptions.add(new SelectItem("", "• Select Specialization •"));
-		try {
-			List<String> specializations = doctorDAO.fetchAllSpecialization();
-			if (specializations != null && !specializations.isEmpty()) {
-				specializations.sort(String.CASE_INSENSITIVE_ORDER);
-				for (String spec : specializations) {
-					if (spec != null && !spec.trim().isEmpty()) {
-						specializationOptions.add(new SelectItem(spec, spec));
-					}
-				}
-			}
-		} catch (Exception e) {
-			LOGGER.error("loadSpecializationOptions: Error fetching specializations - " + e.getMessage());
-			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-					"Error loading specializations. Please try again.", null));
-		}
-	}
-
-	/**
-	 * Placeholder for unimplemented booking logic.
-	 */
-	public String bookDummy() {
-		FacesContext.getCurrentInstance().addMessage(null,
-				new FacesMessage(FacesMessage.SEVERITY_INFO, "Booking functionality is not yet implemented.", null));
-		return null;
-	}
-
-	// ------------------------
 	// Getters & Setters
-	// ------------------------
-
 	public String getSearchBy() {
 		return searchBy;
 	}
 
 	public void setSearchBy(String searchBy) {
-		this.searchBy = searchBy;
+		String oldSearchBy = this.searchBy;
+		this.searchBy = searchBy; 
+
+		if (oldSearchBy != null && !oldSearchBy.equals(this.searchBy)) {
+			if (this.searchBy.equals("specialization")) {
+				this.searchValue = null;
+				this.searchMode = null; 
+			} else {
+				this.selectedSpecialization = null;
+				this.searchMode = "exact"; 
+			}
+			
+			this.searchResults = new ArrayList<>();
+			this.currentPage = 0;
+			this.searchPerformed = false;
+			clearInputMessages(); 
+		}
 	}
+	
+	
 
 	public String getSearchValue() {
 		return searchValue;
@@ -481,7 +492,17 @@ public class RecipientSearchDoctorController implements Serializable {
 		return currentSortColumn;
 	}
 
-	public String getCurrentSortOrder() {
-		return currentSortOrder;
+	public String getcurrentSortDirection() {
+		return currentSortDirection;
 	}
+	
+	private void clearInputMessages() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        while(context.getMessages("searchForm:searchValueInput").hasNext()) {
+            context.getMessages("searchForm:searchValueInput").next();
+        }
+        while(context.getMessages("searchForm:specializationDropdown").hasNext()) {
+            context.getMessages("searchForm:specializationDropdown").next();
+        }
+    }
 }

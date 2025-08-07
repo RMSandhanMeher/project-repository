@@ -7,8 +7,10 @@ import java.time.ZoneId;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.infinite.jsf.recipient.dao.LoginDao;
 import com.infinite.jsf.recipient.daoImpl.LoginDaoImpl;
@@ -19,7 +21,7 @@ import com.infinite.jsf.recipient.model.RecipientOtp;
 public class RecipientLoginController implements Serializable{
 
     private static final long serialVersionUID = 1L; // Recommended for Serializable
-    private static final Logger LOGGER = Logger.getLogger(RecipientLoginController.class.getName());
+	private static final Logger LOGGER=LogManager.getLogger(RecipientLoginController.class);
     private Recipient recipient;
 	private String userName;
     private Integer otpCode;
@@ -36,6 +38,7 @@ public class RecipientLoginController implements Serializable{
 	private boolean passwordCreated;
     private boolean comingBack = false;
     private String registeredEmail;
+    private String fullName;
     
 
 	public String getRegisteredEmail() {
@@ -463,7 +466,7 @@ public class RecipientLoginController implements Serializable{
 	  
 	 
 	 public String login() throws ClassNotFoundException, SQLException {
-
+		 
 			FacesContext context = FacesContext.getCurrentInstance();
 
 			// Validate required fields
@@ -487,10 +490,12 @@ public class RecipientLoginController implements Serializable{
 
 				if (recipient != null) {
 					recipient.setFullName(recipient.getFirstName(), recipient.getLastName());
+					System.out.println(recipient.getFullName()+ " has logged-in....");
 					LOGGER.info(recipient.getFullName() + " " + "has logged-in....");
 					FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("loggedInRecipient",
 							recipient);
 					FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("fullName", recipient);
+					fullName = recipient.getFullName();
 
 				}
 				String requestUri=(String)FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("requestUri");
@@ -524,5 +529,31 @@ public class RecipientLoginController implements Serializable{
 
         return null;
     }
+    
+    /**
+	 * JSF action for logging out user, clearing session, and redirecting to home
+	 * page. * @return navigation string
+	 */
+	public String logout() {
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
+		if (session != null) {
+			Recipient recipient = (Recipient) session.getAttribute("fullName");
+			LOGGER.info("Session invalidated successfully for User"+" "+ recipient.getFullName());
+			LOGGER.info(recipient.getFullName() + " has logged-out....");
+			session.invalidate();
+		}
+		return "/home/Home.jsp?faces-redirect=true";
+	}
+
+
+	public String getFullName() {
+		return fullName;
+	}
+
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
 
 }

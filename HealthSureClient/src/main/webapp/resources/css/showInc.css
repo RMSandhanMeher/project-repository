@@ -1,206 +1,219 @@
 /* Basic Reset & Body Styling */
 body {
-	font-family: 'Poppins', sans-serif; /* Modern font */
-	background-color: #eef2f7; /* Light, calming background */
-	margin: 0;
-	padding: 0;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	min-height: 100vh;
-	color: #333;
+  font-family: 'Poppins', sans-serif;
+  background-color: #eef2f7;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  color: #333;
+}
+
+.main-content-panel {
+  width: 95%;
+  max-width: 1800px;
+  margin-bottom: 20px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 15px;
+  margin-top: 110px;
+  padding-left: 80px;
+  margin-left: 25px;
 }
 
 /* Page Title */
-h2 {
-	text-align: center;
-	color: #0056b3; /* Deeper blue for headings */
-	margin-top: 130px; /* Adjust for navbar */
-	margin-bottom: 15px; /* More space below title */
-	font-size: 32px; /* Larger title */
-	font-weight: 600; /* Slightly bolder */
-	letter-spacing: -0.5px;
+.found {
+    text-align: center;
+    background: #f0f4f8;
+    color: #1976D2; /* Blue, e.g. */
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    padding: 10px 32px;
+    margin: 24px auto 16px auto;
+    width: 600px; /* Kept fixed width for title, adjust if needed */
+    margin-top: -15px;
+}
+.found h2 {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
 }
 
-/* Main Content Panel */
-.main-content-panel {
-	width: 90%; /* Cover more page width */
-	max-width: 1800px; /* Increased max-width */
-	margin-bottom: 30px;
-	background-color: #ffffff;
-	border-radius: 16px; /* More rounded corners */
-	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-	/* Softer, larger shadow */
-	padding: 40px; /* Increased padding */
-	box-sizing: border-box;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+/* NEW: Wrapper for all filter rows */
+.filters-wrapper {
+    width: 100%; /* Ensure it always takes full width of its parent */
+    max-width: 900px; /* Increased max-width for filters */
+    margin-bottom: 30px; /* Space below filters */
+    display: flex;
+    flex-direction: column;
+    gap: 10px; /* Space between filter rows */
+    padding: 10px 10px; /* Little padding to prevent content touching edges */
+    box-sizing: border-box;
+    /* Added min-width to ensure filters don't collapse too much */
+    min-width: 600px; /* A safe minimum based on your screenshot, adjust if needed */
+    background: #f0f4f8;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
 }
 
-/* Recipient ID Input Grid */
-.recipient-input-grid {
-	width: 70%;
-	margin: 15px auto 25px auto;
-	border-collapse: separate;
-	border-spacing: 0 15px;
+/* NEW: Styling for each filter row */
+.filter-row {
+    display: flex;
+    align-items: center;
+    gap: 2px; /* Space between elements in a row */
+    flex-wrap: nowrap; /* CRITICAL CHANGE: Prevent wrapping within filter rows */
+    width: 100%; /* Ensure row takes full width of wrapper */
+    justify-content: flex-start; /* Align items to the start */
+    margin-left: 6px;
 }
 
-.recipient-input-grid tr td:first-child {
-	width: 30%;
-	padding-right: 20px;
-	vertical-align: middle;
-	text-align: right;
-	font-weight: 500;
-	color: #555;
-	font-size: 15px;
+/* Adjust for the top filter row to center its content */
+.top-filter-row {
+	margin-bottom: 15px;
+    justify-content: center; /* Center content in the top filter row */
 }
 
-.recipient-input-grid tr td:nth-child(2) {
-	width: 35%; /* Adjust input width */
-	vertical-align: middle;
+
+.filter-label {
+	margin-top:2px;
+	padding-left:10px;
+    font-weight: 600;
+    white-space: nowrap; /* Prevent label from wrapping */
+    min-width: 10px; /* Give labels a consistent minimum width */
+    text-align: right;
 }
 
-.recipient-input-grid tr td:last-child {
-	width: 35%; /* Adjust buttons width */
-	vertical-align: middle;
+/* Styling for generic text input fields */
+input.text-input { /* NEW CLASS for generic text inputs */
+    font-size: 15px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8 уваpx;
+    outline: none;
+    background-color: #f9fbff;
+    padding: 10px 15px;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    flex-grow: 1;
 }
 
-/* Input & Select Common Styles */
-.recipient-input-grid input[type="text"] {
-	width: 100%;
-	padding: 12px 18px;
-	font-size: 16px;
-	border: 1px solid #dcdfe6;
-	border-radius: 8px;
-	transition: border-color 0.3s ease, box-shadow 0.3s ease;
-	outline: none;
-	background-color: #f9fbff;
+input.text-input:focus {
+    border-color: #4a90e2;
+    box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+    background-color: #ffffff;
 }
 
-.recipient-input-grid input[type="text"]:focus {
-	border-color: #4a90e2;
-	box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
-	background-color: #ffffff;
-}
 
-/* Button Styles - Adjusted for smaller size */
-.btn {
-	padding: 10px 20px; /* Slightly smaller buttons */
-	border: none;
-	border-radius: 8px;
-	cursor: pointer;
-	font-size: 15px; /* Slightly smaller font */
-	font-weight: 500;
-	text-decoration: none;
-	display: inline-block;
-	transition: background-color 0.3s ease, transform 0.2s ease;
-	letter-spacing: 0.5px;
-	outline: none;
-	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.btn:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-}
-
-.btn:active {
-	transform: translateY(0);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
-.btn-primary {
-	background-color: #007bff;
-	color: white;
-}
-
-.btn-primary:hover {
-	background-color: #0069d9;
-}
-
-.btn-secondary {
-	background-color: #6c757d;
-	color: white;
-}
-
-.btn-secondary:hover {
-	background-color: #5a6268;
-}
-
-/* NEW: Active filter styles */
-.btn-primary.active-filter {
-    background-color: #004a8f; /* A darker shade of blue */
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2);
-    transform: translateY(-1px);
-}
-
-.btn-secondary.active-filter {
-    background-color: #5a6268; /* A darker shade for reset */
-    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.2);
-    transform: translateY(-1px);
-}
-/* END NEW */
-
-
-.btn-success {
-	background-color: #28a745;
-	color: white;
-	padding: 8px 18px; /* Even smaller for table buttons */
-	font-size: 13px;
-}
-
-.btn-success:hover {
-	background-color: #218838;
-}
-
-.action-buttons-container {
-	display: flex;
-	gap: 15px; /* Space between Show and Reset buttons */
-	justify-content: flex-start;
-	align-items: center;
-}
-
-.filter-buttons-bar {
-	width: 100%;
-	display: flex;
-	justify-content: center;
-	gap: 15px; /* Reduced space between filter buttons */
-	margin-top: 15px;
-	margin-bottom: 25px; /* Space before table */
-	flex-wrap: wrap; /* Allow wrapping on smaller screens */
-	align-items: center;
-}
-
-.filter-buttons-bar .date-filter-group {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-}
-
+/* Styling for DATE input fields specifically */
 input.date-input {
-	padding: 10px 15px;
-	font-size: 15px;
-	border: 1px solid #dcdfe6;
-	border-radius: 8px;
-	outline: none;
-	transition: border-color 0.3s ease, box-shadow 0.3s ease;
-	background-color: #f9fbff;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
+  font-size: 15px;
+  border: 1px solid #dcdfe6;
+  border-radius: 8px;
+  outline: none;
+  background-color: #f9fbff;
+  -webkit-appearance: none; /* Crucial for removing default date input styling */
+  -moz-appearance: none;
+  appearance: none;
+  padding: 10px 15px;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  min-width: 120px; /* Ensure date inputs have a minimum size */
+  flex-grow: 1; /* Allow date inputs to grow */
+  max-width: 180px; /* Limit date input width */
 }
 
 input.date-input:focus {
-	border-color: #4a90e2;
-	box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
-	background-color: #ffffff;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 4px rgba(74, 144, 226, 0.2);
+  background-color: #ffffff;
+}
+
+/* Specific styling for PLAN NAME input (inherits from text-input, adds max-width) */
+input.plan-name-input {
+    max-width: 250px; /* Max width for plan name input */
+    border-radius: 8px;
+}
+
+
+/* Button Styles */
+.btn {
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  letter-spacing: 0.5px;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  height: 40px; /* Consistent height for buttons */
+  padding: 0 20px;
+  font-size: 15px;
+  box-sizing: border-box;
+  white-space: nowrap; /* Prevent button text from wrapping */
+}
+
+.btn-success {
+	background-color: #007bff; /* Standard green for success */
+	color: white;
+}
+
+
+
+.btn:hover {
+  transform: translateY(0px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary {
+  background-color: #007bff;
+	margin-left: 15px;
+	color: white;}
+
+.btn-primary:hover {
+  background-color: #0069d9;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+/* Specific styling for the status dropdown */
+.status-dropdown {
+    min-width: 110px;
+    font-size: 15px;
+    height: 40px; /* Consistent height */
+    padding: 0 10px; /* Adjust padding for dropdown */
+    background-color: #f9fbff;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px; /* Ensure consistency */
+}
+
+/* Positioning for the Reset Filters button */
+.reset-button-position {
+    margin-left: 20px; /* Add some space to its left */
 }
 
 /* Data Table Styling */
 .data-table {
 	width: 100%;
-	margin-top: 20px;
+	margin-top: 5px;
 	border-collapse: collapse;
 	background-color: #ffffff;
 	border-radius: 12px;
@@ -216,10 +229,10 @@ input.date-input:focus {
 }
 
 .data-table th {
-	background-color: #f8f9fa;
+	background-color: #f3f9ff;
 	text-align: center;
 	font-weight: 600;
-	color: #495057;
+	color: #3675b5;
 	font-size: 15px;
 	position: sticky;
 	top: 0;
@@ -241,15 +254,15 @@ input.date-input:focus {
 	background-color: #eef7ff;
 }
 
-/* Status Specific Styling - UPDATED TO MATCH UPPERCASE STATUS */
-.status-ACTIVE { /* Specific class for active status */
+/* Status Specific Styling */
+.status-ACTIVE {
 	font-weight: 600;
-	color: #28a745; /* Green for active */
+	color: #28a745;
 }
 
-.status-EXPIRED { /* Specific class for expired status */
+.status-EXPIRED {
 	font-weight: 500;
-	color: #dc3545; /* Red for expired */
+	color: #dc3545;
 }
 
 /* Sort Icons */
@@ -285,8 +298,7 @@ input.date-input:focus {
 .pagination {
 	display: flex;
 	align-items: center;
-	/* Changed justify-content to space-between to push summary to left and buttons to right */
-	justify-content: space-between; 
+	justify-content: space-between;
 	gap: 15px;
 	margin: 25px 0 0 0;
 	width: 100%;
@@ -312,7 +324,6 @@ input.date-input:focus {
 }
 
 .pagination .btn:disabled {
-	/* Use :disabled for JSF disabled attribute */
 	opacity: 0.6;
 	cursor: not-allowed;
 	background-color: #f8f9fa;
@@ -320,10 +331,10 @@ input.date-input:focus {
 }
 
 .pagination-label {
-	font-weight: 400; /* Regular weight */
-	color: #777; /* Grayish color */
-	font-size: 14px; /* Smaller font size */
-	/* Removed specific width, text-align, margin-top here as flex container controls positioning */
+	font-weight: 400;
+	color: black;
+	font-size: 14px;
+	
 }
 
 /* Highlight effect and cursor pointer for clickable FAMILY rows */
@@ -333,7 +344,7 @@ input.date-input:focus {
 }
 
 /* Global Messages */
-.global-messages {
+.global-messages { /* You might need to adjust this if using h:messages with specific classes */
 	list-style: none;
 	padding: 0;
 	margin: 0 auto 30px auto;
@@ -351,35 +362,190 @@ input.date-input:focus {
 	border: 1px solid;
 }
 
-.global-messages .ui-messages-info {
+/* If h:messages output directly uses these classes (might depend on Faces config) */
+.ui-messages-info {
 	background-color: #d4edda;
 	color: #155724;
 	border-color: #c3e6cb;
 }
 
-.global-messages .ui-messages-warn {
+.ui-messages-warn {
 	background-color: #fff3cd;
 	color: #856404;
 	border-color: #ffeeba;
 }
 
-.global-messages .ui-messages-error, .global-messages .ui-messages-fatal
-	{
+.ui-messages-error, .ui-messages-fatal {
 	background-color: #f8d7da;
 	color: #721c24;
 	border-color: #f5c6cb;
 }
 
-/* No results / Initial message */
+/* Message styling from your image - if h:messages has these classes */
+#messages {
+    list-style: none;
+    padding: 10px 20px;
+    margin: 15px auto; /* Centered */
+    width: fit-content; /* Adjust width to content */
+    border-radius: 8px;
+    font-weight: 500;
+    color: red; /* Default to red for errors */
+    background-color: #f8d7da; /* Light red background */
+    border: 1px solid #f5c6cb; /* Red border */
+}
+
+/*
+   NEW: Styles for the "No Records Found" panel
+   These are critical for maintaining UI layout when the table is hidden.
+   They visually mimic the .data-table.
+*/
+.no-records-message-container {
+    width: 100%;
+    /* Key for preventing layout collapse: */
+    min-height: 200px; /* Adjust this value to approximate your table's height */
+
+    /* Mimic .data-table appearance */
+    margin-top: 5px; /* Matches .data-table margin-top */
+    background-color: #ffffff; /* Matches .data-table background */
+    border-radius: 12px; /* Matches .data-table border-radius */
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.07); /* Matches .data-table box-shadow */
+    border: 1px solid #e9ecef; /* Added a subtle border to match cells/header visually */
+
+    /* Centering content */
+    display: flex;
+    flex-direction: column; /* Stack messages vertically */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    box-sizing: border-box; /* Include padding/border in width */
+}
+
+.no-records-text {
+    font-weight: 600; /* Made it a bit bolder */
+    font-size: 1.15em; /* Slightly larger */
+    color: #495057; /* Match header text color for prominence */
+    margin-bottom: 5px; /* Space between the two messages */
+}
+
+.initial-no-insurance-text {
+    display: block; /* Ensures it's on a new line */
+    font-size: 1em; /* Normal font size */
+    color: #6c757d; /* Softer color */
+}
+
+
+/* No results / Initial message (your original .not-found - keep or remove based on your strategy) */
+/*
+   Consider if you still need this `.not-found` class, or if the
+   `.no-records-message-container` (which takes the table's place)
+   fully covers your needs for "no data" messages.
+   If you use both, make sure their rendering conditions in JSF don't conflict.
+*/
 .not-found {
 	text-align: center;
 	font-weight: 500;
 	color: #555;
-	margin-top: 30px;
+	margin-top: 30px; /* This margin is different from table */
 	font-size: 1.1em;
 	width: 100%;
 	padding: 20px;
 	background-color: #f0f4f8;
 	border-radius: 10px;
 	border: 1px solid #dcdfe6;
+}
+
+.netflix-bar {
+    display: flex;
+    align-items: center;
+    color: #0056b3;
+    font-weight: 500;
+    font-size: 1rem;
+    letter-spacing: 0.02em;
+    width: fit-content;
+    min-width: 0;
+    margin: -10px auto 24px auto;
+    padding: 0;
+    border-radius: 0;
+    box-shadow: none;
+    margin-top: -25px;
+}
+
+.netflix-bar-accent {
+    width: 4px;
+    height: 1.4em;
+    background: green;
+    border-radius: 2px;
+    margin-right: 16px;
+    margin-top: 0;
+}
+
+
+/* Responsive Adjustments */
+@media (max-width: 900px) {
+    .filter-row {
+        flex-direction: column; /* Stack items vertically in a row */
+        align-items: flex-start; /* Align stacked items to the left */
+        gap: 8px; /* Reduce gap when stacked */
+    }
+
+
+    .filter-label {
+        text-align: left;
+        width: auto; /* Allow labels to take natural width */
+        min-width: 40px;
+        /* gap:8px removed as it's on flex parent */
+    }
+
+    /* Apply to all relevant inputs and buttons for responsiveness */
+    input.date-input,
+    input.text-input,
+    .status-dropdown,
+    .btn.filter-button {
+        width: 100%; /* Make inputs and buttons full width */
+        max-width: unset; /* Remove max-width constraint */
+    }
+
+    .date-filter-group { /* If this group is used, ensure it's responsive */
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .date-filter-group .filter-label,
+    .date-filter-group .date-input {
+        width: 100%;
+    }
+
+    /* No specific reset-button-row needed here, as it's now part of top-filter-row */
+    .reset-button-position {
+        margin-left: 0; /* Remove margin on small screens when stacked */
+        margin-top: 10px; /* Add some space if stacked below search button */
+    }
+}
+
+@media (max-width: 720px) {
+    .main-content-panel {
+        padding: 20px; /* Reduce padding on smaller screens */
+    }
+
+    .found {
+        width: 90%; /* Make title more responsive */
+        margin-left: auto;
+        margin-right: auto;
+    }
+    
+    .filterdiv{
+    background: #f0f4f8;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    padding: 10px 32px;
+    margin: 24px auto 16px auto;
+    width: 1200px; /* Kept fixed width for title, adjust if needed */
+    margin-top: 10px;
+    }
+    
+    
+    
 }

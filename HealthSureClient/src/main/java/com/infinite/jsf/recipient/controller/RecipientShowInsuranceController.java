@@ -1,6 +1,12 @@
-/// Copyright © 2025 Infinite Computer Solution. All rights reserved. 
+/*
+*Copyright © 2025 Infinite Computer Solution. All rights reserved. 
+*/
 
 package com.infinite.jsf.recipient.controller;
+
+/*Pagination, sorting and filtering operate in-memory on data fetched once,
+improving application performance avoiding repeated DB hits
+*/
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -11,17 +17,18 @@ import java.util.stream.Collectors;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpSession;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.infinite.jsf.insurance.model.PlanType;
 import com.infinite.jsf.insurance.model.SubscribedMember;
 import com.infinite.jsf.provider.model.MedicalProcedure;
-import com.infinite.jsf.recipient.dao.InsuranceDao;
-import com.infinite.jsf.recipient.daoImpl.InsuranceDaoImpl;
-import com.infinite.jsf.recipient.model.PatientInsuranceDetails;
+import com.infinite.jsf.recipient.customException.InsuranceRetrivalException;
+import com.infinite.jsf.recipient.dao.ShowInsuranceDao;
+import com.infinite.jsf.recipient.daoImpl.ShowInsuranceDaoImpl;
 import com.infinite.jsf.recipient.model.Recipient;
+import com.infinite.jsf.recipient.model.RecipientInsuranceDTO;
 
 /**
  * JSF Managed Bean responsible for displaying, filtering, and sorting recipient
@@ -31,32 +38,32 @@ import com.infinite.jsf.recipient.model.Recipient;
 public class RecipientShowInsuranceController implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger LOGGER = Logger.getLogger(RecipientShowInsuranceController.class.getName());
-
+	private static final Logger LOGGER = LogManager.getLogger(RecipientShowInsuranceController.class);
 	// Data objects
 	private MedicalProcedure medicalProcedure;
-	private InsuranceDaoImpl insuranceDaoImpl;
 	private Recipient recipient = new Recipient();
-	private PatientInsuranceDetails selectedItem;
-	private String hId = (String) ((Recipient) FacesContext.getCurrentInstance().getExternalContext().getSessionMap()
-			.get("loggedInRecipient")).gethId();
+	private RecipientInsuranceDTO selectedItem; // This will now hold the detailed item for the view page
+	
+	private String hId;
 	private String userName;
-	private String fullName = (String) ((Recipient) FacesContext.getCurrentInstance().getExternalContext()
-			.getSessionMap().get("fullName")).getFullName();
+	private String fullName;
 	private String selectedStatus;
-	private InsuranceDao insuranceDao = new InsuranceDaoImpl();
+	private ShowInsuranceDao insuranceDao = new ShowInsuranceDaoImpl();
 
-	private List<PatientInsuranceDetails> patientInsuranceList;
-	private List<PatientInsuranceDetails> originalInsuranceList;
+	private List<RecipientInsuranceDTO> patientInsuranceList;
+	private List<RecipientInsuranceDTO> originalInsuranceList; // All data fetched from DB, unfiltered
+
+	private String planNameSearchInput;
+
 	private List<SubscribedMember> subscribedMembers;
 
 	// Sorting state for Insurance
 	private String currentInsuranceSortColumn;
-	private String currentInsuranceSortDirection; // "asc" or "desc"
+	private String currentInsuranceSortDirection;
 
 	// Sorting state for Members
 	private String currentMemberSortColumn;
-	private String currentMemberSortDirection; // "asc" or "desc"
+	private String currentMemberSortDirection;
 
 	// Pagination
 	private int insurancePage = 0;
@@ -67,59 +74,145 @@ public class RecipientShowInsuranceController implements Serializable {
 	private Date fromDate;
 	private Date toDate;
 
+	public RecipientShowInsuranceController() {
+
+	}
+
 	/**
 	 * Retrieves the paginated and sorted list of insurance details for the
-	 * recipient.
+	 * recipient. This method now ensures originalInsuranceList is always populated.
 	 * 
 	 * @return List of PatientInsuranceDetails for current page.
 	 */
-	public List<PatientInsuranceDetails> getInsuranceData() {
+	public List<RecipientInsuranceDTO> getInsuranceData() {
 		FacesContext context = FacesContext.getCurrentInstance();
 		try {
-			// Lazy fetch if list is null
-			if (patientInsuranceList == null) {
-				originalInsuranceList = insuranceDao.showInsuranceOfRecipient(hId);
-				patientInsuranceList = originalInsuranceList;
+			// Ensure hId is available before DAO call
+			String currentHId = gethId();
+			if (currentHId == null || currentHId.isEmpty()) {
+				LOGGER.error("Controller: hId is null or empty. Cannot retrieve insurance data.");
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Session Error",
+						"User ID not found. Please log in again."));
+				return Collections.emptyList();
+			}
 
-				if (patientInsuranceList == null || patientInsuranceList.isEmpty()) {
-					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "No Insurance Found",
-							"Please subscribe to a plan."));
+			// This lazy-load logic is correct for a view-scoped bean.
+			if (originalInsuranceList == null || originalInsuranceList.isEmpty()) {
+
+				originalInsuranceList = insuranceDao.showInsuranceOfRecipient(currentHId);
+
+				if (originalInsuranceList.isEmpty()) {
+					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "No Insurance Found", null));
+					this.patientInsuranceList = Collections.emptyList();
 					return Collections.emptyList();
 				}
 
-				// Apply default sort if needed
-				if (currentInsuranceSortColumn == null || currentInsuranceSortColumn.isEmpty()) {
-					currentInsuranceSortColumn = "coverageStart";
-					currentInsuranceSortDirection = "desc";
+				// Assign the original back to the sub-original i.e patientInsuranceList
+				// Upon which the pagination will performed
+				this.patientInsuranceList = originalInsuranceList;
+
+				if (selectedStatus == null) {
+					selectedStatus = "ALL";
 				}
+
+				applyFilters();
+
 				sortPatientInsuranceList();
 				resetInsurancePage();
 			}
-		} catch (Exception e) {
-			LOGGER.warn("Exception occurred while retrieving the insurance data: " + e.getMessage());
+
+		} 
+		
+		// This single block handles all specific errors from the DaoImpl.
+		catch(InsuranceRetrivalException e) {
+			LOGGER.error("Controller: A data or system error occurred while retrieving insurance data for recipient "
+					+ gethId(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error occured while retriving the data", e.getMessage()));
+			patientInsuranceList = Collections.emptyList();
+			originalInsuranceList = Collections.emptyList();
+		}
+		
+		catch (Exception e) {
+			LOGGER.error("Controller: An unexpected error occurred while retrieving insurance data for recipient "
+					+ gethId() + ": " + e.getMessage(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "System Error",
+					"An unexpected error occurred while loading your insurance details."));
+			patientInsuranceList = Collections.emptyList();
+			originalInsuranceList = Collections.emptyList();
 		}
 
-		// Always return paginated data
+		// This returns the paginated list, 4 data per page
 		if (patientInsuranceList == null)
 			return Collections.emptyList();
 		int from = insurancePage * pageSize;
 		int to = Math.min(from + pageSize, patientInsuranceList.size());
+
 		return patientInsuranceList.subList(from, to);
 	}
 
 	/**
-	 * Handles viewing of family members for a particular insurance item.
-	 * 
-	 * @param insurance PatientInsuranceDetails
-	 * @return Navigation outcome for JSF page redirection.
+	 * Handles the "View Details" button click. Sets 'selectedItem' directly and
+	 * returns the navigation outcome.
+	 *
+	 * @param subscribeId, The subscribeId of the insurance policy to view.
+	 * @return The navigation outcome to the insurance details page.
 	 */
-	public String viewMembers(PatientInsuranceDetails insurance) {
+	public String viewInsuranceDetails(String subscribeId) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		this.selectedItem = null;
+		try {
+			if (subscribeId == null || subscribeId.isEmpty()) {
+				context.addMessage(null,
+						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "No insurance ID provided."));
+				return null;
+			}
+
+			// Assuming the data loading may be differed so pre-populating it before
+			// filtering
+			getInsuranceData();
+			if (this.originalInsuranceList != null && !this.originalInsuranceList.isEmpty()) {
+				this.selectedItem = this.originalInsuranceList.stream()
+						.filter(item -> subscribeId.equals(item.getSubscribeId())).findFirst().orElse(null);
+
+				if (this.selectedItem != null) {
+					return "insuranceDetails?faces-redirect=true";
+				} else {
+					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Not Found",
+							"No details found for the selected insurance policy."));
+				}
+			} else {
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
+						"Insurance data could not be loaded from the database."));
+			}
+		}
+		
+		// This single block handles all specific errors from the DaoImpl.
+		catch(InsuranceRetrivalException e) {
+			LOGGER.error("Error retriving all insurance details with IDs"+e.getMessage(),e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"An unexpected error occurred while loading your insurance details.",e.getMessage()));
+		}
+		
+		catch (Exception e) {
+			LOGGER.error("Error retrieving insurance details for ID: " + subscribeId + " from in-memory list.", e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "System Error",
+					"Failed to load details due to an unexpected error."));
+		}
+		this.selectedItem = null;
+		return null;
+	}
+
+	/**
+	 * Handles viewing of family members for a particular insurance item. * @param
+	 * insurance PatientInsuranceDetails 
+	 * @return Navigation outcome for JSF page
+	 * redirection.
+	 */
+	public String viewMembers(RecipientInsuranceDTO insurance) {
+		FacesContext context = FacesContext.getCurrentInstance();
 		this.selectedItem = insurance;
 		try {
 			if (insurance != null && insurance.getCoverageType() == PlanType.FAMILY) {
 				this.subscribedMembers = insurance.getSubscribedMembers();
-
-				FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("hId", insurance.gethId());
 				this.currentMemberSortColumn = null;
 				this.currentMemberSortDirection = null;
 				resetMemberPage();
@@ -129,163 +222,217 @@ public class RecipientShowInsuranceController implements Serializable {
 					currentMemberSortDirection = "asc";
 					sortViewMemberList();
 				}
+
 				return "/recipient/ViewMemebers.jsp?faces-redirect=true";
 			}
-		} catch (Exception e) {
-			LOGGER.warn("Exception occurred while fetching the members data: " + e.getMessage());
+		}
+		
+		catch(InsuranceRetrivalException e) {
+			LOGGER.error("Error retriving members Data base."+e.getMessage());
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Can't show you the results please try againg later",null));
+			subscribedMembers = Collections.emptyList();
+		}
+		
+		catch (Exception e) {
+			LOGGER.warn("Exception occurred while fetching the members data from database " + e.getMessage());
+			context.addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Exception occurred while fetching the members data: ", "Could not view members."));
+			subscribedMembers = Collections.emptyList();
+
 		}
 		return null;
 	}
 
 	/**
-	 * Filters insurance records by coverage status (ACTIVE or EXPIRED).
-	 * 
-	 * @param status The status to filter by.
+	 * Applies status, date range, and plan name filters to the insurance list.
 	 */
-	public void filterByCoverageStatus(String status) {
+	public void applyFilters() {
+		FacesContext context = FacesContext.getCurrentInstance();
 		try {
-			if (originalInsuranceList == null || status == null) {
-				this.patientInsuranceList = Collections.emptyList();
-				return;
-			}
-
-			this.selectedStatus = status;
-			this.fromDate = null;
-			this.toDate = null;
-
-			this.patientInsuranceList = originalInsuranceList.stream()
-					.filter(p -> p.getCoverageStatus() != null && p.getCoverageStatus().name().equalsIgnoreCase(status))
-					.collect(Collectors.toList());
-
-			this.currentInsuranceSortColumn = null;
-			this.currentInsuranceSortDirection = null;
-			resetInsurancePage();
-		} catch (Exception e) {
-			LOGGER.warn("Exception occurred while filtering insurance by status: " + e.getMessage());
-		}
-	}
-
-	/**
-	 * Filters patient insurance list by the currently selected date range and
-	 * status.
-	 */
-	public void filterByDateRange() {
-		try {
-			FacesContext context = FacesContext.getCurrentInstance();
-
-			if (fromDate == null && toDate == null) {
-				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Both From and To dates are required.", null));
-				return;
-			}
-
-			if (fromDate == null) {
-				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, "From date must be selected", null));
-				return;
-			}
-
-			if (toDate == null) {
-				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, "To Date must be selected", null));
-				return;
-			}
-
-			if (fromDate.after(toDate)) {
-				context.addMessage(null,
-						new FacesMessage(FacesMessage.SEVERITY_ERROR, "From Date cannot be after To Date.", null));
-				return;
-			}
-
 			if (originalInsuranceList == null || originalInsuranceList.isEmpty()) {
-				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
-						"No insurance records available to filter.", null));
+				originalInsuranceList = insuranceDao.showInsuranceOfRecipient(gethId());
+				if (originalInsuranceList == null) {
+					originalInsuranceList = Collections.emptyList();
+				}
+			}
+
+			if (originalInsuranceList.isEmpty()) {
+				this.patientInsuranceList = Collections.emptyList();
+				if (fromDate != null || toDate != null || (selectedStatus != null && !"ALL".equals(selectedStatus))
+						|| (planNameSearchInput != null && !planNameSearchInput.trim().isEmpty())) {
+					context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+							"No insurance records available to filter.", null));
+				}
+				sortPatientInsuranceList();
+				resetInsurancePage();
 				return;
 			}
 
+			if (!validateDates(fromDate, toDate, context)) {
+				sortPatientInsuranceList();
+				resetInsurancePage();
+				return;
+			}
+
+			if ((fromDate != null && toDate == null) || (fromDate == null && toDate != null)) {
+				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+						"Partial date range applied. Results may vary.", null));
+			}
+
+			// Status Filtering
 			this.patientInsuranceList = originalInsuranceList.stream().filter(p -> {
-				Date start = p.getCoverageStartDate();
-				boolean isInRange = start != null && !start.before(fromDate) && !start.after(toDate);
-				boolean matchesStatus = true;
-				if (selectedStatus != null && !selectedStatus.isEmpty()) {
-					matchesStatus = p.getCoverageStatus() != null
-							&& p.getCoverageStatus().name().equalsIgnoreCase(selectedStatus);
+				boolean matchesStatus = selectedStatus == null || selectedStatus.isEmpty()
+						|| "ALL".equalsIgnoreCase(selectedStatus) || (p.getCoverageStatus() != null
+								&& p.getCoverageStatus().name().equalsIgnoreCase(selectedStatus));
+
+				// Date Filtering
+				boolean matchesDateRange = true;
+				if (fromDate != null || toDate != null) {
+					if (p.getCoverageStartDate() == null) {
+						matchesDateRange = false;
+					} else {
+						Date filterStart = (fromDate != null) ? fromDate : new Date(0);
+						Date filterEnd = (toDate != null) ? toDate : new Date(Long.MAX_VALUE);
+						boolean noOverlap = p.getCoverageStartDate().before(filterStart)
+								|| p.getCoverageStartDate().after(filterEnd);
+						matchesDateRange = !noOverlap;
+					}
 				}
-				return isInRange && matchesStatus;
+
+				// Plan name filter
+				boolean matchesPlanName = true;
+				if (planNameSearchInput != null && !planNameSearchInput.trim().isEmpty()) {
+					matchesPlanName = p.getPlanName() != null && p.getPlanName().toLowerCase().replaceAll("\\s+", "")
+							.contains(planNameSearchInput.trim().toLowerCase().replaceAll("\\s+", ""));
+				}
+
+				return matchesStatus && matchesDateRange && matchesPlanName;
 			}).collect(Collectors.toList());
 
 			if (patientInsuranceList.isEmpty()) {
 				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
-						"No insurance records fall within the selected date range.", null));
+						"No insurance records fall within the search criteria.", null));
 			}
 
 			this.currentInsuranceSortColumn = null;
 			this.currentInsuranceSortDirection = null;
+			sortPatientInsuranceList();
 			resetInsurancePage();
-		} catch (Exception e) {
-			LOGGER.warn("Exception occurred while filtering by date range: " + e.getMessage());
+
+		} 
+		
+		catch(InsuranceRetrivalException e) {
+			LOGGER.error("Controller: Error appliing the filter or some data integrity issue occured"+ gethId() + ": " + e.getMessage(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "error occured while filtering",
+					"Failed to apply filters due to a technical issue. Please try again later."));
+			patientInsuranceList = Collections.emptyList();
+			originalInsuranceList = Collections.emptyList();
+		}
+		
+		catch (Exception e) {
+			LOGGER.error("Controller: An unexpected error occurred while applying filters for recipient " + gethId()
+					+ ": " + e.getMessage(), e);
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error applying filters.", null));
+			patientInsuranceList = Collections.emptyList();
+			originalInsuranceList = Collections.emptyList();
 		}
 	}
 
-	/**
-	 * Gets the paginated member list for the members table.
-	 * 
-	 * @return Sub-list for current page, or empty list if none.
-	 */
+	// Date Validation Helper method
+	private boolean validateDates(Date from, Date to, FacesContext context) {
+		Date today = new Date();
+
+		if ((from != null && from.after(today)) || (to != null && to.after(today))) {
+			context.addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Dates cannot be in the future.", null));
+			return false;
+		}
+
+		if (from != null && to != null && from.after(to)) {
+			context.addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "From Date cannot be after To Date.", null));
+			return false;
+		}
+
+		return true;
+	}
+
+	// Validation for Plan Name
+	public void searchByPlanName() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		String input = (planNameSearchInput != null) ? planNameSearchInput.trim() : "";
+		if (input.isEmpty()) {
+			context.addMessage("insuranceForm:planNameSearchInput",
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "PlanName cannot be empty.", null));
+			return;
+		}
+		if (!input.matches("^[A-Za-z ]+$")) {
+			context.addMessage("insuranceForm:planNameSearchInput",
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "No digits/symbols supported", null));
+			return;
+		}
+		if (input.length() < 5) {
+			context.addMessage("insuranceForm:planNameSearchInput",
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "PlanName must of 5 Character", null));
+			return;
+		}
+		applyFilters();
+	}
+
+	// paginated Member list that to be returned in the UI page
 	public List<SubscribedMember> getPaginatedMemberList() {
 		try {
 			if (subscribedMembers == null || subscribedMembers.isEmpty())
 				return Collections.emptyList();
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred in getPaginatedMemberList: " + e.getMessage());
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Could not retrieve member list."));
 		}
 		int from = memberPage * pageSize;
 		int to = Math.min(from + pageSize, subscribedMembers.size());
 		return subscribedMembers.subList(from, to);
 	}
 
-	/**
-	 * Summary string for paginated insurance list.
-	 * 
-	 * @return Pagination summary ("Showing N of M Results")
-	 */
+	// UI summary for InsurancePage like Showing 4 of 12 Results
 	public String getPaginationIncSummary() {
 		try {
 			if (patientInsuranceList == null || patientInsuranceList.isEmpty()) {
-				return "";
+				return "Showing 0 of 0 Results";
 			}
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while getting the Insurance pagination summary: " + e.getMessage());
 		}
-		int from = Math.min((insurancePage + 1) * pageSize, patientInsuranceList.size());
+		int toCount = Math.min((insurancePage + 1) * pageSize, patientInsuranceList.size());
 		int total = patientInsuranceList.size();
-		return "Showing " + from + " of " + total + " Results";
+
+		if (total == 0)
+			return "Showing 0 of 0 Results";
+
+		return "Showing " + toCount + " of " + total + " Results";
 	}
 
-	/**
-	 * Summary string for paginated member list.
-	 * 
-	 * @return Pagination summary ("Showing N of M Results")
-	 */
+	// UI summary for Member like Showing 4 of 12 Results
 	public String getPaginationMemSummary() {
 		try {
 			if (subscribedMembers == null || subscribedMembers.isEmpty()) {
-				return "";
+				return "Showing 0 of 0 Results";
 			}
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while getting the members pagination summary: " + e.getMessage());
 		}
-		int from = Math.min((memberPage + 1) * pageSize, subscribedMembers.size());
+		int toCount = Math.min((memberPage + 1) * pageSize, subscribedMembers.size());
 		int total = subscribedMembers.size();
-		return "Showing " + from + " of " + total + " Results";
+
+		if (total == 0)
+			return "Showing 0 of 0 Results";
+
+		return "Showing " + toCount + " of " + total + " Results";
 	}
 
-	/**
-	 * Sorts patientInsuranceList ascending by fieldName.
-	 * 
-	 * @param fieldName Field to sort on.
-	 * @return null for JSF navigation.
-	 */
+	// SORTING METHODS
+	// Sort by Ascending arrow method
 	public String sortByAsc(String fieldName) {
 		try {
 			this.currentInsuranceSortColumn = fieldName;
@@ -294,16 +441,13 @@ public class RecipientShowInsuranceController implements Serializable {
 			resetInsurancePage();
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while sorting by Ascending: " + e.getMessage());
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Could not apply sort."));
 		}
 		return null;
 	}
 
-	/**
-	 * Sorts patientInsuranceList descending by fieldName.
-	 * 
-	 * @param fieldName Field to sort on.
-	 * @return null for JSF navigation.
-	 */
+	// Sort by Descending arrow method
 	public String sortByDesc(String fieldName) {
 		try {
 			this.currentInsuranceSortColumn = fieldName;
@@ -312,16 +456,13 @@ public class RecipientShowInsuranceController implements Serializable {
 			resetInsurancePage();
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while sorting by Descending: " + e.getMessage());
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Could not apply sort."));
 		}
 		return null;
 	}
 
-	/**
-	 * Sort members ascending by fieldName.
-	 * 
-	 * @param fieldName Member object field to sort on.
-	 * @return null for JSF navigation.
-	 */
+	// Sort by Ascending arrow method
 	public String sortByAscMem(String fieldName) {
 		try {
 			this.currentMemberSortColumn = fieldName;
@@ -330,16 +471,13 @@ public class RecipientShowInsuranceController implements Serializable {
 			resetMemberPage();
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while sorting members ascending: " + e.getMessage());
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Could not apply member sort."));
 		}
 		return null;
 	}
 
-	/**
-	 * Sort members descending by fieldName.
-	 * 
-	 * @param fieldName Member object field to sort on.
-	 * @return null for JSF navigation.
-	 */
+	// Sort by Descending arrow method
 	public String sortByDescMem(String fieldName) {
 		try {
 			this.currentMemberSortColumn = fieldName;
@@ -348,93 +486,153 @@ public class RecipientShowInsuranceController implements Serializable {
 			resetMemberPage();
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while sorting members descending: " + e.getMessage());
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Could not apply member sort."));
 		}
 		return null;
 	}
 
-	/**
-	 * Resets all insurance and date filters, restoring the original list.
-	 * 
-	 * @return null for JSF.
-	 */
-	public String resetFilter() {
-		try {
-			this.insurancePage = 0;
-			this.fromDate = null;
-			this.toDate = null;
-			this.selectedStatus = null;
-			this.patientInsuranceList = insuranceDao.showInsuranceOfRecipient(hId);
-			this.currentInsuranceSortColumn = null;
-			this.currentInsuranceSortDirection = null;
-		} catch (Exception e) {
-			LOGGER.warn("Exception occurred while resetting the filters: " + e.getMessage());
-		}
-		return null;
+	// Rendering the sort buttons on Insurance page
+	public boolean renderSortButton(String column, String direction) {
+		if (currentInsuranceSortColumn == null || !currentInsuranceSortColumn.equals(column))
+			return true;
+		return !currentInsuranceSortDirection.equals(direction);
 	}
 
+	// Rendering the sort buttons on Member page
+	public boolean renderSortButtonMem(String column, String direction) {
+		if (currentMemberSortColumn == null || !currentMemberSortColumn.equals(column))
+			return true;
+		return !currentMemberSortDirection.equals(direction);
+	}
+
+	// Actual sorting method for the Insurance sorting
 	@SuppressWarnings("unchecked")
 	private void sortPatientInsuranceList() {
 		try {
-			if (patientInsuranceList == null || currentInsuranceSortColumn == null)
+			if (patientInsuranceList == null || patientInsuranceList.isEmpty() || currentInsuranceSortColumn == null
+					|| currentInsuranceSortColumn.isEmpty())
 				return;
 
 			Collections.sort(patientInsuranceList, (a, b) -> {
 				try {
 					Field fieldA = a.getClass().getDeclaredField(currentInsuranceSortColumn);
 					Field fieldB = b.getClass().getDeclaredField(currentInsuranceSortColumn);
+
+					/// Even if the field is private, this allows access.
 					fieldA.setAccessible(true);
 					fieldB.setAccessible(true);
+
 					Comparable<Object> valueA = (Comparable<Object>) fieldA.get(a);
 					Comparable<Object> valueB = (Comparable<Object>) fieldB.get(b);
 
+//					Null Handling:
+					if (valueA == null && valueB == null)
+						return 0;
 					if (valueA == null)
 						return currentInsuranceSortDirection.equals("asc") ? -1 : 1;
 					if (valueB == null)
 						return currentInsuranceSortDirection.equals("asc") ? 1 : -1;
 
+//					Comparison Logic:
 					return currentInsuranceSortDirection.equals("asc") ? valueA.compareTo(valueB)
 							: valueB.compareTo(valueA);
+
 				} catch (Exception e) {
+					// Internal sorting logic error, log but don't re-throw to higher layers
+					LOGGER.warn("Error during reflective sorting for column " + currentInsuranceSortColumn + ": "
+							+ e.getMessage());
+					// It's usually fine to return 0 or throw a RuntimeException if sorting is
+					// critical
+					// For now, retaining original behavior of returning 0
 					return 0;
 				}
 			});
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while sorting Insurance table: " + e.getMessage());
+			// This is an internal collection sort, just log. UI already handled with
+			// FacesMessage in sortByAsc/Desc.
 		}
 	}
 
+	// Actual Sorting method for the Member sorting
 	@SuppressWarnings("unchecked")
 	private void sortViewMemberList() {
 		try {
-			if (subscribedMembers == null || currentMemberSortColumn == null)
-				return;
+		if (currentMemberSortColumn == null || subscribedMembers == null || subscribedMembers.isEmpty()) {
+			return;
+		}
 
-			Collections.sort(subscribedMembers, (a, b) -> {
-				try {
-					Field fieldA = a.getClass().getDeclaredField(currentMemberSortColumn);
-					Field fieldB = b.getClass().getDeclaredField(currentMemberSortColumn);
-					fieldA.setAccessible(true);
-					fieldB.setAccessible(true);
-					Comparable<Object> valueA = (Comparable<Object>) fieldA.get(a);
-					Comparable<Object> valueB = (Comparable<Object>) fieldB.get(b);
+		Collections.sort(subscribedMembers, (o1, o2) -> {
+			try {
+				Field field = o1.getClass().getDeclaredField(currentMemberSortColumn);
+				field.setAccessible(true);
+				Comparable<Object> value1 = (Comparable<Object>) field.get(o1);
+				Comparable<Object> value2 = (Comparable<Object>) field.get(o2);
 
-					if (valueA == null)
-						return currentMemberSortDirection.equals("asc") ? -1 : 1;
-					if (valueB == null)
-						return currentMemberSortDirection.equals("asc") ? 1 : -1;
-					return currentMemberSortDirection.equals("asc") ? valueA.compareTo(valueB)
-							: valueB.compareTo(valueA);
-				} catch (Exception e) {
+				if (value1 == null && value2 == null)
 					return 0;
-				}
-			});
-		} catch (Exception e) {
-			LOGGER.warn("Exception occurred while sorting Members table: " + e.getMessage());
+				if (value1 == null)
+					return "asc".equals(currentMemberSortDirection) ? -1 : 1;
+				if (value2 == null)
+					return "asc".equals(currentMemberSortDirection) ? 1 : -1;
+
+				int result = value1.compareTo(value2);
+				return "asc".equals(currentMemberSortDirection) ? result : -result;
+			} catch (NoSuchFieldException | IllegalAccessException e) {
+				LOGGER.error("Sorting error: Field not found or accessible: " + currentMemberSortColumn, e);
+				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+						"Sorting Error", "Could not sort members by " + currentMemberSortColumn + "."));
+				return 0; // Return 0 to indicate no change in order
+			}
+		});
+		}
+		catch (Exception e) {
+			LOGGER.warn("Exception occurred while sorting view Member table: " + e.getMessage());
 		}
 	}
 
-	// Getter and setter methods (no logic change, so left as-is)
+	// Reset button for clearing all the data chunks on the page
+	public String resetFilter() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		try {
+			this.insurancePage = 0;
+			this.fromDate = null;
+			this.toDate = null;
+			this.selectedStatus = "ALL";
+			this.planNameSearchInput = null;
+			originalInsuranceList = insuranceDao.showInsuranceOfRecipient(gethId());
+			if (originalInsuranceList == null) {
+				originalInsuranceList = Collections.emptyList();
+			}
+			this.currentInsuranceSortColumn = null;
+			this.currentInsuranceSortDirection = null;
+			applyFilters();
+		}  catch (Exception e) {
+			LOGGER.warn("Exception occurred while resetting the filters: " + e.getMessage());
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error resetting filters.", null));
+		}
+		return null;
+	}
+
+	// Getter and setter methods
+	public String getPlanNameSearchInput() {
+		return planNameSearchInput;
+	}
+
+	public void setPlanNameSearchInput(String planNameSearchInput) {
+		this.planNameSearchInput = planNameSearchInput;
+	}
+
 	public String gethId() {
+		if (hId == null) {
+			Recipient loggedInRecipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext()
+					.getSessionMap().get("loggedInRecipient");
+			if (loggedInRecipient != null) {
+				hId = loggedInRecipient.gethId();
+			}
+		}
 		return hId;
 	}
 
@@ -451,6 +649,13 @@ public class RecipientShowInsuranceController implements Serializable {
 	}
 
 	public String getFullName() {
+		if (fullName == null) {
+			Recipient loggedInRecipient = (Recipient) FacesContext.getCurrentInstance().getExternalContext()
+					.getSessionMap().get("loggedInRecipient");
+			if (loggedInRecipient != null) {
+				fullName = loggedInRecipient.getFullName();
+			}
+		}
 		return fullName;
 	}
 
@@ -466,14 +671,6 @@ public class RecipientShowInsuranceController implements Serializable {
 		this.medicalProcedure = medicalProcedure;
 	}
 
-	public InsuranceDaoImpl getInsuranceDaoImpl() {
-		return insuranceDaoImpl;
-	}
-
-	public void setInsuranceDaoImpl(InsuranceDaoImpl insuranceDaoImpl) {
-		this.insuranceDaoImpl = insuranceDaoImpl;
-	}
-
 	public Recipient getRecipient() {
 		return recipient;
 	}
@@ -482,27 +679,27 @@ public class RecipientShowInsuranceController implements Serializable {
 		this.recipient = recipient;
 	}
 
-	public PatientInsuranceDetails getSelectedItem() {
+	public RecipientInsuranceDTO getSelectedItem() {
 		return selectedItem;
 	}
 
-	public void setSelectedItem(PatientInsuranceDetails selectedItem) {
+	public void setSelectedItem(RecipientInsuranceDTO selectedItem) {
 		this.selectedItem = selectedItem;
 	}
 
-	public InsuranceDao getInsuranceDao() {
+	public ShowInsuranceDao getInsuranceDao() {
 		return insuranceDao;
 	}
 
-	public void setInsuranceDao(InsuranceDao insuranceDao) {
+	public void setInsuranceDao(ShowInsuranceDao insuranceDao) {
 		this.insuranceDao = insuranceDao;
 	}
 
-	public List<PatientInsuranceDetails> getPatientInsuranceList() {
+	public List<RecipientInsuranceDTO> getPatientInsuranceList() {
 		return patientInsuranceList;
 	}
 
-	public void setPatientInsuranceList(List<PatientInsuranceDetails> patientInsuranceList) {
+	public void setPatientInsuranceList(List<RecipientInsuranceDTO> patientInsuranceList) {
 		this.patientInsuranceList = patientInsuranceList;
 	}
 
@@ -596,27 +793,6 @@ public class RecipientShowInsuranceController implements Serializable {
 		this.selectedStatus = selectedStatus;
 	}
 
-	/**
-	 * Determines if a sort button (up or down arrow) should be rendered for the
-	 * PatientInsuranceDetails table.
-	 */
-	public boolean renderSortButton(String column, String direction) {
-		if (currentInsuranceSortColumn == null || !currentInsuranceSortColumn.equals(column))
-			return true;
-		return !currentInsuranceSortDirection.equals(direction);
-	}
-
-	/**
-	 * Determines if a sort button (up or down arrow) should be rendered for the
-	 * SubscribedMembers table.
-	 */
-	public boolean renderSortButtonMem(String column, String direction) {
-		if (currentMemberSortColumn == null || !currentMemberSortColumn.equals(column))
-			return true;
-		return !currentMemberSortDirection.equals(direction);
-	}
-
-	// Insurance table pagination methods...
 	public void nextPage() {
 		if (getHasNextPage())
 			insurancePage++;
@@ -649,7 +825,6 @@ public class RecipientShowInsuranceController implements Serializable {
 		this.insurancePage = 0;
 	}
 
-	// Members table pagination methods...
 	public void nextMemberPage() {
 		if (getHasNextMemberPage())
 			memberPage++;
@@ -668,7 +843,8 @@ public class RecipientShowInsuranceController implements Serializable {
 		return memberPage > 0;
 	}
 
-	public int getMemberPage() {
+	// The getter name you need to use in the JSP.
+	public int getCurrentMemberPage() {
 		return memberPage + 1;
 	}
 
@@ -683,27 +859,21 @@ public class RecipientShowInsuranceController implements Serializable {
 	}
 
 	/**
-	 * JSF action for logging out user, clearing session, and redirecting to home
-	 * page.
-	 * 
-	 * @return navigation string
-	 */
-	public String logout() {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		HttpSession session = (HttpSession) facesContext.getExternalContext().getSession(false);
-		if (session != null) {
-			LOGGER.info(getFullName() + " has logged-out....");
-			session.invalidate();
-		}
-		return "/home/Home.jsp?faces-redirect=true";
-	}
-
-	/**
-	 * Action to return to insurance listing.
-	 * 
-	 * @return navigation string to ShowInsurance page
+	 * Action to return to insurance listing. * @return navigation string to
+	 * ShowInsurance page
 	 */
 	public String goBackinc() {
 		return "ShowInsurance";
 	}
+
+	/**
+	 * Reset all the field before redirecting to other page
+	 * 
+	 * @return the respective page
+	 */
+	public String resetAndRedirect(String page) {
+		resetFilter();
+		return page + "?faces-redirect=true";
+	}
+
 }
