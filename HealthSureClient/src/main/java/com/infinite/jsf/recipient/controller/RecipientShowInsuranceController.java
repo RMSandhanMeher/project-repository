@@ -1,6 +1,4 @@
-/*
-*Copyright © 2025 Infinite Computer Solution. All rights reserved. 
-*/
+/// Copyright © 2025 Infinite Computer Solution. All rights reserved. 
 
 package com.infinite.jsf.recipient.controller;
 
@@ -20,11 +18,11 @@ import javax.faces.context.FacesContext;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.HibernateException;
 
 import com.infinite.jsf.insurance.model.PlanType;
 import com.infinite.jsf.insurance.model.SubscribedMember;
 import com.infinite.jsf.provider.model.MedicalProcedure;
-import com.infinite.jsf.recipient.customException.InsuranceRetrivalException;
 import com.infinite.jsf.recipient.dao.ShowInsuranceDao;
 import com.infinite.jsf.recipient.daoImpl.ShowInsuranceDaoImpl;
 import com.infinite.jsf.recipient.model.Recipient;
@@ -43,7 +41,7 @@ public class RecipientShowInsuranceController implements Serializable {
 	private MedicalProcedure medicalProcedure;
 	private Recipient recipient = new Recipient();
 	private RecipientInsuranceDTO selectedItem; // This will now hold the detailed item for the view page
-	
+
 	private String hId;
 	private String userName;
 	private String fullName;
@@ -121,18 +119,21 @@ public class RecipientShowInsuranceController implements Serializable {
 				resetInsurancePage();
 			}
 
-		} 
-		
-		// This single block handles all specific errors from the DaoImpl.
-		catch(InsuranceRetrivalException e) {
-			LOGGER.error("Controller: A data or system error occurred while retrieving insurance data for recipient "
-					+ gethId(), e);
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error occured while retriving the data", e.getMessage()));
+		} catch (HibernateException e) {
+			LOGGER.error("Controller: Database error retrieving insurance data for recipient " + gethId() + ": "
+					+ e.getMessage(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Database Error",
+					"Failed to load insurance details due to a technical issue. Please try again later."));
 			patientInsuranceList = Collections.emptyList();
 			originalInsuranceList = Collections.emptyList();
-		}
-		
-		catch (Exception e) {
+		} catch (IllegalArgumentException e) {
+			LOGGER.warn("Controller: Data integrity issue for recipient " + gethId() + ": Invalid enum value from DB: "
+					+ e.getMessage(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Data Issue",
+					"Some insurance details may be incomplete or missing due to invalid data in our system."));
+			patientInsuranceList = Collections.emptyList();
+			originalInsuranceList = Collections.emptyList();
+		} catch (Exception e) {
 			LOGGER.error("Controller: An unexpected error occurred while retrieving insurance data for recipient "
 					+ gethId() + ": " + e.getMessage(), e);
 			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "System Error",
@@ -184,15 +185,7 @@ public class RecipientShowInsuranceController implements Serializable {
 				context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error",
 						"Insurance data could not be loaded from the database."));
 			}
-		}
-		
-		// This single block handles all specific errors from the DaoImpl.
-		catch(InsuranceRetrivalException e) {
-			LOGGER.error("Error retriving all insurance details with IDs"+e.getMessage(),e);
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"An unexpected error occurred while loading your insurance details.",e.getMessage()));
-		}
-		
-		catch (Exception e) {
+		} catch (Exception e) {
 			LOGGER.error("Error retrieving insurance details for ID: " + subscribeId + " from in-memory list.", e);
 			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "System Error",
 					"Failed to load details due to an unexpected error."));
@@ -203,12 +196,10 @@ public class RecipientShowInsuranceController implements Serializable {
 
 	/**
 	 * Handles viewing of family members for a particular insurance item. * @param
-	 * insurance PatientInsuranceDetails 
-	 * @return Navigation outcome for JSF page
+	 * insurance PatientInsuranceDetails * @return Navigation outcome for JSF page
 	 * redirection.
 	 */
 	public String viewMembers(RecipientInsuranceDTO insurance) {
-		FacesContext context = FacesContext.getCurrentInstance();
 		this.selectedItem = insurance;
 		try {
 			if (insurance != null && insurance.getCoverageType() == PlanType.FAMILY) {
@@ -225,20 +216,10 @@ public class RecipientShowInsuranceController implements Serializable {
 
 				return "/recipient/ViewMemebers.jsp?faces-redirect=true";
 			}
-		}
-		
-		catch(InsuranceRetrivalException e) {
-			LOGGER.error("Error retriving members Data base."+e.getMessage());
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,"Can't show you the results please try againg later",null));
-			subscribedMembers = Collections.emptyList();
-		}
-		
-		catch (Exception e) {
-			LOGGER.warn("Exception occurred while fetching the members data from database " + e.getMessage());
-			context.addMessage(null,
-					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Exception occurred while fetching the members data: ", "Could not view members."));
-			subscribedMembers = Collections.emptyList();
-
+		} catch (Exception e) {
+			LOGGER.warn("Exception occurred while fetching the members data: " + e.getMessage());
+			FacesContext.getCurrentInstance().addMessage(null,
+					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error", "Could not view members."));
 		}
 		return null;
 	}
@@ -319,17 +300,21 @@ public class RecipientShowInsuranceController implements Serializable {
 			sortPatientInsuranceList();
 			resetInsurancePage();
 
-		} 
-		
-		catch(InsuranceRetrivalException e) {
-			LOGGER.error("Controller: Error appliing the filter or some data integrity issue occured"+ gethId() + ": " + e.getMessage(), e);
-			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "error occured while filtering",
+		} catch (HibernateException e) {
+			LOGGER.error(
+					"Controller: Database error applying filters for recipient " + gethId() + ": " + e.getMessage(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Database Error",
 					"Failed to apply filters due to a technical issue. Please try again later."));
 			patientInsuranceList = Collections.emptyList();
 			originalInsuranceList = Collections.emptyList();
-		}
-		
-		catch (Exception e) {
+		} catch (IllegalArgumentException e) {
+			LOGGER.warn("Controller: Data integrity issue applying filters for recipient " + gethId()
+					+ ": Invalid enum value from DB: " + e.getMessage(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Data Issue",
+					"Filters may be partially applied due to invalid data in our system."));
+			patientInsuranceList = Collections.emptyList();
+			originalInsuranceList = Collections.emptyList();
+		} catch (Exception e) {
 			LOGGER.error("Controller: An unexpected error occurred while applying filters for recipient " + gethId()
 					+ ": " + e.getMessage(), e);
 			FacesContext.getCurrentInstance().addMessage(null,
@@ -506,89 +491,101 @@ public class RecipientShowInsuranceController implements Serializable {
 		return !currentMemberSortDirection.equals(direction);
 	}
 
-	// Actual sorting method for the Insurance sorting
+	/**
+	 * Actual sorting method for the Insurance sorting
+	 */
 	@SuppressWarnings("unchecked")
 	private void sortPatientInsuranceList() {
+		if (patientInsuranceList == null || patientInsuranceList.isEmpty() || currentInsuranceSortColumn == null
+				|| currentInsuranceSortColumn.isEmpty()) {
+			return;
+		}
+
 		try {
-			if (patientInsuranceList == null || patientInsuranceList.isEmpty() || currentInsuranceSortColumn == null
-					|| currentInsuranceSortColumn.isEmpty())
-				return;
+			Field field = patientInsuranceList.get(0).getClass().getDeclaredField(currentInsuranceSortColumn);
+			field.setAccessible(true);
+			boolean ascending = "asc".equalsIgnoreCase(currentInsuranceSortDirection);
 
 			Collections.sort(patientInsuranceList, (a, b) -> {
 				try {
-					Field fieldA = a.getClass().getDeclaredField(currentInsuranceSortColumn);
-					Field fieldB = b.getClass().getDeclaredField(currentInsuranceSortColumn);
+					Object valueA = field.get(a);
+					Object valueB = field.get(b);
 
-					/// Even if the field is private, this allows access.
-					fieldA.setAccessible(true);
-					fieldB.setAccessible(true);
-
-					Comparable<Object> valueA = (Comparable<Object>) fieldA.get(a);
-					Comparable<Object> valueB = (Comparable<Object>) fieldB.get(b);
-
-//					Null Handling:
 					if (valueA == null && valueB == null)
 						return 0;
 					if (valueA == null)
-						return currentInsuranceSortDirection.equals("asc") ? -1 : 1;
+						return 1;
 					if (valueB == null)
-						return currentInsuranceSortDirection.equals("asc") ? 1 : -1;
+						return -1;
 
-//					Comparison Logic:
-					return currentInsuranceSortDirection.equals("asc") ? valueA.compareTo(valueB)
-							: valueB.compareTo(valueA);
+					if (!(valueA instanceof Comparable)) {
+						LOGGER.error("Cannot sort column '" + currentInsuranceSortColumn
+								+ "' because it is not a Comparable type.");
+						return 0;
+					}
+
+					// Comparison here
+					Comparable<Object> comparableA = (Comparable<Object>) valueA;
+					int comparison = comparableA.compareTo(valueB);
+					return ascending ? comparison : -comparison;
 
 				} catch (Exception e) {
-					// Internal sorting logic error, log but don't re-throw to higher layers
-					LOGGER.warn("Error during reflective sorting for column " + currentInsuranceSortColumn + ": "
-							+ e.getMessage());
-					// It's usually fine to return 0 or throw a RuntimeException if sorting is
-					// critical
-					// For now, retaining original behavior of returning 0
+					LOGGER.error("Internal sorting error for column " + currentInsuranceSortColumn, e);
 					return 0;
 				}
 			});
+
+		} catch (NoSuchFieldException e) {
+			LOGGER.error("Sort column '" + currentInsuranceSortColumn + "' not found.", e);
 		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while sorting Insurance table: " + e.getMessage());
-			// This is an internal collection sort, just log. UI already handled with
-			// FacesMessage in sortByAsc/Desc.
 		}
 	}
 
-	// Actual Sorting method for the Member sorting
+	/**
+	 * Actual Sorting method for the Member sorting
+	 */
 	@SuppressWarnings("unchecked")
 	private void sortViewMemberList() {
-		try {
 		if (currentMemberSortColumn == null || subscribedMembers == null || subscribedMembers.isEmpty()) {
 			return;
 		}
 
-		Collections.sort(subscribedMembers, (o1, o2) -> {
-			try {
-				Field field = o1.getClass().getDeclaredField(currentMemberSortColumn);
-				field.setAccessible(true);
-				Comparable<Object> value1 = (Comparable<Object>) field.get(o1);
-				Comparable<Object> value2 = (Comparable<Object>) field.get(o2);
+		try {
+			Field field = subscribedMembers.get(0).getClass().getDeclaredField(currentMemberSortColumn);
+			field.setAccessible(true);
+			boolean ascending = "asc".equalsIgnoreCase(currentMemberSortDirection);
 
-				if (value1 == null && value2 == null)
+			Collections.sort(subscribedMembers, (a, b) -> {
+				try {
+					Object valueA = field.get(a);
+					Object valueB = field.get(b);
+
+					if (valueA == null && valueB == null)
+						return 0;
+					if (valueA == null)
+						return 1;
+					if (valueB == null)
+						return -1;
+
+					if (!(valueA instanceof Comparable)) {
+						LOGGER.error("Cannot sort column '" + currentMemberSortColumn
+								+ "' because it is not a Comparable type.");
+						return 0;
+					}
+
+					Comparable<Object> comparableA = (Comparable<Object>) valueA;
+					int comparison = comparableA.compareTo(valueB);
+					return ascending ? comparison : -comparison;
+
+				} catch (Exception e) {
+					LOGGER.error("Internal sorting error for column " + currentInsuranceSortColumn, e);
 					return 0;
-				if (value1 == null)
-					return "asc".equals(currentMemberSortDirection) ? -1 : 1;
-				if (value2 == null)
-					return "asc".equals(currentMemberSortDirection) ? 1 : -1;
+				}
+			});
 
-				int result = value1.compareTo(value2);
-				return "asc".equals(currentMemberSortDirection) ? result : -result;
-			} catch (NoSuchFieldException | IllegalAccessException e) {
-				LOGGER.error("Sorting error: Field not found or accessible: " + currentMemberSortColumn, e);
-				FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-						"Sorting Error", "Could not sort members by " + currentMemberSortColumn + "."));
-				return 0; // Return 0 to indicate no change in order
-			}
-		});
-		}
-		catch (Exception e) {
-			LOGGER.warn("Exception occurred while sorting view Member table: " + e.getMessage());
+		} catch (NoSuchFieldException e) {
+			LOGGER.error("Sort column '" + currentInsuranceSortColumn + "' not found.", e);
 		}
 	}
 
@@ -608,7 +605,22 @@ public class RecipientShowInsuranceController implements Serializable {
 			this.currentInsuranceSortColumn = null;
 			this.currentInsuranceSortDirection = null;
 			applyFilters();
-		}  catch (Exception e) {
+		} catch (HibernateException e) {
+			LOGGER.error(
+					"Controller: Database error resetting filters for recipient " + gethId() + ": " + e.getMessage(),
+					e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Database Error",
+					"Failed to reset filters due to a technical issue. Please try again."));
+			patientInsuranceList = Collections.emptyList();
+			originalInsuranceList = Collections.emptyList();
+		} catch (IllegalArgumentException e) {
+			LOGGER.warn("Controller: Data integrity issue resetting filters for recipient " + gethId()
+					+ ": Invalid enum value from DB: " + e.getMessage(), e);
+			context.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Data Issue",
+					"Filters might not have fully reset due to invalid data in our system."));
+			patientInsuranceList = Collections.emptyList();
+			originalInsuranceList = Collections.emptyList();
+		} catch (Exception e) {
 			LOGGER.warn("Exception occurred while resetting the filters: " + e.getMessage());
 			FacesContext.getCurrentInstance().addMessage(null,
 					new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error resetting filters.", null));

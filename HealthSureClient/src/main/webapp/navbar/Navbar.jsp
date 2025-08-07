@@ -1,4 +1,7 @@
-<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core"%>
+<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html"%>
+
 <link rel="stylesheet" href="/HealthSureClient/resources/css/navStyle.css" />
 
 <nav id="navbar" class="navbar navbar-transparent">
@@ -23,8 +26,12 @@
         </ul>
 
         <!-- LOGIN + SIGNUP -->
+        
+        
         <div class="auth-buttons">
-
+			 <h:panelGroup
+        rendered="#{empty sessionScope.loggedInRecipient }"
+        >
             <!-- LOGIN -->
             <div class="dropdown">
                 <button class="dropdown-button login-btn">Login ▾</button>
@@ -48,6 +55,7 @@
                     <li><a href="doctorSignup.jsp">Doctor</a></li>
                 </ul>
             </div>
+        </h:panelGroup>
         </div>
     </div>
 </nav>
