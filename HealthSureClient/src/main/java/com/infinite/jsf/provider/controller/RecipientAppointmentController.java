@@ -1,17 +1,17 @@
 /*
-* -----------------------------------------------------------------------------
-* Copyright © 2025 Infinite Computer Solution. All rights reserved.
-* -----------------------------------------------------------------------------
-*
-* @Author   : Sandhan Meher
-* @Purpose  : This class serves as the controller for managing appointment
-* details and operations from the recipient's perspective. It handles fetching,
-* filtering, sorting, and pagination of upcoming and past appointments.
-* It also provides functionality for cancelling appointments and sending
-* corresponding email notifications.
-*
-* -----------------------------------------------------------------------------
-*/
+ * -----------------------------------------------------------------------------
+ * Copyright © 2025 Infinite Computer Solution. All rights reserved.
+ * -----------------------------------------------------------------------------
+ *
+ * @Author   : Infinite Computer Solution
+ * @Purpose  : This class serves as the controller for managing appointment
+ * details and operations from the recipient's perspective. It handles fetching,
+ * filtering, sorting, and pagination of upcoming and past appointments.
+ * It also provides functionality for cancelling appointments and sending
+ * corresponding email notifications.
+ *
+ * -----------------------------------------------------------------------------
+ */
 package com.infinite.jsf.provider.controller;
 
 import java.io.Serializable;
@@ -132,6 +132,18 @@ public class RecipientAppointmentController implements Serializable {
 
 		filteredAppointments = new ArrayList<>();
 		cancellableMap.clear();
+
+		// Check for valid date range before filtering
+		if (!isFromDateBeforeToDate()) {
+			// Date range is invalid, clear filters and display message
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN,
+					"The 'From' date cannot be after the 'To' date. Resetting date filters.", null));
+			fromDate = null;
+			toDate = null;
+			// Re-run the method to apply other filters without the invalid date range
+			updateFilteredAndSortedAppointments();
+			return;
+		}
 
 		for (Appointment appt : baseList) {
 			boolean matchStatus = "ALL".equalsIgnoreCase(statusFilterType)
@@ -455,6 +467,31 @@ public class RecipientAppointmentController implements Serializable {
 		this.toDate = null;
 		updateFilteredAndSortedAppointments();
 	}
+
+	/**
+	 * Validates the date range, swapping {@code fromDate} and {@code toDate} if necessary
+	 * to ensure {@code fromDate} is not after {@code toDate}.
+	 */
+	private void validateDateRange() {
+		if (fromDate != null && toDate != null && fromDate.after(toDate)) {
+			// Swap dates to maintain a valid range and notify the user
+			Date temp = fromDate;
+			this.fromDate = toDate;
+			this.toDate = temp;
+			FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO,
+					"The entered date range is invalid — the 'From' date is later than the 'To' date.", null));
+		}
+	}
+
+	/**
+	 * Checks if the {@code fromDate} is before or equal to the {@code toDate}.
+	 *
+	 * @return {@code true} if the date range is valid, {@code false} otherwise.
+	 */
+	public boolean isFromDateBeforeToDate() {
+		return fromDate == null || toDate == null || fromDate.before(toDate) || fromDate.equals(toDate);
+	}
+
 	// ======================= GETTERS & SETTERS ========================
 
 	/**
@@ -669,8 +706,9 @@ public class RecipientAppointmentController implements Serializable {
 	 */
 	public void setFromDate(Date fromDate) {
 		this.fromDate = fromDate;
+		validateDateRange(); // Validate the date range after setting
 		this.currentPage = 0; // Reset page on filter change
-		LOGGER.info("From Date filter changed to: " + fromDate);
+		LOGGER.info("From Date filter changed to: " + this.fromDate);
 		updateFilteredAndSortedAppointments(); // Re-filter and re-paginate
 	}
 
@@ -690,15 +728,9 @@ public class RecipientAppointmentController implements Serializable {
 	 */
 	public void setToDate(Date toDate) {
 		this.toDate = toDate;
+		validateDateRange(); // Validate the date range after setting
 		this.currentPage = 0; // Reset page on filter change
-		LOGGER.info("To Date filter changed to: " + toDate);
+		LOGGER.info("To Date filter changed to: " + this.toDate);
 		updateFilteredAndSortedAppointments(); // Re-filter and re-paginate
 	}
 }
-
-
-
-
-
-
-
