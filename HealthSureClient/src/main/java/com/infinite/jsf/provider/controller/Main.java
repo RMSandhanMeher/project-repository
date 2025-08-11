@@ -14,5 +14,10 @@ public class Main {
 			System.out.println(ap.getAppointmentId());
 		}
 	}
+	public void method(String a) {
+		if(a.equals("name")) {
+			System.out.println("name ");
+		}
+	}
 
 }

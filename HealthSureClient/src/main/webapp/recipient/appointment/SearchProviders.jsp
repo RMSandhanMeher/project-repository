@@ -17,7 +17,7 @@
 <%-- Link to external Java Script file --%>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/searchdocFilter.js"></script>
-	
+
 
 </head>
 <body>
@@ -26,8 +26,11 @@
 
 	<jsp:include page="NavBar.jsp" />
 
-	<h:form id="searchForm" styleClass="main-content-panel" style="margin-top:125px;padding-bottom:10px">
-		<h2 style=" font-size: 32px;font-weight: 600;letter-spacing: -0.5px;  text-align: center;color: #0056b3;">Search for Providers🩺</h2>
+	<h:form id="searchForm" styleClass="main-content-panel"
+		style="margin-top:125px;padding-bottom:10px">
+		<h2
+			style="font-size: 32px; font-weight: 600; letter-spacing: -0.5px; text-align: center; color: #0056b3;">Search
+			for Providers🩺</h2>
 		<%-- Global messages display --%>
 		<h:messages globalOnly="true" style="color:red" />
 
@@ -342,6 +345,6 @@
 
 	</h:form>
 </body>
-<jsp:include page="/footer/Footer.jsp" />
+
 	</html>
 </f:view>
