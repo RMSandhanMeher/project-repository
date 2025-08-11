@@ -13,13 +13,14 @@ public class Appointment {
 	private Provider provider;
 	private Timestamp requestedAt;
 	private Timestamp bookedAt;
-	private Timestamp cancelledAt; // NEW
-	private Timestamp completedAt; // NEW
+	private Timestamp cancelledAt;
+	private Timestamp completedAt; 
 	private AppointmentStatus status;
 	private String notes;
 	private int slotNo;
-	private Timestamp start; // NEW
-	private Timestamp end; // NEW
+	private Timestamp start; 
+	private Timestamp end; 
+	private Set<MedicalProcedure> procedures;
 
 	public Set<MedicalProcedure> getProcedures() {
 		return procedures;
@@ -29,7 +30,6 @@ public class Appointment {
 		this.procedures = procedures;
 	}
 
-	private Set<MedicalProcedure> procedures;
 
 	// Constructors
 	public Appointment() {

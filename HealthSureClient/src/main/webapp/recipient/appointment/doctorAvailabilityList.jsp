@@ -67,7 +67,7 @@
 				<div class="flex-col-flex-1">
 					<%-- A date picker for manual date picking  --%>
 					<h2 class="section-title mb-2-spacing">Select Date</h2>
-					<div class="date-picker-input-group">
+					<div class="date-picker-input-group" style="position:relative;">
 						<h:inputText id="datePicker"
 							value="#{doctorAvailabilityController.selectedDateInput}"
 							styleClass="flatpickr-input date-input-field" />
@@ -77,7 +77,7 @@
 						<h:commandLink action="#{doctorAvailabilityController.resetDate}"
 							rendered="#{true}" styleClass="sort-icons">
 							<h:graphicImage value="/resources/media/images/icons/reset.png"
-								style="height: 25px;position: absolute;top: 250px;left: 280px;"
+								style="height: 25px;position: absolute;top: 10px;left: 150px;"
 								title="reset button" />
 						</h:commandLink>
 						<div class="message-container date-picker-message">

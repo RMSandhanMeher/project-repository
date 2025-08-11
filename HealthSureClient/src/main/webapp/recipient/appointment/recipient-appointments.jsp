@@ -101,7 +101,7 @@
 				</div>
 			</div>
 			<%-- time filter for the user appointment --%>
-			<div class="filter-grid-container" style="display: flex; flex-wrap: wrap; gap: 15px;">
+			<div class="filter-grid-container" style="display: flex; flex-wrap: wrap; gap: 15px;position:relative">
 				<div class="filter-item">
 					<label for="timeFilter" class="filter-label">Time Filter:</label>
 					<h:selectOneMenu id="timeFilter"
@@ -153,7 +153,7 @@
 						rendered="#{true}"
 						styleClass="sort-icons">
 							<h:graphicImage value="/resources/media/images/icons/reset.png"
-								style="height: 25px;position: absolute;top: 220px;right: 90px;" title="reset button" />
+								style="height: 25px;position: absolute;top: 50px;right: 10px;" title="reset button" />
 					</h:commandLink>
 			
 			</div>
