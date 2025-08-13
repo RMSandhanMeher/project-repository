@@ -500,9 +500,9 @@ public class RecipientLoginController implements Serializable{
 				}
 				String requestUri=(String)FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("requestUri");
 				if(requestUri!=null) {
-					return requestUri;
+					return requestUri+"?faces-redirect=true";
 				}
-				return "RecipientDashBoard.jsp?faces-redirect=true";
+				return "RecipientDashBoard.jsf?faces-redirect=true";
 			} else {
 				context.addMessage(null,
 						new FacesMessage(FacesMessage.SEVERITY_ERROR, "Invalid Username or Password", null));
