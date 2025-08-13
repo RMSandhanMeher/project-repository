@@ -144,7 +144,7 @@ body {
 				</h:form>
 				<h:form>
 					<h:commandButton value="Reset Password"
-						action="#{authBean.resetPassword}" styleClass="button-yellow" />
+						action="null" styleClass="button-yellow" />
 				</h:form>
 			</div>
 		</div>
