@@ -42,7 +42,7 @@
 				<div class="input-wrapper">
 					<h:selectOneMenu id="searchBy"
 						value="#{doctorSearchController.searchBy}"
-						onchange="this.form.submit()">
+						onchange="this.form.submit(this)">
 						<f:selectItems value="#{doctorSearchController.searchOptions}" />
 					</h:selectOneMenu>
 				</div>
@@ -57,7 +57,8 @@
 					<h:panelGroup id="searchValueInputDiv" layout="block"
 						styleClass="#{(doctorSearchController.searchBy eq 'specialization') ? 'hidden' : ''}">
 						<h:inputText id="searchValueInput"
-							value="#{doctorSearchController.searchValue}" />
+							value="#{doctorSearchController.searchValue}"
+							onfocus="this.setAttribute('autocomplete','off');" />
 						<br>
 						<h:message for="searchValueInput" style="color:red" />
 					</h:panelGroup>
@@ -87,11 +88,9 @@
 					<h:selectOneRadio id="searchMode"
 						value="#{doctorSearchController.searchMode}"
 						styleClass="search-mode-radios">
-						<f:selectItem itemValue="exact" itemLabel="Exact Match" />
-						<br>
-						<f:selectItem itemValue="startsWith" itemLabel="StartsWith" />
+						<f:selectItem itemValue="startsWith" itemLabel="Starts With" />
 						<f:selectItem itemValue="contains" itemLabel="Contains" />
-						<%-- Important: If doctorSearchController.searchMode is null or not matching any itemValue, none will be selected --%>
+						<%-- Important: If doctorSearchController.searchMode is null or not matching any itemValue, none will be selected & search will be exact match --%>
 					</h:selectOneRadio>
 				</h:panelGroup>
 			</div>
@@ -112,18 +111,10 @@
 
 
 		<%-- Conditional rendering for the table and its scrollable wrapper --%>
-		<h:panelGroup id="scrollableTableWrapper"
+		<h:panelGroup
 			rendered="#{doctorSearchController.searchPerformed and not empty doctorSearchController.paginatedDoctors}"
 			layout="block">
-			<%-- NEW: Wrapper div for scrolling --%>
 
-			<%-- Script to scroll only when the table and its wrapper are rendered --%>
-			<a id="results"></a>
-			<!-- ✅ Added anchor -->
-
-			<script type="text/javascript">
-				setTimeout(scrollToTable, 200);
-			</script>
 
 			<h:dataTable id="searchResultsTable"
 				value="#{doctorSearchController.paginatedDoctors}" var="doc"
@@ -318,7 +309,7 @@
 					onclick="setTimeout(function() { window.location.hash='results'; }, 10);" />
 
 
-				<h:outputText styleClass="pagination-info"
+				<h:outputText styleClass="pagination-label"
 					value="Page #{doctorSearchController.currentPage} of #{doctorSearchController.totalPages}" />
 
 				<h:commandButton value="Next »"
@@ -330,11 +321,13 @@
 			</div>
 		</h:panelGroup>
 
-
 		<%-- Messages for no search or no results --%>
 		<h:panelGroup rendered="#{not doctorSearchController.searchPerformed}">
-			<div class="not-found">Search for doctors by name,
-				specialization or address to find available appointments.</div>
+			<div class="not-found">
+				🛈 Use radio buttons to narrow your search. <br> 🛈 Click
+				Search once you've entered your criteria.<br> 🛈 Spell names
+				correctly as system will be looking for an exact match by default.
+			</div>
 		</h:panelGroup>
 
 		<h:panelGroup
