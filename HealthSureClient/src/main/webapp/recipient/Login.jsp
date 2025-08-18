@@ -96,6 +96,10 @@ input[type="text"], input[type="password"] {
 	margin-top: 16px;
 }
 </style>
+<script >
+window.addEventListener("beforeunload", function (e) { document.getElementById("login").reset();
+});
+</script>
 </head>
 <body>
 
