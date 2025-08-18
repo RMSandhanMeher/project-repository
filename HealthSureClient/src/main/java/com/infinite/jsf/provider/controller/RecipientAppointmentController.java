@@ -40,6 +40,7 @@ import com.infinite.jsf.provider.model.Doctors;
 import com.infinite.jsf.recipient.model.Recipient;
 import com.infinite.jsf.util.MailSend;
 
+
 @Named
 @ViewScoped
 public class RecipientAppointmentController implements Serializable {
