@@ -77,7 +77,7 @@
 						<h:commandLink action="#{doctorAvailabilityController.resetDate}"
 							rendered="#{true}" styleClass="sort-icons">
 							<h:graphicImage value="/resources/media/images/icons/reset.png"
-								style="height: 25px;position: absolute;top: 10px;left: 150px;"
+								style="height: 25px;position: absolute;top: 10px;left: 125px;"
 								title="reset button" />
 						</h:commandLink>
 						<div class="message-container date-picker-message">

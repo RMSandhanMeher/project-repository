@@ -78,9 +78,9 @@ to appointment and the provider
 					<h:form>
 						<!-- Action buttons -->
 						<div class="button-group">
-							<h:outputLink value="./../SearchProviders.jsf"
+							<h:outputLink value="./SearchProviders.jsf"
 								styleClass="btn btn-primary focus-ring">Book Another Appointment</h:outputLink>
-							<h:outputLink value="./../../home/Home.jsf"
+							<h:outputLink value="./../RecipientDashBoard.jsf"
 								styleClass="btn btn-secondary focus-ring">Back to Home</h:outputLink>
 						</div>
 					</h:form>
